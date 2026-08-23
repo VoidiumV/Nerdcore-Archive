@@ -278,8 +278,12 @@
   }
   .artist-card:hover{ transform:translate(-3px,-3px); box-shadow:8px 8px 0 rgba(0,0,0,0.4); border-color:var(--green); }
   .artist-card img{ width:100%; aspect-ratio:1/1; object-fit:cover; background:#0a0d1c; border-bottom:3px solid var(--border); display:block; }
-  .artist-card .name{ font-family:'Press Start 2P', monospace; font-size:12px; color:var(--green); padding:12px 10px; text-align:center; line-height:1.6; }
+  .artist-card .name{ font-family:'Press Start 2P', monospace; font-size:12px; color:var(--green); padding:12px 10px; text-align:center; line-height:1.6; word-break:break-word; overflow-wrap:anywhere; }
   .franchise-cat{ font-family:'VT323', monospace; font-size:13px; color:var(--amber); text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
+  .group-tag{ font-family:'VT323', monospace; font-size:13px; color:#5fc9ff; text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
+  .group-members-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+  .group-member-chip{ font-family:'VT323', monospace; font-size:17px; color:var(--ink); background:var(--panel-2); border:2px solid var(--border); padding:6px 13px; cursor:pointer; letter-spacing:0.3px; }
+  .group-member-chip:hover{ color:var(--green); border-color:var(--green); }
   .sort-arrow{ font-family:'VT323', monospace; font-size:20px; line-height:1; vertical-align:middle; padding:0 2px; position:relative; top:-3px; }
 
   /* ---------- artist detail toolbar (search + sort) ---------- */
@@ -525,9 +529,33 @@
   }
   .modal-btn.primary{ color:var(--green); border-color:var(--green); }
   .modal-btn.primary:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
+
+  /* ---------- initial-load overlay (hides everything, including any
+     nav tabs / home tiles / pages that end up Hidden, until Settings —
+     and therefore the Hidden Pages list — has actually loaded) ---------- */
+  #app-loading-overlay{
+    position:fixed; inset:0; z-index:10001;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px),
+      radial-gradient(circle at 20% -10%, var(--bg-a) 0%, var(--bg-b) 55%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .app-loading-inner{ text-align:center; }
+  .app-loading-title{ font-size:16px; color:var(--ink); text-shadow:2px 2px 0 var(--magenta); line-height:1.6; margin-bottom:14px; }
+  .app-loading-sub{ font-size:22px; color:var(--muted); letter-spacing:0.5px; }
 </style>
 </head>
 <body>
+
+<!-- Covers the whole site until Settings (and its Hidden Pages list) has
+     loaded, so a page/tile that's set to Hidden is never painted, even
+     for a split second, instead of flashing on then getting hidden. -->
+<div id="app-loading-overlay">
+  <div class="app-loading-inner">
+    <div class="pixel app-loading-title" id="app-loading-title">NERDCORE<br>ARCHIVE</div>
+    <div class="retro app-loading-sub">Loading&hellip;</div>
+  </div>
+</div>
 
 <div class="topbar">
   <div class="topbar-inner">
@@ -772,7 +800,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzaHULksJLEyWpnxZ2xLINaM9XHQJ50zdQZ4SqXjrOjfg7fUN_K21BfTaoVOA0ZjBdY/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbx1WPhBkfUFTnp7lobWAHDf1GZz8LxaNjGuqFPIRxjZ6gClJ1DNWCULoM8KMl34yVQt/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -837,6 +865,11 @@
     return (siteSettings && siteSettings.defaultImage) || 'https://placehold.co/220x220/141831/3dff8f?text=%3F';
   }
 
+  function hideAppLoadingOverlay() {
+    var el = document.getElementById('app-loading-overlay');
+    if (el) el.style.display = 'none';
+  }
+
   function splitCsv_(raw) {
     if (!raw) return [];
     return String(raw).split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; });
@@ -862,6 +895,7 @@
   var artistDetailSortDir = 'asc';
   var artistDetailSearchQuery = '';
   var artistDetailViewMode = 'songs'; // 'songs' | 'albums' -- which pane is shown on an artist page
+  var artistDetailIncludeMembers = false; // for group/duo/band artists -- whether songs/albums pane also includes members' solo work
 
   // ALBUMS / EPS
   var allAlbums = [];
@@ -1106,6 +1140,7 @@
     artistDetailSortDir = 'asc';
     artistDetailSearchQuery = '';
     artistDetailViewMode = 'songs';
+    artistDetailIncludeMembers = false;
     if (!lyricsLoaded) {
       document.getElementById('artist-detail-content').innerHTML = '<div class="loading">Loading&hellip;</div>';
       api('lyrics').then(function (list) {
@@ -1437,7 +1472,17 @@
       renderSocialLinks();
       applyHiddenPages_(siteSettings.hiddenPages);
       routeFromHash();
-    }).catch(function () { });
+    }).catch(function () {
+      // Settings failed to load -- we don't know the Hidden Pages list,
+      // so fall back to showing everything rather than leaving the site
+      // stuck behind the loading overlay forever.
+      routeFromHash();
+    }).then(function () {
+      // Runs after either branch above (a .then after a .catch behaves
+      // like a "finally" here) -- only reveal the site once routing has
+      // been decided with the real (or fallback) Hidden Pages state.
+      hideAppLoadingOverlay();
+    });
   }
 
   function splitArtistNames(raw) {
@@ -1495,11 +1540,13 @@
   function uniqueArtistList() {
     var pfpMap = {};
     var hiddenMap = {};
+    var groupMap = {};
     allArtists.forEach(function (a) {
       var key = normalizeArtistKey(a.artist);
       if (!key) return;
       pfpMap[key] = a.pfp;
       if (a.hidden) hiddenMap[key] = true;
+      if (!isNA(a.members)) groupMap[key] = true;
     });
     var seen = {};
     var names = [];
@@ -1533,7 +1580,7 @@
     names.sort(function (a, b) {
       return artistSortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
     });
-    return names.map(function (n) { return { artist: n, pfp: pfpMap[normalizeArtistKey(n)] || '' }; });
+    return names.map(function (n) { return { artist: n, pfp: pfpMap[normalizeArtistKey(n)] || '', isGroup: !!groupMap[normalizeArtistKey(n)] }; });
   }
 
   function renderArtistGrid() {
@@ -1543,10 +1590,12 @@
     var fallback = getFallbackImage();
     container.innerHTML = '<div class="artist-grid">' + list.map(function (a) {
       var img = a.pfp ? escapeHtml(optimizeArtUrl(a.pfp, 300)) : fallback;
+      var groupTagHtml = a.isGroup ? '<div class="group-tag">GROUP</div>' : '';
       return (
         '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
           '<img src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
+          groupTagHtml +
         '</div>'
       );
     }).join('') + '</div>';
@@ -2061,21 +2110,22 @@
   // ----------------------------------------------------------------------
   // ALBUMS / EPS (Songs/Albums toggle on artist pages + tracklist pages)
   // ----------------------------------------------------------------------
-  function uniqueArtistAlbums_(name) {
-    var key = normalizeArtistKey(name);
+  function uniqueArtistAlbums_(names) {
+    var list = Array.isArray(names) ? names : [names];
+    var keys = list.map(normalizeArtistKey);
     return allAlbums.filter(function (a) {
       if (a.hidden) return false;
-      return splitArtistNames(a.artist).some(function (n) { return normalizeArtistKey(n) === key; });
+      return splitArtistNames(a.artist).some(function (n) { return keys.indexOf(normalizeArtistKey(n)) !== -1; });
     }).sort(function (a, b) {
       if (a.dateRaw !== b.dateRaw) return b.dateRaw - a.dateRaw;
       return String(a.title || '').localeCompare(String(b.title || ''));
     });
   }
 
-  function renderArtistAlbumsPane_(name) {
+  function renderArtistAlbumsPane_(matchNames, backArtistName) {
     var pane = document.getElementById('artist-albums-pane');
     if (!pane) return;
-    var albums = uniqueArtistAlbums_(name);
+    var albums = uniqueArtistAlbums_(matchNames);
     if (!albums.length) { pane.innerHTML = '<div class="empty">No albums or EPs posted for this artist yet.</div>'; return; }
     var fallback = getFallbackImage();
     pane.innerHTML = '<div class="artist-grid">' + albums.map(function (a) {
@@ -2094,7 +2144,7 @@
 
     pane.querySelectorAll('[data-album-id]').forEach(function (card) {
       card.addEventListener('click', function () {
-        showAlbumDetail(card.getAttribute('data-album-id'), name);
+        showAlbumDetail(card.getAttribute('data-album-id'), backArtistName);
       });
     });
   }
@@ -2399,9 +2449,19 @@
     var fallback = getFallbackImage();
     var pfp = (pfpEntry && pfpEntry.pfp) ? pfpEntry.pfp : fallback;
 
+    // GROUP MEMBERS: if this artist's row in the Artists sheet has a
+    // "Group Members" value, treat it as a group/duo/band. Members are
+    // shown as clickable chips (linking to their own artist page), and a
+    // toggle lets songs/albums either stay scoped to the group name only,
+    // or also pull in anything credited directly to a member (e.g. a solo
+    // track that isn't credited to the group name at all).
+    var groupMembers = (pfpEntry && !isNA(pfpEntry.members)) ? splitArtistNames(pfpEntry.members) : [];
+    var matchNames = (groupMembers.length && artistDetailIncludeMembers) ? [name].concat(groupMembers) : [name];
+    var matchKeys = matchNames.map(normalizeArtistKey);
+
     var allSongs = allLyrics.filter(function (item) {
       return !isNA(item.artist) && splitArtistNames(item.artist).some(function (n) {
-        return normalizeArtistKey(n) === normalizeArtistKey(name);
+        return matchKeys.indexOf(normalizeArtistKey(n)) !== -1;
       });
     });
 
@@ -2420,6 +2480,41 @@
         '</div>' +
       '</div>';
 
+    var groupMembersHtml = groupMembers.length
+      ? '<div class="lyric-card" style="margin-bottom:16px;">' +
+          '<div class="lyric-body" style="padding:18px;">' +
+            '<p class="lyric-title">GROUP MEMBERS</p>' +
+            '<div class="group-members-row">' + groupMembers.map(function (m) {
+              return '<span class="group-member-chip" data-member="' + escapeHtml(m) + '">' + escapeHtml(m) + '</span>';
+            }).join('') + '</div>' +
+          '</div>' +
+        '</div>'
+      : '';
+
+    var groupToggleHtml = groupMembers.length
+      ? '<div class="subtabs" id="artist-group-toggle-tabs">' +
+          '<div class="subtab' + (!artistDetailIncludeMembers ? ' active' : '') + '" data-groupmode="group">GROUP ONLY</div>' +
+          '<div class="subtab' + (artistDetailIncludeMembers ? ' active' : '') + '" data-groupmode="groupmembers">GROUP + MEMBERS</div>' +
+        '</div>'
+      : '';
+
+    function wireGroupUi_() {
+      container.querySelectorAll('[data-member]').forEach(function (chip) {
+        chip.addEventListener('click', function () { showArtistDetail(chip.getAttribute('data-member')); });
+      });
+      var toggleTabs = document.getElementById('artist-group-toggle-tabs');
+      if (toggleTabs) {
+        toggleTabs.querySelectorAll('.subtab').forEach(function (t) {
+          t.addEventListener('click', function () {
+            var newVal = t.getAttribute('data-groupmode') === 'groupmembers';
+            if (newVal === artistDetailIncludeMembers) return;
+            artistDetailIncludeMembers = newVal;
+            renderArtistDetail(name);
+          });
+        });
+      }
+    }
+
     var viewTabs =
       '<div class="subtabs" id="artist-detail-view-tabs">' +
         '<div class="subtab' + (artistDetailViewMode === 'songs' ? ' active' : '') + '" data-artistview="songs">SONGS</div>' +
@@ -2427,20 +2522,21 @@
       '</div>';
 
     if (artistDetailViewMode === 'albums') {
-      container.innerHTML = header + viewTabs + '<div id="artist-albums-pane"><div class="loading">Loading albums&hellip;</div></div>';
+      container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + '<div id="artist-albums-pane"><div class="loading">Loading albums&hellip;</div></div>';
       wireArtistViewTabs_(name);
       wireArtistMissingSongButton_(name);
+      wireGroupUi_();
       if (!albumsLoaded) {
         api('albums').then(function (list) {
           allAlbums = list || [];
           albumsLoaded = true;
-          if (currentArtistDetail === name && artistDetailViewMode === 'albums') renderArtistAlbumsPane_(name);
+          if (currentArtistDetail === name && artistDetailViewMode === 'albums') renderArtistAlbumsPane_(matchNames, name);
         }).catch(function (err) {
           var pane = document.getElementById('artist-albums-pane');
           if (pane) renderErrorWithRetry(pane, "Couldn't load albums: " + escapeHtml(err.message || err), function () { renderArtistDetail(name); });
         });
       } else {
-        renderArtistAlbumsPane_(name);
+        renderArtistAlbumsPane_(matchNames, name);
       }
       return;
     }
@@ -2456,9 +2552,10 @@
       : '';
 
     if (!allSongs.length) {
-      container.innerHTML = header + viewTabs + featuredTile + '<div class="empty">No songs posted for this artist yet.</div>';
+      container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + '<div class="empty">No songs posted for this artist yet.</div>';
       wireArtistMissingSongButton_(name);
       wireArtistViewTabs_(name);
+      wireGroupUi_();
       var featuredTileElEmpty = document.getElementById('artist-featured-tile');
       if (featuredTileElEmpty) featuredTileElEmpty.addEventListener('click', function () { showArtistFeaturedSongs(name); });
       return;
@@ -2503,9 +2600,10 @@
       }).join('');
     }
 
-    container.innerHTML = header + viewTabs + featuredTile + toolbarRow + cardsHtml;
+    container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + toolbarRow + cardsHtml;
     wireArtistMissingSongButton_(name);
     wireArtistViewTabs_(name);
+    wireGroupUi_();
     var featuredTileEl = document.getElementById('artist-featured-tile');
     if (featuredTileEl) featuredTileEl.addEventListener('click', function () { showArtistFeaturedSongs(name); });
 
@@ -3095,7 +3193,6 @@
 
   loadSettings();
   loadDisclaimers();
-  routeFromHash();
 </script>
 </body>
 </html>
