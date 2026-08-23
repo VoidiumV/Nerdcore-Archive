@@ -3191,6 +3191,21 @@
   }
   document.addEventListener('keydown', encKeyHandler);
 
+  // The loading overlay exists purely so a Hidden-Pages nav tab / home tile
+  // never flashes into view on the HOME page before Settings (and its
+  // Hidden Pages list) has loaded. On every other route the underlying view
+  // is already hidden by default (display:none) until routeFromHash() reveals
+  // it once Settings has loaded, so there's nothing for the overlay to
+  // protect against there -- leaving it up just adds a redundant "Loading…"
+  // screen on top of that. Only keep it up when we're actually about to
+  // land on Home; otherwise drop it immediately so the page goes straight
+  // from blank to content.
+  function initialPathIsHome_() {
+    var path = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
+    return !path || path === 'home';
+  }
+  if (!initialPathIsHome_()) hideAppLoadingOverlay();
+
   loadSettings();
   loadDisclaimers();
 </script>
