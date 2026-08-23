@@ -3204,7 +3204,16 @@
     var path = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
     return !path || path === 'home';
   }
-  if (!initialPathIsHome_()) hideAppLoadingOverlay();
+  if (!initialPathIsHome_()) {
+    // view-home has no inline "display:none" in the markup (it's the one
+    // view meant to show by default), so it would otherwise flash on
+    // screen the instant the overlay above drops -- before routeFromHash()
+    // gets a chance to swap in the real route once Settings has loaded.
+    // Hiding all views now (leaving just the topbar) keeps that gap blank
+    // instead.
+    hideAllViews();
+    hideAppLoadingOverlay();
+  }
 
   loadSettings();
   loadDisclaimers();
