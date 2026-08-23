@@ -1141,11 +1141,16 @@
     artistDetailSearchQuery = '';
     artistDetailViewMode = 'songs';
     artistDetailIncludeMembers = false;
-    if (!lyricsLoaded) {
+    
+    var needLyricsForArtist = !lyricsLoaded;
+    var needArtistsForArtist = !artistsLoaded;
+    if (needLyricsForArtist || needArtistsForArtist) {
       document.getElementById('artist-detail-content').innerHTML = '<div class="loading">Loading&hellip;</div>';
-      api('lyrics').then(function (list) {
-        lyricsLoaded = true;
-        allLyrics = list || [];
+      var lyricsPromiseForArtist = needLyricsForArtist ? api('lyrics') : Promise.resolve(allLyrics);
+      var artistsPromiseForArtist = needArtistsForArtist ? api('artists').catch(function () { return []; }) : Promise.resolve(allArtists);
+      Promise.all([lyricsPromiseForArtist, artistsPromiseForArtist]).then(function (r) {
+        if (needLyricsForArtist) { allLyrics = r[0] || []; lyricsLoaded = true; }
+        if (needArtistsForArtist) { allArtists = r[1] || []; artistsLoaded = true; }
         renderArtistDetail(name);
       }).catch(function (err) {
         renderErrorWithRetry(document.getElementById('artist-detail-content'),
