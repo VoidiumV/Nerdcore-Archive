@@ -800,7 +800,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxy_Je9O97izR-vljCecTvu6XdMHPIAWSdUUUkIYi3lcqacdhUPOpJgGJD-lzv65XzN/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwitLH5i5gmTm-p1kWgThf5xYuJsAvo729JIuFmHC_Zwvx1CTJtvgqPPLcfC4V9d77p/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -2806,6 +2806,8 @@
         var typeBadge = '';
         if (item.releaseType === 'Album') typeBadge = '<span class="badge album release-type-badge">Album</span>';
         else if (item.releaseType === 'EP') typeBadge = '<span class="badge ep release-type-badge">EP</span>';
+        else if (item.releaseType === 'AMV') typeBadge = '<span class="badge amv release-type-badge">AMV</span>';
+        else if (item.releaseType === 'Streaming') typeBadge = '<span class="badge streaming release-type-badge">Streaming</span>';
         var featuredHtml = (item.featured && !isNA(item.featured))
           ? '<div class="release-featured">feat. ' + escapeHtml(item.featured) + '</div>'
           : '';
