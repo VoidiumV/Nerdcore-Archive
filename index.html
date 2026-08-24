@@ -896,41 +896,41 @@
   var currentArtistDetail = null;
   var artistDetailSortDir = 'asc';
   var artistDetailSearchQuery = '';
-  var artistDetailViewMode = 'songs'; // 'songs' | 'albums' -- which pane is shown on an artist page
-  var artistDetailIncludeMembers = false; // for group/duo/band artists -- whether songs/albums pane also includes members' solo work
+  var artistDetailViewMode = 'songs';
+  var artistDetailIncludeMembers = false; 
 
   // ALBUMS / EPS
   var allAlbums = [];
   var albumsLoaded = false;
-  var currentAlbumDetail = null;   // album id, while viewing its tracklist page
-  var albumBackArtist = null;      // artist name to return to from the album detail page's back link
+  var currentAlbumDetail = null;   
+  var albumBackArtist = null;      
   var lyricsLoaded = false;
   var releasesLoaded = false;
   var top5Loaded = false;
   var encyclopediaLoaded = false;
 
   // NEW: "Browse by Franchise" state
-  var lyricsBrowseMode = 'artist'; // 'artist' | 'franchise'
+  var lyricsBrowseMode = 'artist'; 
   var allFranchises = [];
   var allCharacters = [];
   var franchisesLoaded = false;
   var charactersLoaded = false;
   var franchiseSortDir = 'asc';
   var franchiseSearchQuery = '';
-  var currentFranchiseDetail = null;      // franchise name, while viewing its character grid
+  var currentFranchiseDetail = null;      
   var franchiseCharSortDir = 'asc';
   var franchiseCharSearchQuery = '';
-  var currentFranchiseCharDetail = null;  // {franchise, character}, while viewing a character's songs
-  var currentFranchiseAllDetail = null;   // franchise name, while viewing "all songs" for it
-  var currentFranchiseGeneralDetail = null; // franchise name, while viewing its "General / no character" songs
-  var currentFranchiseGeneralDetail = null; // franchise name, while viewing "general / no character" songs for it
-  var currentArtistFeaturedDetail = null; // artist name, while viewing songs where they're a featured artist (not the main artist)
-  var franchiseSongsSortDir = 'asc';        // direction for the current primary sort field (song title, or artist name)
-  var franchiseSongsSortField = 'song';     // 'song' | 'artist'
-  var franchiseSongsArtistSecondaryDir = 'asc'; // when sortField is 'artist', direction used for song titles within each artist
+  var currentFranchiseCharDetail = null; 
+  var currentFranchiseAllDetail = null;   
+  var currentFranchiseGeneralDetail = null;
+  var currentFranchiseGeneralDetail = null; 
+  var currentArtistFeaturedDetail = null; 
+  var franchiseSongsSortDir = 'asc';       
+  var franchiseSongsSortField = 'song';   
+  var franchiseSongsArtistSecondaryDir = 'asc';
   var franchiseSongsSearchQuery = '';
 
-  // FLOATING PLAYER LOGIC
+  // FLOATING PLAYER
   function openFloatingPlayer(url) {
     if (!url) return;
     var player = document.getElementById('floating-player');
@@ -946,7 +946,7 @@
     player.style.display = 'none';
   });
 
-  // BUG / QUALITY REPORT MODAL
+  // BUG / QUALITY REPORT
   var bugReportContext = null;
 
     function openBugReportModal(context) {
