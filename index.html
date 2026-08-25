@@ -288,7 +288,7 @@
   .group-member-chip:hover{ color:var(--green); border-color:var(--green); }
   .sort-arrow{ font-family:'VT323', monospace; font-size:20px; line-height:1; vertical-align:middle; padding:0 2px; position:relative; top:-3px; }
 
-  /* ---------- artist detail toolbar (search + sort) ---------- */
+  /* ---------- artist detail toolbar ---------- */
   .artist-detail-toolbar{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
   .artist-detail-search{ flex:1; min-width:180px; }
 
@@ -472,7 +472,7 @@
   }
   .enc-jump-row input:focus{ border-color:var(--green); }
 
-  /* ---------- DRAGGABLE + RESIZABLE FLOATING PLAYER WIDGET ---------- */
+  /* ---------- DRAGGABLE + RESIZABLE FLOATING PLAYER ---------- */
   #floating-player{
     position:fixed; bottom:20px; right:20px; z-index:9999;
     width:340px; height:236px; min-width:220px; min-height:150px;
@@ -496,7 +496,7 @@
       linear-gradient(135deg, transparent 0 50%, var(--green) 50% 58%, transparent 58% 66%, var(--green) 66% 74%, transparent 74% 82%, var(--green) 82% 90%, transparent 90% 100%);
   }
 
-  /* ---------- report-an-issue modal ---------- */
+  /* ---------- report-an-issue ---------- */
   .modal-overlay{
     position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:10000;
     display:none; align-items:center; justify-content:center; padding:20px;
@@ -532,9 +532,6 @@
   .modal-btn.primary{ color:var(--green); border-color:var(--green); }
   .modal-btn.primary:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
 
-  /* ---------- initial-load overlay (hides everything, including any
-     nav tabs / home tiles / pages that end up Hidden, until Settings —
-     and therefore the Hidden Pages list — has actually loaded) ---------- */
   #app-loading-overlay{
     position:fixed; inset:0; z-index:10001;
     background:
@@ -548,7 +545,7 @@
 </style>
 </head>
 <body>
-  
+
 <div id="app-loading-overlay">
   <div class="app-loading-inner">
     <div class="pixel app-loading-title" id="app-loading-title">NERDCORE<br>ARCHIVE</div>
@@ -615,7 +612,7 @@
   </div>
 </div>
 
-<!-- LYRICS = ARTIST PROFILE GRID / FRANCHISE BROWSE -->
+<!-- LYRICS -->
 <div class="page" id="view-lyrics-list" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
   <div class="page-head">
@@ -762,7 +759,7 @@
   <div id="about-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
-<!-- FLOATING PLAYER CONTAINER -->
+<!-- FLOATING PLAYER -->
 <div id="floating-player">
   <div id="floating-player-header">
     <span>&#9654; MEDIA PLAYER</span>
@@ -774,7 +771,7 @@
   <div id="floating-player-resize-handle" title="Drag to resize"></div>
 </div>
 
-<!-- BUG / QUALITY REPORT MODAL -->
+<!-- BUG / QUALITY REPORT -->
 <div class="modal-overlay" id="bug-report-overlay">
   <div class="modal-box">
     <h3 id="bug-report-modal-title">REPORT AN ISSUE</h3>
@@ -799,7 +796,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxIj6KK0RvFLxqVfUMGIKSVrK2tftFWRNcG9uJk7rKiaguztwfgKXA2Y8XJbUQDxkfd/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyTRrJYc8KWvs5NURkUoqNs9HMkhDMWW2VdV_hBJH0gbaYi-j6uTNZFILF3vqvO3uCP/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -860,6 +857,9 @@
     var c = String(val).trim().toUpperCase();
     return c === '' || c === 'N/A' || c === 'NA';
   }
+  function isHiddenVariantRow_(item) {
+    return !!(item && item.isVariant && item.mainId);
+  }
   function getFallbackImage() {
     return (siteSettings && siteSettings.defaultImage) || 'https://placehold.co/220x220/141831/3dff8f?text=%3F';
   }
@@ -900,13 +900,18 @@
   var allAlbums = [];
   var albumsLoaded = false;
   var currentAlbumDetail = null;   
-  var albumBackArtist = null;      
+  var albumBackArtist = null;     
   var lyricsLoaded = false;
+
+  var currentLyricPost = null;
+  var currentLyricViewVariantLabel = null;
+  var currentLyricViewAltLabel = null;
+  var currentLyricAltCache = {};
+
   var releasesLoaded = false;
   var top5Loaded = false;
   var encyclopediaLoaded = false;
 
-  // NEW: "Browse by Franchise" state
   var lyricsBrowseMode = 'artist'; 
   var allFranchises = [];
   var allCharacters = [];
@@ -914,20 +919,20 @@
   var charactersLoaded = false;
   var franchiseSortDir = 'asc';
   var franchiseSearchQuery = '';
-  var currentFranchiseDetail = null;      
+  var currentFranchiseDetail = null;    
   var franchiseCharSortDir = 'asc';
   var franchiseCharSearchQuery = '';
-  var currentFranchiseCharDetail = null; 
+  var currentFranchiseCharDetail = null;  
   var currentFranchiseAllDetail = null;   
-  var currentFranchiseGeneralDetail = null;
   var currentFranchiseGeneralDetail = null; 
+  var currentFranchiseGeneralDetail = null;
   var currentArtistFeaturedDetail = null; 
   var franchiseSongsSortDir = 'asc';       
   var franchiseSongsSortField = 'song';   
-  var franchiseSongsArtistSecondaryDir = 'asc';
+  var franchiseSongsArtistSecondaryDir = 'asc'; 
   var franchiseSongsSearchQuery = '';
 
-  // FLOATING PLAYER
+  // FLOATING PLAYER 
   function openFloatingPlayer(url) {
     if (!url) return;
     var player = document.getElementById('floating-player');
@@ -1172,13 +1177,13 @@
       }).catch(function () { charactersLoaded = true; });
     }
   }
-  function showLyricsDetail(id) {
+  function showLyricsDetail(id, initialVariant) {
     hideAllViews();
     document.getElementById('view-lyrics-detail').style.display = '';
     setActiveTab('lyrics');
-    setPath('lyric-' + id);
+    setPath('lyric-' + id + (initialVariant ? '/variant/' + encodeURIComponent(initialVariant) : ''));
     document.getElementById('lyrics-detail-content').innerHTML = '<div class="loading">Loading lyrics&hellip;</div>';
-    loadLyricDetail(id);
+    loadLyricDetail(id, initialVariant);
   }
   function showEncyclopedia() {
     hideAllViews();
@@ -1294,7 +1299,16 @@
     if (path.indexOf('artist-featured-') === 0) { showArtistFeaturedSongs(decodeURIComponent(path.slice(16))); return; }
     if (path.indexOf('album-') === 0) { showAlbumDetail(decodeURIComponent(path.slice(6))); return; }
     if (path.indexOf('artist-') === 0) { showArtistDetail(decodeURIComponent(path.slice(7))); return; }
-    if (path.indexOf('lyric-') === 0) { showLyricsDetail(path.slice(6)); return; }
+    if (path.indexOf('lyric-') === 0) {
+      var lyricRest = path.slice(6);
+      var variantSplit = lyricRest.indexOf('/variant/');
+      if (variantSplit !== -1) {
+        showLyricsDetail(lyricRest.slice(0, variantSplit), decodeURIComponent(lyricRest.slice(variantSplit + 9)));
+      } else {
+        showLyricsDetail(lyricRest);
+      }
+      return;
+    }
     if (path.indexOf('franchise/') === 0) {
       var rest = path.slice('franchise/'.length);
       var segs = rest.split('/');
@@ -1400,7 +1414,7 @@
     }
   }
 
-    // HIDDEN PAGES (driven by Settings > "Hidden Pages")
+    // HIDDEN PAGES 
   var hiddenRoutesMap = {};
 
   function isRouteHidden_(route) {
@@ -1477,14 +1491,8 @@
       applyHiddenPages_(siteSettings.hiddenPages);
       routeFromHash();
     }).catch(function () {
-      // Settings failed to load -- we don't know the Hidden Pages list,
-      // so fall back to showing everything rather than leaving the site
-      // stuck behind the loading overlay forever.
       routeFromHash();
     }).then(function () {
-      // Runs after either branch above (a .then after a .catch behaves
-      // like a "finally" here) -- only reveal the site once routing has
-      // been decided with the real (or fallback) Hidden Pages state.
       hideAppLoadingOverlay();
     });
   }
@@ -1499,9 +1507,6 @@
     return String(name || '').replace(/\s+/g, ' ').trim().toLowerCase();
   }
 
-  // Matches a search query against a song's primary artist(s) and
-  // featured artist(s), so the search box can find songs by collaborator
-  // or featured-artist name, not just by title.
   function songArtistsMatchQuery_(item, q) {
     if (!isNA(item.artist) && String(item.artist).toLowerCase().indexOf(q) !== -1) return true;
     if (!isNA(item.featured) && String(item.featured).toLowerCase().indexOf(q) !== -1) return true;
@@ -1565,15 +1570,8 @@
       names.push(name);
     }
 
-    // 1) Anyone explicitly listed in the Artists sheet gets a tile right away --
-    //    even if they don't have a song as the main artist yet (e.g. so far they've
-    //    only shown up as a Featured Artist, or you're adding them ahead of time).
     allArtists.forEach(function (a) { addArtistName_(a.artist); });
 
-    // 2) Anyone who's the main artist OR a featured artist on any Lyrics row.
-    //    (Previously this only looked at the main "Artist Name" column, so an artist
-    //    who only ever appears in "Featured Artist(s)" never got their own tile here,
-    //    even though visiting their page directly by URL always worked.)
     allLyrics.forEach(function (item) {
       if (!isNA(item.artist)) splitArtistNames(item.artist).forEach(addArtistName_);
       if (!isNA(item.featured)) splitArtistNames(item.featured).forEach(addArtistName_);
@@ -1749,7 +1747,7 @@
   function franchiseSongs_(name) {
     var key = normalizeArtistKey(name);
     return allLyrics.filter(function (item) {
-      return !isNA(item.franchise) && splitCsv_(item.franchise).some(function (f) { return normalizeArtistKey(f) === key; });
+      return !isHiddenVariantRow_(item) && !isNA(item.franchise) && splitCsv_(item.franchise).some(function (f) { return normalizeArtistKey(f) === key; });
     });
   }
 
@@ -1950,7 +1948,7 @@
     function render() {
       var fKey = normalizeArtistKey(franchise), cKey = normalizeArtistKey(character);
       var songs = allLyrics.filter(function (item) {
-        return !isNA(item.franchise) && !isNA(item.character) &&
+        return !isHiddenVariantRow_(item) && !isNA(item.franchise) && !isNA(item.character) &&
           splitCsv_(item.franchise).some(function (f) { return normalizeArtistKey(f) === fKey; }) &&
           splitCsv_(item.character).some(function (c) { return normalizeArtistKey(c) === cKey; });
       });
@@ -2057,12 +2055,12 @@
   }
 
   // ----------------------------------------------------------------------
-  // ARTIST "FEATURED ON" SONGS (songs where this artist appears in the
-  // Featured Artist(s) column but isn't the main artist)
+  // Featured Artist(s)
   // ----------------------------------------------------------------------
   function featuredSongsForArtist_(name) {
     var key = normalizeArtistKey(name);
     return allLyrics.filter(function (item) {
+      if (isHiddenVariantRow_(item)) return false;
       if (isNA(item.featured)) return false;
       var inFeatured = splitArtistNames(item.featured).some(function (f) { return normalizeArtistKey(f) === key; });
       if (!inFeatured) return false;
@@ -2112,7 +2110,7 @@
   }
 
   // ----------------------------------------------------------------------
-  // ALBUMS / EPS (Songs/Albums toggle on artist pages + tracklist pages)
+  // ALBUMS / EPS 
   // ----------------------------------------------------------------------
   function uniqueArtistAlbums_(names) {
     var list = Array.isArray(names) ? names : [names];
@@ -2209,14 +2207,6 @@
     var fallback = getFallbackImage();
     var img = album.cover ? optimizeArtUrl(album.cover, 440) : fallback;
 
-    // Tracks are matched to this album by its Album ID (from the Albums
-    // tab's "Album ID" column, or the row-number fallback if that was left
-    // blank), never by title text or artist overlap -- so two different
-    // albums that happen to share a title, even across two completely
-    // different artists, can never get mixed up. The comparison is
-    // case/whitespace-insensitive since Album IDs are free text you choose.
-    // See parseAlbumTrackCell_ in code.gs for how the Lyrics "Album Track"
-    // cell is read.
     var albumIdKey = normalizeArtistKey(album.id);
     var tracks = allLyrics.filter(function (item) {
       return !isNA(item.albumId) && normalizeArtistKey(item.albumId) === albumIdKey;
@@ -2264,15 +2254,22 @@
           var tImg = item.cover ? escapeHtml(optimizeArtUrl(item.cover, 160)) : fallback;
           var lockedClass = item.isLocked ? ' locked' : '';
           var numLabel = (item.trackNum === null || item.trackNum === undefined) ? '\u2014' : item.trackNum;
+          var isVariantTrack = isHiddenVariantRow_(item);
+          var mainAttrs = isVariantTrack
+            ? ' data-main-id="' + escapeHtml(item.mainId) + '" data-variant-label="' + escapeHtml(item.variantLabel || '') + '"'
+            : '';
+          var variantBadge = isVariantTrack
+            ? '<span class="badge ep">' + escapeHtml(String(item.variantLabel || '').toUpperCase()) + '</span>'
+            : '';
           return (
-            '<div class="track-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '">' +
+            '<div class="track-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '"' + mainAttrs + '>' +
               '<div class="track-num">' + escapeHtml(String(numLabel)) + '</div>' +
               '<img class="lyric-cover" src="' + tImg + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
               '<div class="lyric-body">' +
                 '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
                 '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
                 (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-                (item.isLocked ? '<div class="lyric-meta-row"><span class="badge locked">Locked</span></div>' : '') +
+                '<div class="lyric-meta-row">' + variantBadge + (item.isLocked ? '<span class="badge locked">Locked</span>' : '') + '</div>' +
               '</div>' +
             '</div>'
           );
@@ -2283,7 +2280,9 @@
     container.querySelectorAll('.track-card[data-id]').forEach(function (card) {
       card.addEventListener('click', function () {
         if (card.getAttribute('data-locked') === 'true') return;
-        showLyricsDetail(card.getAttribute('data-id'));
+        var mainId = card.getAttribute('data-main-id');
+        if (mainId) showLyricsDetail(mainId, card.getAttribute('data-variant-label') || null);
+        else showLyricsDetail(card.getAttribute('data-id'));
       });
     });
   }
@@ -2382,7 +2381,7 @@
     if (sortFieldToggle) {
       sortFieldToggle.addEventListener('click', function () {
         franchiseSongsSortField = franchiseSongsSortField === 'song' ? 'artist' : 'song';
-        franchiseSongsSortDir = 'asc'; // reset direction when switching what's being sorted
+        franchiseSongsSortDir = 'asc'; 
         renderFranchiseSongsPage_(title, subtitle, songsForPage, heroImage);
       });
     }
@@ -2444,7 +2443,6 @@
   }
 
   // ARTIST DETAIL
-    // ARTIST DETAIL
   function renderArtistDetail(name) {
     var container = document.getElementById('artist-detail-content');
     var pfpEntry = allArtists.filter(function (a) {
@@ -2452,19 +2450,12 @@
     })[0];
     var fallback = getFallbackImage();
     var pfp = (pfpEntry && pfpEntry.pfp) ? pfpEntry.pfp : fallback;
-
-    // GROUP MEMBERS: if this artist's row in the Artists sheet has a
-    // "Group Members" value, treat it as a group/duo/band. Members are
-    // shown as clickable chips (linking to their own artist page), and a
-    // toggle lets songs/albums either stay scoped to the group name only,
-    // or also pull in anything credited directly to a member (e.g. a solo
-    // track that isn't credited to the group name at all).
     var groupMembers = (pfpEntry && !isNA(pfpEntry.members)) ? splitArtistNames(pfpEntry.members) : [];
     var matchNames = (groupMembers.length && artistDetailIncludeMembers) ? [name].concat(groupMembers) : [name];
     var matchKeys = matchNames.map(normalizeArtistKey);
 
     var allSongs = allLyrics.filter(function (item) {
-      return !isNA(item.artist) && splitArtistNames(item.artist).some(function (n) {
+      return !isHiddenVariantRow_(item) && !isNA(item.artist) && splitArtistNames(item.artist).some(function (n) {
         return matchKeys.indexOf(normalizeArtistKey(n)) !== -1;
       });
     });
@@ -2651,54 +2642,64 @@
     else showLyricsList();
   });
 
-  function loadLyricDetail(id) {
+  function loadLyricDetail(id, initialVariant) {
     var lyricPromise = api('lyric', { id: id });
     var franPromise = franchisesLoaded ? Promise.resolve(allFranchises) : api('franchises').catch(function () { return []; });
     var charsPromise = charactersLoaded ? Promise.resolve(allCharacters) : api('characters').catch(function () { return []; });
     Promise.all([lyricPromise, franPromise, charsPromise]).then(function (r) {
       if (!franchisesLoaded) { allFranchises = r[1] || []; franchisesLoaded = true; }
       if (!charactersLoaded) { allCharacters = r[2] || []; charactersLoaded = true; }
-      renderLyricDetail(r[0]);
+      var post = r[0];
+      if (post && post.redirectId) {
+        showLyricsDetail(post.redirectId, post.redirectVariant || initialVariant);
+        return;
+      }
+      renderLyricDetail(post, initialVariant);
     }).catch(function (err) {
       renderErrorWithRetry(document.getElementById('lyrics-detail-content'),
-        "Couldn't load this page: " + escapeHtml(err.message || err), function () { loadLyricDetail(id); });
+        "Couldn't load this page: " + escapeHtml(err.message || err), function () { loadLyricDetail(id, initialVariant); });
     });
   }
 
-  function toSpotifyEmbedUrl(url) {
-    if (!url) return '';
-    var m = String(url).match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/i);
-    if (!m) return '';
-    return 'https://open.spotify.com/embed/' + m[1] + '/' + m[2];
+  function renderLyricDetail(post, initialVariant) {
+    currentLyricPost = post || null;
+    currentLyricViewVariantLabel = (post && post.variants && initialVariant &&
+      post.variants.some(function (v) { return v.label === initialVariant; })) ? initialVariant : null;
+    currentLyricViewAltLabel = null;
+    currentLyricAltCache = {};
+    renderLyricDetailBody_();
   }
 
-  function toAppleMusicEmbedUrl(url) {
-    if (!url) return '';
-    return String(url).replace(/^https?:\/\/music\.apple\.com/i, 'https://embed.music.apple.com');
-  }
-
-  function renderLyricDetail(post) {
+  function renderLyricDetailBody_() {
+    var post = currentLyricPost;
     var container = document.getElementById('lyrics-detail-content');
     if (!post) { container.innerHTML = '<div class="empty">Not found.</div>'; return; }
     if (post.isLocked) { container.innerHTML = '<div class="empty">This one is locked until its release date.</div>'; return; }
 
     var fallback = getFallbackImage();
-    var img = post.cover ? optimizeArtUrl(post.cover, 440) : fallback;
+
+    var activeVariant = null;
+    if (currentLyricViewVariantLabel && post.variants) {
+      activeVariant = post.variants.filter(function (v) { return v.label === currentLyricViewVariantLabel; })[0] || null;
+    }
+    var src = activeVariant || post;
+
+    var img = src.cover ? optimizeArtUrl(src.cover, 440) : (post.cover ? optimizeArtUrl(post.cover, 440) : fallback);
 
     var streamBtns = '';
-    if (post.spotify) {
-      var spotifyEmbed = toSpotifyEmbedUrl(post.spotify);
+    if (src.spotify) {
+      var spotifyEmbed = toSpotifyEmbedUrl(src.spotify);
       streamBtns += spotifyEmbed
         ? '<button class="stream-btn spotify" onclick="openFloatingPlayer(\'' + escapeHtml(spotifyEmbed) + '\')">&#9654; Spotify</button>'
-        : '<a class="stream-btn spotify" href="' + escapeHtml(post.spotify) + '" target="_blank" rel="noopener">&#9654; Spotify</a>';
+        : '<a class="stream-btn spotify" href="' + escapeHtml(src.spotify) + '" target="_blank" rel="noopener">&#9654; Spotify</a>';
     }
-    if (post.apple) {
-      var appleEmbed = toAppleMusicEmbedUrl(post.apple);
+    if (src.apple) {
+      var appleEmbed = toAppleMusicEmbedUrl(src.apple);
       streamBtns += appleEmbed
         ? '<button class="stream-btn apple" onclick="openFloatingPlayer(\'' + escapeHtml(appleEmbed) + '\')">&#9654; Apple Music</button>'
-        : '<a class="stream-btn apple" href="' + escapeHtml(post.apple) + '" target="_blank" rel="noopener">&#9654; Apple Music</a>';
+        : '<a class="stream-btn apple" href="' + escapeHtml(src.apple) + '" target="_blank" rel="noopener">&#9654; Apple Music</a>';
     }
-    if (post.youtube) streamBtns += '<button class="stream-btn youtube" onclick="openFloatingPlayer(\'' + escapeHtml(post.youtube) + '\')">&#9654; Watch Video</button>';
+    if (src.youtube) streamBtns += '<button class="stream-btn youtube" onclick="openFloatingPlayer(\'' + escapeHtml(src.youtube) + '\')">&#9654; Watch Video</button>';
 
     var tagsHtml = '';
     if (!isNA(post.franchise) || !isNA(post.character)) {
@@ -2729,19 +2730,56 @@
       tagsHtml = '<div class="lyric-meta-row" style="margin-top:10px;">' + tagBits.join(' ') + '</div>';
     }
 
+    var displayTitle = post.title + (activeVariant ? ' (' + activeVariant.label + ')' : '');
+
+    // VERSION TOGGLE (Original / Sped Up / Slowed / etc.) -- swaps audio +
+    // cover + lyrics all together, since these are different masters.
+    var versionToggleHtml = '';
+    if (post.variants && post.variants.length) {
+      var activeStyle = ' style="cursor:pointer; text-decoration:underline; font-weight:700;"';
+      var inactiveStyle = ' style="cursor:pointer;"';
+      var vChips = ['<span class="badge album" data-version-label=""' + (!currentLyricViewVariantLabel ? activeStyle : inactiveStyle) + '>ORIGINAL</span>'];
+      post.variants.forEach(function (v) {
+        var isActive = currentLyricViewVariantLabel === v.label;
+        vChips.push('<span class="badge album" data-version-label="' + escapeHtml(v.label) + '"' + (isActive ? activeStyle : inactiveStyle) + '>' + escapeHtml(v.label.toUpperCase()) + '</span>');
+      });
+      versionToggleHtml = '<div class="lyric-meta-row" style="margin-top:10px;">' + vChips.join(' ') + '</div>';
+    }
+
+    // ALT LYRICS TOGGLE (e.g. "English Translation") -- swaps ONLY the
+    // lyrics text; audio/cover/everything else stays on whichever version
+    // is currently active above.
+    var altToggleHtml = '';
+    if (post.altLyrics && post.altLyrics.length) {
+      var altActiveStyle = ' style="cursor:pointer; text-decoration:underline; font-weight:700;"';
+      var altInactiveStyle = ' style="cursor:pointer;"';
+      var aChips = ['<span class="badge ep" data-alt-label=""' + (!currentLyricViewAltLabel ? altActiveStyle : altInactiveStyle) + '>ORIGINAL LYRICS</span>'];
+      post.altLyrics.forEach(function (a) {
+        var isActive = currentLyricViewAltLabel === a.label;
+        aChips.push('<span class="badge ep" data-alt-label="' + escapeHtml(a.label) + '"' + (isActive ? altActiveStyle : altInactiveStyle) + '>' + escapeHtml(a.label.toUpperCase()) + '</span>');
+      });
+      altToggleHtml = '<div class="lyric-meta-row" style="margin-top:8px;">' + aChips.join(' ') + '</div>';
+    }
+
+    var lyricsBodyHtml = currentLyricViewAltLabel
+      ? (currentLyricAltCache[currentLyricViewAltLabel] || '<div class="loading">Loading translation&hellip;</div>')
+      : (post.contentHtml || '<p><i>No lyrics added yet.</i></p>');
+
     container.innerHTML =
       '<div class="detail-hero">' +
         '<span class="report-btn-corner" id="lyric-report-btn">&#9873; REPORT ISSUE</span>' +
         '<img class="detail-hero-img" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
-          '<h1 class="detail-title">' + escapeHtml(post.title) + '</h1>' +
-          '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(post.dateStr) + '</span></div>' +
+          '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
+          '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span></div>' +
           (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + escapeHtml(post.featured) + '</span></div>' : '') +
           tagsHtml +
+          versionToggleHtml +
+          altToggleHtml +
         '</div>' +
       '</div>' +
       (streamBtns ? '<div class="stream-row">' + streamBtns + '</div>' : '') +
-      '<div class="lyrics-content">' + (post.contentHtml || '<p><i>No lyrics added yet.</i></p>') + '</div>';
+      '<div class="lyrics-content" id="lyrics-content-body">' + lyricsBodyHtml + '</div>';
 
     var reportBtn = document.getElementById('lyric-report-btn');
     if (reportBtn) {
@@ -2760,6 +2798,48 @@
         else showFranchiseDetail(el.getAttribute('data-tag-character'));
       });
     });
+
+    container.querySelectorAll('[data-version-label]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var label = el.getAttribute('data-version-label');
+        if (label === currentLyricViewVariantLabel || (!label && !currentLyricViewVariantLabel)) return;
+        currentLyricViewVariantLabel = label || null;
+        setPath('lyric-' + post.id + (currentLyricViewVariantLabel ? '/variant/' + encodeURIComponent(currentLyricViewVariantLabel) : ''));
+        renderLyricDetailBody_();
+      });
+    });
+
+    container.querySelectorAll('[data-alt-label]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var label = el.getAttribute('data-alt-label') || null;
+        if (label === currentLyricViewAltLabel) return;
+        currentLyricViewAltLabel = label;
+        if (currentLyricViewAltLabel && !currentLyricAltCache[currentLyricViewAltLabel]) {
+          renderLyricDetailBody_(); // shows the "Loading translation..." placeholder immediately
+          api('lyricAlt', { id: post.id, label: currentLyricViewAltLabel }).then(function (r) {
+            currentLyricAltCache[currentLyricViewAltLabel] = (r && r.contentHtml) || '<p><i>Couldn\'t load this version.</i></p>';
+            if (currentLyricViewAltLabel === label) renderLyricDetailBody_();
+          }).catch(function () {
+            currentLyricAltCache[currentLyricViewAltLabel] = '<p><i>Couldn\'t load this version.</i></p>';
+            if (currentLyricViewAltLabel === label) renderLyricDetailBody_();
+          });
+          return;
+        }
+        renderLyricDetailBody_();
+      });
+    });
+  }
+
+  function toSpotifyEmbedUrl(url) {
+    if (!url) return '';
+    var m = String(url).match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/i);
+    if (!m) return '';
+    return 'https://open.spotify.com/embed/' + m[1] + '/' + m[2];
+  }
+
+  function toAppleMusicEmbedUrl(url) {
+    if (!url) return '';
+    return String(url).replace(/^https?:\/\/music\.apple\.com/i, 'https://embed.music.apple.com');
   }
 
   // RELEASES
@@ -3197,26 +3277,11 @@
   }
   document.addEventListener('keydown', encKeyHandler);
 
-  // The loading overlay exists purely so a Hidden-Pages nav tab / home tile
-  // never flashes into view on the HOME page before Settings (and its
-  // Hidden Pages list) has loaded. On every other route the underlying view
-  // is already hidden by default (display:none) until routeFromHash() reveals
-  // it once Settings has loaded, so there's nothing for the overlay to
-  // protect against there -- leaving it up just adds a redundant "Loading…"
-  // screen on top of that. Only keep it up when we're actually about to
-  // land on Home; otherwise drop it immediately so the page goes straight
-  // from blank to content.
   function initialPathIsHome_() {
     var path = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
     return !path || path === 'home';
   }
   if (!initialPathIsHome_()) {
-    // view-home has no inline "display:none" in the markup (it's the one
-    // view meant to show by default), so it would otherwise flash on
-    // screen the instant the overlay above drops -- before routeFromHash()
-    // gets a chance to swap in the real route once Settings has loaded.
-    // Hiding all views now (leaving just the topbar) keeps that gap blank
-    // instead.
     hideAllViews();
     hideAppLoadingOverlay();
   }
