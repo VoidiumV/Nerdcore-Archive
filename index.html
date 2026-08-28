@@ -829,7 +829,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyTRrJYc8KWvs5NURkUoqNs9HMkhDMWW2VdV_hBJH0gbaYi-j6uTNZFILF3vqvO3uCP/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxuccm47ZBSsttJXo8wWHhYrcvpy3S5rqp3ingWCH0e5tl66VkSbwapFz0SWXFfLvKf/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -891,7 +891,7 @@
     return c === '' || c === 'N/A' || c === 'NA';
   }
   function isHiddenVariantRow_(item) {
-    return !!(item && item.isVariant && item.mainId);
+    return !!(item && ((item.isVariant && item.mainId) || (item.isLyricVariant && item.lyricMainId)));
   }
   function getFallbackImage() {
     return (siteSettings && siteSettings.defaultImage) || 'https://placehold.co/220x220/141831/3dff8f?text=%3F';
@@ -1205,13 +1205,15 @@
       }).catch(function () { charactersLoaded = true; });
     }
   }
-  function showLyricsDetail(id, initialVariant) {
+  function showLyricsDetail(id, initialVariant, initialAlt) {
     hideAllViews();
     document.getElementById('view-lyrics-detail').style.display = '';
     setActiveTab('lyrics');
-    setPath('lyric-' + id + (initialVariant ? '/variant/' + encodeURIComponent(initialVariant) : ''));
+    setPath('lyric-' + id +
+      (initialVariant ? '/variant/' + encodeURIComponent(initialVariant) : '') +
+      (initialAlt ? '/alt/' + encodeURIComponent(initialAlt) : ''));
     document.getElementById('lyrics-detail-content').innerHTML = '<div class="loading">Loading lyrics&hellip;</div>';
-    loadLyricDetail(id, initialVariant);
+    loadLyricDetail(id, initialVariant, initialAlt);
   }
   function showEncyclopedia() {
     hideAllViews();
@@ -1327,12 +1329,15 @@
     if (path.indexOf('artist-') === 0) { showArtistDetail(decodeURIComponent(path.slice(7))); return; }
     if (path.indexOf('lyric-') === 0) {
       var lyricRest = path.slice(6);
-      var variantSplit = lyricRest.indexOf('/variant/');
-      if (variantSplit !== -1) {
-        showLyricsDetail(lyricRest.slice(0, variantSplit), decodeURIComponent(lyricRest.slice(variantSplit + 9)));
-      } else {
-        showLyricsDetail(lyricRest);
-      }
+      var vIdx = lyricRest.indexOf('/variant/');
+      var aIdx = lyricRest.indexOf('/alt/');
+      var cutIdxs = [lyricRest.length];
+      if (vIdx !== -1) cutIdxs.push(vIdx);
+      if (aIdx !== -1) cutIdxs.push(aIdx);
+      var lyricId = lyricRest.slice(0, Math.min.apply(null, cutIdxs));
+      var variantLabel = (vIdx !== -1) ? decodeURIComponent(lyricRest.slice(vIdx + 9, aIdx > vIdx ? aIdx : undefined)) : null;
+      var altLabel = (aIdx !== -1) ? decodeURIComponent(lyricRest.slice(aIdx + 5, vIdx > aIdx ? vIdx : undefined)) : null;
+      showLyricsDetail(lyricId, variantLabel, altLabel);
       return;
     }
     if (path.indexOf('franchise/') === 0) {
@@ -2665,7 +2670,7 @@
     else showLyricsList();
   });
 
-  function loadLyricDetail(id, initialVariant) {
+  function loadLyricDetail(id, initialVariant, initialAlt) {
     var lyricPromise = api('lyric', { id: id });
     var franPromise = franchisesLoaded ? Promise.resolve(allFranchises) : api('franchises').catch(function () { return []; });
     var charsPromise = charactersLoaded ? Promise.resolve(allCharacters) : api('characters').catch(function () { return []; });
@@ -2674,21 +2679,22 @@
       if (!charactersLoaded) { allCharacters = r[2] || []; charactersLoaded = true; }
       var post = r[0];
       if (post && post.redirectId) {
-        showLyricsDetail(post.redirectId, post.redirectVariant || initialVariant);
+        showLyricsDetail(post.redirectId, post.redirectVariant || initialVariant, post.redirectAlt || initialAlt);
         return;
       }
-      renderLyricDetail(post, initialVariant);
+      renderLyricDetail(post, initialVariant, initialAlt);
     }).catch(function (err) {
       renderErrorWithRetry(document.getElementById('lyrics-detail-content'),
-        "Couldn't load this page: " + escapeHtml(err.message || err), function () { loadLyricDetail(id, initialVariant); });
+        "Couldn't load this page: " + escapeHtml(err.message || err), function () { loadLyricDetail(id, initialVariant, initialAlt); });
     });
   }
 
-  function renderLyricDetail(post, initialVariant) {
+  function renderLyricDetail(post, initialVariant, initialAlt) {
     currentLyricPost = post || null;
     currentLyricViewVariantLabel = (post && post.variants && initialVariant &&
       post.variants.some(function (v) { return v.label === initialVariant; })) ? initialVariant : null;
-    currentLyricViewAltLabel = null;
+    currentLyricViewAltLabel = (post && post.altLyrics && initialAlt &&
+      post.altLyrics.some(function (a) { return a.label === initialAlt; })) ? initialAlt : null;
     currentLyricAltCache = {};
     renderLyricDetailBody_();
   }
@@ -2774,7 +2780,7 @@
       var aButtons = ['<button type="button" class="version-toggle-btn' + (!currentLyricViewAltLabel ? ' active' : '') + '" data-alt-label="">ORIGINAL LYRICS</button>'];
       post.altLyrics.forEach(function (a) {
         var isActive = currentLyricViewAltLabel === a.label;
-        aButtons.push('<button type="button" class="version-toggle-btn' + (isActive ? ' active' : '') + '" data-alt-label="' + escapeHtml(a.label) + '">' + escapeHtml(a.label.toUpperCase()) + '</button>');
+        aButtons.push('<button type="button" class="version-toggle-btn' + (isActive ? ' active' : '') + '" data-alt-label="' + escapeHtml(a.label) + '" data-alt-id="' + escapeHtml(a.id) + '">' + escapeHtml(a.label.toUpperCase()) + '</button>');
       });
       altSectionHtml =
         '<div class="version-toggle-section alt-section">' +
@@ -2821,12 +2827,18 @@
       });
     });
 
+    function setLyricDetailPath_() {
+      setPath('lyric-' + post.id +
+        (currentLyricViewVariantLabel ? '/variant/' + encodeURIComponent(currentLyricViewVariantLabel) : '') +
+        (currentLyricViewAltLabel ? '/alt/' + encodeURIComponent(currentLyricViewAltLabel) : ''));
+    }
+
     container.querySelectorAll('[data-version-label]').forEach(function (el) {
       el.addEventListener('click', function () {
         var label = el.getAttribute('data-version-label');
         if (label === currentLyricViewVariantLabel || (!label && !currentLyricViewVariantLabel)) return;
         currentLyricViewVariantLabel = label || null;
-        setPath('lyric-' + post.id + (currentLyricViewVariantLabel ? '/variant/' + encodeURIComponent(currentLyricViewVariantLabel) : ''));
+        setLyricDetailPath_();
         renderLyricDetailBody_();
       });
     });
@@ -2834,11 +2846,13 @@
     container.querySelectorAll('[data-alt-label]').forEach(function (el) {
       el.addEventListener('click', function () {
         var label = el.getAttribute('data-alt-label') || null;
+        var altId = el.getAttribute('data-alt-id') || null;
         if (label === currentLyricViewAltLabel) return;
         currentLyricViewAltLabel = label;
-        if (currentLyricViewAltLabel && !currentLyricAltCache[currentLyricViewAltLabel]) {
+        setLyricDetailPath_();
+        if (currentLyricViewAltLabel && altId && !currentLyricAltCache[currentLyricViewAltLabel]) {
           renderLyricDetailBody_();
-          api('lyricAlt', { id: post.id, label: currentLyricViewAltLabel }).then(function (r) {
+          api('lyricAlt', { id: altId }).then(function (r) {
             currentLyricAltCache[currentLyricViewAltLabel] = (r && r.contentHtml) || '<p><i>Couldn\'t load this version.</i></p>';
             if (currentLyricViewAltLabel === label) renderLyricDetailBody_();
           }).catch(function () {
