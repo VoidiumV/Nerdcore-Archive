@@ -822,7 +822,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbw2xOBCZ66R1vyDNk0iXCBALtvwSUKgOUTud5qT-sfMg31dXJWfIJ72-3lhKkVj8HXT/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycby-MiCu3maCJabeyYPEwZfT7ibSHZ0Znlrg7RiBXRPjPL16Q_MJT18a67E0kvVMgd1C/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -2756,8 +2756,9 @@
           '<div class="version-toggle-row">' + vButtons.join('') + '</div>' +
         '</div>';
     }
-
-    var lyricsBodyHtml = post.contentHtml || '<p><i>No lyrics added yet.</i></p>';
+      var lyricsBodyHtml = (activeVariant && activeVariant.kind === 'bracket' && activeVariant.contentHtml)
+        ? activeVariant.contentHtml
+        : (post.contentHtml || '<p><i>No lyrics added yet.</i></p>');
 
     container.innerHTML =
       '<div class="detail-hero">' +
