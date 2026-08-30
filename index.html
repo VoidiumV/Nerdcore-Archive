@@ -658,6 +658,10 @@
   </div>
 
   <div class="subpane active" id="browsepane-artist">
+    <div class="subtabs" id="artist-group-tabs" style="margin-bottom:18px;">
+      <div class="subtab active" data-artistgroup="nerdcore">NERDCORE ARTISTS</div>
+      <div class="subtab" data-artistgroup="friends">FRIENDS OF NERDCORE</div>
+    </div>
     <input type="text" class="search-box" id="artist-search" placeholder="Search artists&hellip;" style="width:100%; margin-bottom:18px;">
     <div style="display:flex; justify-content:flex-end; margin-bottom:18px;">
       <div class="nav-tab" id="artist-sort-toggle">SORT: A<span class="sort-arrow">&#8594;</span>Z</div>
@@ -826,7 +830,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzyjpGfVERkS6e3dszbhYKzNuffF7_DAyrleEWev8HN6tjW03q6y6_WWLXV14VVeQUS/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzXocaYeUunGg_X1pH8zqv3a5ak_gupfAM63fH6cDj_t9__PfCFgPRSOoxgRLjxRKK0/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -920,6 +924,7 @@
   var artistsLoaded = false;
   var artistSortDir = 'asc';
   var artistSearchQuery = '';
+  var artistGroupMode = 'nerdcore'; // 'nerdcore' or 'friends' -- see #artist-group-tabs
   var currentArtistDetail = null;
   var artistDetailSortDir = 'asc';
   var artistDetailSearchQuery = '';
@@ -1572,12 +1577,14 @@
     var pfpMap = {};
     var hiddenMap = {};
     var groupMap = {};
+    var friendMap = {};
     allArtists.forEach(function (a) {
       var key = normalizeArtistKey(a.artist);
       if (!key) return;
       pfpMap[key] = a.pfp;
       if (a.hidden) hiddenMap[key] = true;
       if (!isNA(a.members)) groupMap[key] = true;
+      if (a.friend) friendMap[key] = true;
     });
     var seen = {};
     var names = [];
@@ -1600,6 +1607,15 @@
       if (!isNA(item.producer)) splitArtistNames(item.producer).forEach(addArtistName_);
     });
 
+    // Split by the "Friend of Nerdcore" flag (Artists sheet TRUE/FALSE
+    // column). Anyone not explicitly marked TRUE -- including artists
+    // that only show up via the Lyrics tab and aren't in the Artists
+    // sheet at all -- defaults to the main "Nerdcore Artists" group.
+    names = names.filter(function (n) {
+      var isFriend = !!friendMap[normalizeArtistKey(n)];
+      return artistGroupMode === 'friends' ? isFriend : !isFriend;
+    });
+
     var q = artistSearchQuery.trim().toLowerCase();
     if (q) names = names.filter(function (n) { return n.toLowerCase().indexOf(q) !== -1; });
     names.sort(function (a, b) {
@@ -1611,7 +1627,12 @@
   function renderArtistGrid() {
     var container = document.getElementById('artist-grid-content');
     var list = uniqueArtistList();
-    if (!list.length) { container.innerHTML = '<div class="empty">No artists found.</div>'; return; }
+    if (!list.length) {
+      container.innerHTML = '<div class="empty">' +
+        (artistGroupMode === 'friends' ? 'No friends of nerdcore tagged yet.' : 'No artists found.') +
+        '</div>';
+      return;
+    }
     var fallback = getFallbackImage();
     container.innerHTML = '<div class="artist-grid">' + list.map(function (a) {
       var img = a.pfp ? escapeHtml(optimizeArtUrl(a.pfp, 300)) : fallback;
@@ -1640,6 +1661,17 @@
       t = setTimeout(function () { fn.apply(ctx, args); }, waitMs);
     };
   }
+
+  document.querySelectorAll('#artist-group-tabs .subtab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var mode = tab.getAttribute('data-artistgroup');
+      if (mode === artistGroupMode) return;
+      artistGroupMode = mode;
+      document.querySelectorAll('#artist-group-tabs .subtab').forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      renderArtistGrid();
+    });
+  });
 
   document.getElementById('artist-search').addEventListener('input', debounce_(function () {
     artistSearchQuery = this.value;
