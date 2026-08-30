@@ -296,6 +296,12 @@
   .sync-btn.nudge{ padding:7px 10px; color:var(--muted); border-color:var(--border); }
   .sync-btn.stop{ color:var(--magenta); border-color:var(--magenta); }
   .sync-status{ font-family:'VT323', monospace; font-size:16px; color:var(--muted-dim); }
+  .sync-secondary-link{
+    font-family:'VT323', monospace; font-size:16px; color:var(--muted-dim);
+    cursor:pointer; text-decoration:underline; text-underline-offset:2px;
+    align-self:center; letter-spacing:0.3px;
+  }
+  .sync-secondary-link:hover{ color:var(--muted); }
   .sync-offset-controls{ display:flex; align-items:center; gap:6px; }
 
   .synced-lines{
@@ -871,7 +877,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyV2g4rFpDbfGnEUFDOS_Y9Tf1Ozpbu6I9Fy-QI5u1RVaRKizl5K7RkVYuoR6qDCcSM/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyQLpayWCiBk7c4Ovr4JgNKBPc9otnlEMz_3eA84E9dkAFciw-0GoZPTYbSImbO4bWH/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -3088,7 +3094,8 @@
   function syncedLyricsContentShellHtml_() {
     return (
       '<div class="synced-sync-bar" id="synced-sync-bar">' +
-        '<button type="button" class="sync-btn" id="sync-manual-btn">&#9654; TAP WHEN PLAYBACK STARTS</button>' +
+        '<button type="button" class="sync-btn" id="sync-autoplay-btn">&#9654; AUTO-PLAY &amp; SYNC</button>' +
+        '<span class="sync-secondary-link" id="sync-manual-btn">Already playing it? Tap here instead</span>' +
         '<button type="button" class="sync-btn yt" id="sync-yt-btn" style="display:none;">&#128260; AUTO-SYNC WITH VIDEO</button>' +
         '<span class="sync-status" id="sync-status"></span>' +
         '<div class="sync-offset-controls" id="sync-offset-controls" style="display:none;">' +
@@ -3135,6 +3142,8 @@
   }
 
   function wireSyncedSyncBar_() {
+    var autoplayBtn = document.getElementById('sync-autoplay-btn');
+    if (autoplayBtn) autoplayBtn.onclick = autoSyncStart_;
     var manualBtn = document.getElementById('sync-manual-btn');
     if (manualBtn) manualBtn.onclick = startManualSync_;
     var ytBtn = document.getElementById('sync-yt-btn');
@@ -3150,14 +3159,64 @@
     updateSyncControlsVisibility_();
   }
 
+  // Opens the best available embed for this song (Spotify -> YouTube ->
+  // Apple Music, in that order) in the floating player and immediately
+  // starts syncing against it -- no separate "open the player" step.
+  //   - YouTube: openFloatingPlayer() already appends autoplay=1 (see
+  //     parseYouTubeEmbedUrl_ server-side) and kicks off the postMessage
+  //     "listening" handshake, so once that's attached we switch to the
+  //     REAL auto-synced clock (startYoutubeSyncMode_) instead of a
+  //     guessed one.
+  //   - Spotify: opened with ?autoplay=1 on the embed URL. Whether that
+  //     actually autoplays depends on the browser's autoplay policy --
+  //     since this only runs from a direct button click it usually
+  //     works, but isn't guaranteed everywhere (e.g. some mobile
+  //     browsers still block it).
+  //   - Apple Music: their embed doesn't support an autoplay parameter,
+  //     so this just opens the player and the listener taps play there.
+  // Spotify and Apple Music embeds don't expose playback position to us
+  // at all (see the SYNCED LYRICS comment block in Code.gs), so both of
+  // those fall back to the same manual "assume playback starts now"
+  // clock as the secondary "already playing it?" link -- just kicked off
+  // automatically the instant the embed opens, instead of requiring a
+  // second tap.
+  function autoSyncStart_() {
+    var post = currentLyricPost;
+    if (!post) return;
+
+    var candidates = [];
+    var spotifyEmbed = toSpotifyEmbedUrl(post.spotify, true);
+    if (spotifyEmbed) candidates.push({ type: 'spotify', embed: spotifyEmbed });
+    if (post.youtube) candidates.push({ type: 'youtube', embed: post.youtube });
+    var appleEmbed = toAppleMusicEmbedUrl(post.apple);
+    if (appleEmbed) candidates.push({ type: 'apple', embed: appleEmbed });
+
+    if (!candidates.length) {
+      var statusEl = document.getElementById('sync-status');
+      if (statusEl) statusEl.textContent = "No Spotify, YouTube, or Apple Music link on this song to auto-play.";
+      return;
+    }
+
+    var chosen = candidates[0];
+    openFloatingPlayer(chosen.embed);
+
+    if (chosen.type === 'youtube') {
+      setTimeout(startYoutubeSyncMode_, 900);
+    } else {
+      startManualSync_();
+    }
+  }
+
   // Shows/hides the auto-sync (YouTube) button + the running offset/stop
   // controls depending on whether a YouTube embed is currently open in
   // the floating player and whether a sync clock is currently running.
   function updateSyncControlsVisibility_() {
     var ytBtn = document.getElementById('sync-yt-btn');
-    if (ytBtn) ytBtn.style.display = currentFloatingIsYoutube ? '' : 'none';
+    if (ytBtn) ytBtn.style.display = (currentFloatingIsYoutube && !syncManualRunning) ? '' : 'none';
     var offsetControls = document.getElementById('sync-offset-controls');
     if (offsetControls) offsetControls.style.display = syncManualRunning ? 'flex' : 'none';
+    var autoplayBtn = document.getElementById('sync-autoplay-btn');
+    if (autoplayBtn) autoplayBtn.style.display = syncManualRunning ? 'none' : '';
     var manualBtn = document.getElementById('sync-manual-btn');
     if (manualBtn) manualBtn.style.display = syncManualRunning ? 'none' : '';
   }
@@ -3234,11 +3293,12 @@
     statusEl.textContent = (syncUsingYoutube ? 'Auto-synced \u2014 ' : 'Manual \u2014 ') + mm + ':' + (ss < 10 ? '0' : '') + ss + offsetTxt;
   }
 
-  function toSpotifyEmbedUrl(url) {
+  function toSpotifyEmbedUrl(url, autoplay) {
     if (!url) return '';
     var m = String(url).match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(track|album|playlist|episode|show)\/([A-Za-z0-9]+)/i);
     if (!m) return '';
-    return 'https://open.spotify.com/embed/' + m[1] + '/' + m[2];
+    var embed = 'https://open.spotify.com/embed/' + m[1] + '/' + m[2];
+    return autoplay ? embed + '?autoplay=1' : embed;
   }
 
   function toAppleMusicEmbedUrl(url) {
