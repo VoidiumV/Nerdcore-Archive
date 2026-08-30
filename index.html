@@ -210,6 +210,10 @@
     margin-top:8px; line-height:1.5; white-space:normal; overflow-wrap:break-word; word-break:break-word;
   }
   .detail-featured .feat-name{ color:var(--amber); font-weight:normal; }
+  .detail-producer{
+    font-family:'VT323', monospace; font-size:16px; color:var(--muted-dim);
+    margin-top:6px; line-height:1.5; white-space:normal; overflow-wrap:break-word; word-break:break-word;
+  }
   @media(max-width:620px){
     .detail-hero{ flex-direction:column; }
     .detail-hero-img{ width:100%; height:220px; border-right:none; border-bottom:3px solid var(--border); }
@@ -822,7 +826,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyIIyncpbS8UNzJ_LKnyFOArCTNyowG3ztNCNGvvp88UU4vt1M-LCKt3GkfpvP5a_LQ/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwKx28xFUNaLUybwfqQlRHldxLSAOLr8rowkMhkKdlo75Xznzn7lR7BdmB7MRLK0Rmg/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -950,6 +954,7 @@
   var currentFranchiseGeneralDetail = null;
   var currentFranchiseGeneralDetail = null;
   var currentArtistFeaturedDetail = null;
+  var currentArtistProducedDetail = null;
   var franchiseSongsSortDir = 'asc';
   var franchiseSongsSortField = 'song';
   var franchiseSongsArtistSecondaryDir = 'asc';
@@ -1145,6 +1150,7 @@
     currentFranchiseAllDetail = null;
     currentFranchiseGeneralDetail = null;
     currentArtistFeaturedDetail = null;
+    currentArtistProducedDetail = null;
     if (!lyricsLoaded) loadLyrics(); else loadArtistsData();
     if (lyricsBrowseMode === 'franchise' && !franchisesLoaded) loadFranchiseBrowse();
   }
@@ -1159,6 +1165,7 @@
     currentFranchiseAllDetail = null;
     currentFranchiseGeneralDetail = null;
     currentArtistFeaturedDetail = null;
+    currentArtistProducedDetail = null;
     currentAlbumDetail = null;
     artistDetailSortDir = 'asc';
     artistDetailSearchQuery = '';
@@ -1307,6 +1314,7 @@
 
     var isLyricsFamily = path === 'lyrics' ||
       path.indexOf('artist-featured-') === 0 ||
+      path.indexOf('artist-produced-') === 0 ||
       path.indexOf('album-') === 0 ||
       path.indexOf('artist-') === 0 ||
       path.indexOf('lyric-') === 0 ||
@@ -1315,6 +1323,7 @@
 
     if (path === 'lyrics') { showLyricsList(); return; }
     if (path.indexOf('artist-featured-') === 0) { showArtistFeaturedSongs(decodeURIComponent(path.slice(16))); return; }
+    if (path.indexOf('artist-produced-') === 0) { showArtistProducedSongs(decodeURIComponent(path.slice(16))); return; }
     if (path.indexOf('album-') === 0) { showAlbumDetail(decodeURIComponent(path.slice(6))); return; }
     if (path.indexOf('artist-') === 0) { showArtistDetail(decodeURIComponent(path.slice(7))); return; }
     if (path.indexOf('lyric-') === 0) {
@@ -1588,6 +1597,7 @@
     allLyrics.forEach(function (item) {
       if (!isNA(item.artist)) splitArtistNames(item.artist).forEach(addArtistName_);
       if (!isNA(item.featured)) splitArtistNames(item.featured).forEach(addArtistName_);
+      if (!isNA(item.producer)) splitArtistNames(item.producer).forEach(addArtistName_);
     });
 
     var q = artistSearchQuery.trim().toLowerCase();
@@ -1827,6 +1837,7 @@
     currentFranchiseGeneralDetail = null;
     currentArtistDetail = null;
     currentArtistFeaturedDetail = null;
+    currentArtistProducedDetail = null;
     franchiseCharSortDir = 'asc';
     franchiseCharSearchQuery = '';
 
@@ -1953,6 +1964,7 @@
     currentFranchiseGeneralDetail = null;
     currentArtistDetail = null;
     currentArtistFeaturedDetail = null;
+    currentArtistProducedDetail = null;
     franchiseSongsSortDir = 'asc';
     franchiseSongsSortField = 'song';
     franchiseSongsArtistSecondaryDir = 'asc';
@@ -1998,6 +2010,7 @@
     currentFranchiseGeneralDetail = null;
     currentArtistDetail = null;
     currentArtistFeaturedDetail = null;
+    currentArtistProducedDetail = null;
     franchiseSongsSortDir = 'asc';
     franchiseSongsSortField = 'song';
     franchiseSongsArtistSecondaryDir = 'asc';
@@ -2037,6 +2050,7 @@
     currentFranchiseCharDetail = null;
     currentArtistDetail = null;
     currentArtistFeaturedDetail = null;
+    currentArtistProducedDetail = null;
     franchiseSongsSortDir = 'asc';
     franchiseSongsSortField = 'song';
     franchiseSongsArtistSecondaryDir = 'asc';
@@ -2088,6 +2102,7 @@
     setActiveTab('lyrics');
     setPath('artist-featured-' + encodeURIComponent(name));
     currentArtistFeaturedDetail = name;
+    currentArtistProducedDetail = null;
     currentFranchiseCharDetail = null;
     currentFranchiseAllDetail = null;
     currentFranchiseGeneralDetail = null;
@@ -2116,6 +2131,66 @@
       }).catch(function (err) {
         renderErrorWithRetry(document.getElementById('franchise-songs-content'),
           "Couldn't load songs: " + escapeHtml(err.message || err), function () { showArtistFeaturedSongs(name); });
+      });
+    } else {
+      render();
+    }
+  }
+
+  // ----------------------------------------------------------------------
+  // PRODUCER(S) -- same idea as Featured Artist(s) above, except:
+  //   - never shown on lyric-card list views (song lists, album tracklists,
+  //     franchise/character song lists, artist song lists)
+  //   - DOES show up on the song's own lyrics detail page, but in muted
+  //     text (see .detail-producer CSS) rather than the bright amber used
+  //     for Featured Artist(s)
+  //   - a producer's own artist page gets a "PRODUCED X SONGS" section,
+  //     the same way an artist page shows "ALSO FEATURED ON X SONGS"
+  // ----------------------------------------------------------------------
+  function producedSongsForArtist_(name) {
+    var key = normalizeArtistKey(name);
+    return allLyrics.filter(function (item) {
+      if (isHiddenVariantRow_(item)) return false;
+      if (isNA(item.producer)) return false;
+      return splitArtistNames(item.producer).some(function (p) { return normalizeArtistKey(p) === key; });
+    });
+  }
+
+  function showArtistProducedSongs(name) {
+    hideAllViews();
+    document.getElementById('view-franchise-songs').style.display = '';
+    setActiveTab('lyrics');
+    setPath('artist-produced-' + encodeURIComponent(name));
+    currentArtistProducedDetail = name;
+    currentArtistFeaturedDetail = null;
+    currentFranchiseCharDetail = null;
+    currentFranchiseAllDetail = null;
+    currentFranchiseGeneralDetail = null;
+    currentArtistDetail = null;
+    franchiseSongsSortDir = 'asc';
+    franchiseSongsSortField = 'song';
+    franchiseSongsArtistSecondaryDir = 'asc';
+    franchiseSongsSearchQuery = '';
+
+    function render() {
+      var pfpEntry = allArtists.filter(function (a) { return normalizeArtistKey(a.artist) === normalizeArtistKey(name); })[0];
+      var heroImg = (pfpEntry && pfpEntry.pfp) ? pfpEntry.pfp : getFallbackImage();
+      renderFranchiseSongsPage_(name, 'Produced by', producedSongsForArtist_(name), heroImg);
+    }
+
+    var needLyrics = !lyricsLoaded;
+    var needArtists = !artistsLoaded;
+    if (needLyrics || needArtists) {
+      document.getElementById('franchise-songs-content').innerHTML = '<div class="loading">Loading&hellip;</div>';
+      var lyricsPromise = needLyrics ? api('lyrics') : Promise.resolve(allLyrics);
+      var artistsPromise = needArtists ? api('artists').catch(function () { return []; }) : Promise.resolve(allArtists);
+      Promise.all([lyricsPromise, artistsPromise]).then(function (r) {
+        if (needLyrics) { allLyrics = r[0] || []; lyricsLoaded = true; }
+        if (needArtists) { allArtists = r[1] || []; artistsLoaded = true; }
+        render();
+      }).catch(function (err) {
+        renderErrorWithRetry(document.getElementById('franchise-songs-content'),
+          "Couldn't load songs: " + escapeHtml(err.message || err), function () { showArtistProducedSongs(name); });
       });
     } else {
       render();
@@ -2187,6 +2262,7 @@
     currentFranchiseAllDetail = null;
     currentFranchiseGeneralDetail = null;
     currentArtistFeaturedDetail = null;
+    currentArtistProducedDetail = null;
     currentArtistDetail = null;
     currentAlbumDetail = id;
     if (backArtist) albumBackArtist = backArtist;
@@ -2439,6 +2515,7 @@
     else if (currentFranchiseGeneralDetail) showFranchiseDetail(currentFranchiseGeneralDetail);
     else if (currentFranchiseAllDetail) showFranchiseDetail(currentFranchiseAllDetail);
     else if (currentArtistFeaturedDetail) showArtistDetail(currentArtistFeaturedDetail);
+    else if (currentArtistProducedDetail) showArtistDetail(currentArtistProducedDetail);
     else showLyricsList();
   });
 
@@ -2559,13 +2636,25 @@
         '</div>'
       : '';
 
+    var producedSongsList = producedSongsForArtist_(name);
+    var producedTile = producedSongsList.length
+      ? '<div class="lyric-card" id="artist-produced-tile" style="margin-bottom:22px;">' +
+          '<div class="lyric-body" style="padding:18px;">' +
+            '<p class="lyric-title">&#9654; PRODUCED ' + producedSongsList.length + (producedSongsList.length === 1 ? ' SONG' : ' SONGS') + '</p>' +
+            '<p class="lyric-artist">Songs where ' + escapeHtml(name) + ' is credited as producer</p>' +
+          '</div>' +
+        '</div>'
+      : '';
+
     if (!allSongs.length) {
-      container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + '<div class="empty">No songs posted for this artist yet.</div>';
+      container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + producedTile + '<div class="empty">No songs posted for this artist yet.</div>';
       wireArtistMissingSongButton_(name);
       wireArtistViewTabs_(name);
       wireGroupUi_();
       var featuredTileElEmpty = document.getElementById('artist-featured-tile');
       if (featuredTileElEmpty) featuredTileElEmpty.addEventListener('click', function () { showArtistFeaturedSongs(name); });
+      var producedTileElEmpty = document.getElementById('artist-produced-tile');
+      if (producedTileElEmpty) producedTileElEmpty.addEventListener('click', function () { showArtistProducedSongs(name); });
       return;
     }
 
@@ -2608,12 +2697,14 @@
       }).join('');
     }
 
-    container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + toolbarRow + cardsHtml;
+    container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + producedTile + toolbarRow + cardsHtml;
     wireArtistMissingSongButton_(name);
     wireArtistViewTabs_(name);
     wireGroupUi_();
     var featuredTileEl = document.getElementById('artist-featured-tile');
     if (featuredTileEl) featuredTileEl.addEventListener('click', function () { showArtistFeaturedSongs(name); });
+    var producedTileEl = document.getElementById('artist-produced-tile');
+    if (producedTileEl) producedTileEl.addEventListener('click', function () { showArtistProducedSongs(name); });
 
     var sortToggle = document.getElementById('artist-detail-sort-toggle');
     if (sortToggle) {
@@ -2650,6 +2741,7 @@
     else if (currentFranchiseGeneralDetail) showFranchiseGeneralSongs(currentFranchiseGeneralDetail);
     else if (currentFranchiseAllDetail) showFranchiseAllSongs(currentFranchiseAllDetail);
     else if (currentArtistFeaturedDetail) showArtistFeaturedSongs(currentArtistFeaturedDetail);
+    else if (currentArtistProducedDetail) showArtistProducedSongs(currentArtistProducedDetail);
     else if (currentAlbumDetail) showAlbumDetail(currentAlbumDetail, albumBackArtist);
     else if (currentArtistDetail) showArtistDetail(currentArtistDetail);
     else showLyricsList();
@@ -2768,6 +2860,7 @@
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
           '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span></div>' +
           (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + escapeHtml(post.featured) + '</span></div>' : '') +
+          (post.producer && !isNA(post.producer) ? '<div class="detail-producer">Produced by ' + escapeHtml(post.producer) + '</div>' : '') +
           tagsHtml +
         '</div>' +
       '</div>' +
