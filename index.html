@@ -871,7 +871,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwSNBOTK5T9FebMgZEnRLiG1Zb6nzxOb1Ebsjo89LmGPgTv29217NarlEOra3cm624D/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyV2g4rFpDbfGnEUFDOS_Y9Tf1Ozpbu6I9Fy-QI5u1RVaRKizl5K7RkVYuoR6qDCcSM/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -3109,7 +3109,7 @@
       wireSyncedSyncBar_();
       return;
     }
-    api('syncedLyrics', { title: post.title }).then(function (data) {
+    api('syncedLyrics', { title: post.title, artist: post.artist }).then(function (data) {
       if (!currentLyricPost || currentLyricPost.id !== post.id) return; // navigated away meanwhile
       syncedLyricsData = (data && data.found) ? data.lines : [];
       syncedLyricsLoadedForId = post.id;
