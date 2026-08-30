@@ -878,7 +878,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwoLX0Lb9iKi_wn8RgWJvVgwW-lGpseAY0ous9mAYuTFJ02hdEVa36ibDB4v9fvoIqp/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzE06fhZ2G0rv3j0ui-_rMzS22cgS4m7E8UFFJ9coOT_3lfKhrKnngdqseVPiYR-fNh/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -972,7 +972,7 @@
   var artistsLoaded = false;
   var artistSortDir = 'asc';
   var artistSearchQuery = '';
-  var artistGroupMode = 'nerdcore'; // 'nerdcore' or 'friends' -- see #artist-group-tabs
+  var artistGroupMode = 'nerdcore'; 
   var currentArtistDetail = null;
   var artistDetailSortDir = 'asc';
   var artistDetailSearchQuery = '';
@@ -989,8 +989,8 @@
   var currentLyricViewVariantLabel = null;
 
   // ---- synced lyrics state ----
-  var lyricsViewMode = 'text'; // 'text' or 'synced'
-  var syncedLyricsData = null; // parsed lines for the currently-open song
+  var lyricsViewMode = 'text';
+  var syncedLyricsData = null;
   var syncedLyricsLoadedForId = null;
   var syncedRafId = null;
   var syncManualRunning = false;
@@ -1001,8 +1001,8 @@
   var ytListenInterval = null;
   var syncUsingYoutube = false;
   var syncedTickInterval = null;
-  var syncedAudioUrl = null; // direct-playable audio URL for the current song's synced lyrics, if provided
-  var syncedAudioEl = null;  // the <audio> element driving playback-accurate sync, when in use
+  var syncedAudioUrl = null; 
+  var syncedAudioEl = null;  
 
   var releasesLoaded = false;
   var top5Loaded = false;
@@ -1040,8 +1040,6 @@
 
     var finalUrl = url;
     if (currentFloatingIsYoutube) {
-      // enablejsapi + origin are needed for the embedded player to accept
-      // our postMessage "listening" handshake below.
       var sep = url.indexOf('?') === -1 ? '?' : '&';
       finalUrl = url + sep + 'enablejsapi=1&origin=' + encodeURIComponent(window.location.origin);
     }
@@ -1055,13 +1053,6 @@
   // ----------------------------------------------------------------------
   // BEST-EFFORT YOUTUBE PLAYBACK-POSITION LISTENING (for synced lyrics)
   // ----------------------------------------------------------------------
-  // YouTube's embedded iframe player broadcasts periodic "infoDelivery"
-  // postMessage events (including currentTime) once it receives a
-  // "listening" handshake message from us. This needs no external script
-  // and no player object -- just enablejsapi=1 on the src (set above) and
-  // pinging "listening" every second or so. It's undocumented/best-effort:
-  // if YouTube ever changes this, synced lyrics just fall back to the
-  // always-available manual "tap to sync" mode further down.
   function startYoutubeListening_() {
     var iframe = document.getElementById('floating-player-iframe');
     if (!iframe || !currentFloatingIsYoutube) return;
@@ -1734,10 +1725,6 @@
       if (!isNA(item.producer)) splitArtistNames(item.producer).forEach(addArtistName_);
     });
 
-    // Split by the "Friend of Nerdcore" flag (Artists sheet TRUE/FALSE
-    // column). Anyone not explicitly marked TRUE -- including artists
-    // that only show up via the Lyrics tab and aren't in the Artists
-    // sheet at all -- defaults to the main "Nerdcore Artists" group.
     names = names.filter(function (n) {
       var isFriend = !!friendMap[normalizeArtistKey(n)];
       return artistGroupMode === 'friends' ? isFriend : !isFriend;
@@ -2297,14 +2284,7 @@
   }
 
   // ----------------------------------------------------------------------
-  // PRODUCER(S) -- same idea as Featured Artist(s) above, except:
-  //   - never shown on lyric-card list views (song lists, album tracklists,
-  //     franchise/character song lists, artist song lists)
-  //   - DOES show up on the song's own lyrics detail page, but in muted
-  //     text (see .detail-producer CSS) rather than the bright amber used
-  //     for Featured Artist(s)
-  //   - a producer's own artist page gets a "PRODUCED X SONGS" section,
-  //     the same way an artist page shows "ALSO FEATURED ON X SONGS"
+  // PRODUCER(S)
   // ----------------------------------------------------------------------
   function producedSongsForArtist_(name) {
     var key = normalizeArtistKey(name);
@@ -3011,10 +2991,6 @@
         ? activeVariant.contentHtml
         : (post.contentHtml || '<p><i>No lyrics added yet.</i></p>');
 
-    // Synced lyrics only apply to the ORIGINAL version -- a "(Sped Up)"
-    // audio swap or a "[Remix]" with its own lyrics doc wouldn't line up
-    // with timing captured for the main track, so the toggle only shows
-    // up while no variant is selected.
     var canShowSynced = !!(post.hasSynced && !activeVariant);
     if (!canShowSynced) { lyricsViewMode = 'text'; stopManualSync_(); }
 
@@ -3136,15 +3112,6 @@
     }).join('');
   }
 
-  // Builds the sync control bar. If this song has a direct playable audio
-  // URL (see the "Audio URL" column on the Synced Lyrics sheet tab), we use
-  // a real <audio> element as the single source of truth for playback
-  // position -- this is what actually fixes drift and "lyrics keep going
-  // after I paused" issues, since we're reading the real currentTime/paused
-  // state straight off the browser's own media element instead of guessing
-  // with a local clock. Falls back to the old manual/YouTube-postMessage
-  // sync (see autoSyncStart_ / startManualSync_ / startYoutubeSyncMode_
-  // above) for songs that don't have an Audio URL configured yet.
   function buildSyncBar_() {
     var bar = document.getElementById('synced-sync-bar');
     if (!bar) return;
@@ -3190,10 +3157,6 @@
     updateSyncControlsVisibility_();
   }
 
-  // Reads the REAL current time / paused state directly off the <audio>
-  // element on every relevant event -- no local clock, no drift, and
-  // lyrics naturally freeze the instant playback is paused because
-  // timeupdate simply stops firing while paused.
   function onSyncedAudioUpdate_() {
     var el = syncedAudioEl;
     if (!el) return;
@@ -3206,27 +3169,6 @@
     }
   }
 
-  // Opens the best available embed for this song (Spotify -> YouTube ->
-  // Apple Music, in that order) in the floating player and immediately
-  // starts syncing against it -- no separate "open the player" step.
-  //   - YouTube: openFloatingPlayer() already appends autoplay=1 (see
-  //     parseYouTubeEmbedUrl_ server-side) and kicks off the postMessage
-  //     "listening" handshake, so once that's attached we switch to the
-  //     REAL auto-synced clock (startYoutubeSyncMode_) instead of a
-  //     guessed one.
-  //   - Spotify: opened with ?autoplay=1 on the embed URL. Whether that
-  //     actually autoplays depends on the browser's autoplay policy --
-  //     since this only runs from a direct button click it usually
-  //     works, but isn't guaranteed everywhere (e.g. some mobile
-  //     browsers still block it).
-  //   - Apple Music: their embed doesn't support an autoplay parameter,
-  //     so this just opens the player and the listener taps play there.
-  // Spotify and Apple Music embeds don't expose playback position to us
-  // at all (see the SYNCED LYRICS comment block in Code.gs), so both of
-  // those fall back to the same manual "assume playback starts now"
-  // clock as the secondary "already playing it?" link -- just kicked off
-  // automatically the instant the embed opens, instead of requiring a
-  // second tap.
   function autoSyncStart_() {
     var post = currentLyricPost;
     if (!post) return;
@@ -3254,9 +3196,6 @@
     }
   }
 
-  // Shows/hides the auto-sync (YouTube) button + the running offset/stop
-  // controls depending on whether a YouTube embed is currently open in
-  // the floating player and whether a sync clock is currently running.
   function updateSyncControlsVisibility_() {
     var ytBtn = document.getElementById('sync-yt-btn');
     if (ytBtn) ytBtn.style.display = (currentFloatingIsYoutube && !syncManualRunning) ? '' : 'none';
