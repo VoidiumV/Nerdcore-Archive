@@ -303,6 +303,7 @@
   }
   .sync-secondary-link:hover{ color:var(--muted); }
   .sync-offset-controls{ display:flex; align-items:center; gap:6px; }
+  .synced-audio-el{ flex:1; min-width:220px; height:38px; }
 
   .synced-lines{
     background:var(--panel-2); border:1px solid var(--border); border-top:none;
@@ -877,7 +878,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyQLpayWCiBk7c4Ovr4JgNKBPc9otnlEMz_3eA84E9dkAFciw-0GoZPTYbSImbO4bWH/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwoLX0Lb9iKi_wn8RgWJvVgwW-lGpseAY0ous9mAYuTFJ02hdEVa36ibDB4v9fvoIqp/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1000,6 +1001,8 @@
   var ytListenInterval = null;
   var syncUsingYoutube = false;
   var syncedTickInterval = null;
+  var syncedAudioUrl = null; // direct-playable audio URL for the current song's synced lyrics, if provided
+  var syncedAudioEl = null;  // the <audio> element driving playback-accurate sync, when in use
 
   var releasesLoaded = false;
   var top5Loaded = false;
@@ -1337,6 +1340,7 @@
     lyricsViewMode = 'text';
     syncedLyricsData = null;
     syncedLyricsLoadedForId = null;
+    syncedAudioUrl = null;
     stopManualSync_();
     loadLyricDetail(id, initialVariant);
   }
@@ -3093,17 +3097,7 @@
   // ----------------------------------------------------------------------
   function syncedLyricsContentShellHtml_() {
     return (
-      '<div class="synced-sync-bar" id="synced-sync-bar">' +
-        '<button type="button" class="sync-btn" id="sync-autoplay-btn">&#9654; AUTO-PLAY &amp; SYNC</button>' +
-        '<span class="sync-secondary-link" id="sync-manual-btn">Already playing it? Tap here instead</span>' +
-        '<button type="button" class="sync-btn yt" id="sync-yt-btn" style="display:none;">&#128260; AUTO-SYNC WITH VIDEO</button>' +
-        '<span class="sync-status" id="sync-status"></span>' +
-        '<div class="sync-offset-controls" id="sync-offset-controls" style="display:none;">' +
-          '<button type="button" class="sync-btn nudge" data-nudge="-1">&minus;1s</button>' +
-          '<button type="button" class="sync-btn nudge" data-nudge="1">+1s</button>' +
-          '<button type="button" class="sync-btn stop" id="sync-stop-btn">STOP</button>' +
-        '</div>' +
-      '</div>' +
+      '<div class="synced-sync-bar" id="synced-sync-bar"><span class="sync-status">Loading sync options&hellip;</span></div>' +
       '<div class="synced-lines" id="synced-lines"><div class="synced-empty">Loading synced lyrics&hellip;</div></div>'
     );
   }
@@ -3113,15 +3107,16 @@
     if (!post) return;
     if (syncedLyricsLoadedForId === post.id && syncedLyricsData) {
       renderSyncedLinesList_();
-      wireSyncedSyncBar_();
+      buildSyncBar_();
       return;
     }
     api('syncedLyrics', { title: post.title, artist: post.artist }).then(function (data) {
       if (!currentLyricPost || currentLyricPost.id !== post.id) return; // navigated away meanwhile
       syncedLyricsData = (data && data.found) ? data.lines : [];
+      syncedAudioUrl = (data && data.audioUrl) || '';
       syncedLyricsLoadedForId = post.id;
       renderSyncedLinesList_();
-      wireSyncedSyncBar_();
+      buildSyncBar_();
     }).catch(function () {
       var wrap = document.getElementById('synced-lines');
       if (wrap) wrap.innerHTML = '<div class="synced-empty">Couldn\'t load synced lyrics right now.</div>';
@@ -3141,7 +3136,43 @@
     }).join('');
   }
 
-  function wireSyncedSyncBar_() {
+  // Builds the sync control bar. If this song has a direct playable audio
+  // URL (see the "Audio URL" column on the Synced Lyrics sheet tab), we use
+  // a real <audio> element as the single source of truth for playback
+  // position -- this is what actually fixes drift and "lyrics keep going
+  // after I paused" issues, since we're reading the real currentTime/paused
+  // state straight off the browser's own media element instead of guessing
+  // with a local clock. Falls back to the old manual/YouTube-postMessage
+  // sync (see autoSyncStart_ / startManualSync_ / startYoutubeSyncMode_
+  // above) for songs that don't have an Audio URL configured yet.
+  function buildSyncBar_() {
+    var bar = document.getElementById('synced-sync-bar');
+    if (!bar) return;
+
+    if (syncedAudioUrl) {
+      bar.innerHTML =
+        '<audio id="synced-audio-el" class="synced-audio-el" controls preload="metadata" style="color-scheme:dark;" src="' + escapeHtml(syncedAudioUrl) + '"></audio>' +
+        '<span class="sync-status" id="sync-status">Press play to sync</span>';
+      syncedAudioEl = document.getElementById('synced-audio-el');
+      if (syncedAudioEl) {
+        ['timeupdate', 'seeking', 'play', 'pause', 'ended'].forEach(function (evt) {
+          syncedAudioEl.addEventListener(evt, onSyncedAudioUpdate_);
+        });
+      }
+      return;
+    }
+
+    bar.innerHTML =
+      '<button type="button" class="sync-btn" id="sync-autoplay-btn">&#9654; AUTO-PLAY &amp; SYNC</button>' +
+      '<span class="sync-secondary-link" id="sync-manual-btn">Already playing it? Tap here instead</span>' +
+      '<button type="button" class="sync-btn yt" id="sync-yt-btn" style="display:none;">&#128260; AUTO-SYNC WITH VIDEO</button>' +
+      '<span class="sync-status" id="sync-status"></span>' +
+      '<div class="sync-offset-controls" id="sync-offset-controls" style="display:none;">' +
+        '<button type="button" class="sync-btn nudge" data-nudge="-1">&minus;1s</button>' +
+        '<button type="button" class="sync-btn nudge" data-nudge="1">+1s</button>' +
+        '<button type="button" class="sync-btn stop" id="sync-stop-btn">STOP</button>' +
+      '</div>';
+
     var autoplayBtn = document.getElementById('sync-autoplay-btn');
     if (autoplayBtn) autoplayBtn.onclick = autoSyncStart_;
     var manualBtn = document.getElementById('sync-manual-btn');
@@ -3157,6 +3188,22 @@
       };
     });
     updateSyncControlsVisibility_();
+  }
+
+  // Reads the REAL current time / paused state directly off the <audio>
+  // element on every relevant event -- no local clock, no drift, and
+  // lyrics naturally freeze the instant playback is paused because
+  // timeupdate simply stops firing while paused.
+  function onSyncedAudioUpdate_() {
+    var el = syncedAudioEl;
+    if (!el) return;
+    highlightSyncedLyricsAtTime_(el.currentTime);
+    var statusEl = document.getElementById('sync-status');
+    if (statusEl) {
+      var t = el.currentTime || 0;
+      var mm = Math.floor(t / 60), ss = Math.floor(t % 60);
+      statusEl.textContent = (el.paused ? 'Paused \u2014 ' : 'Playing \u2014 ') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+    }
   }
 
   // Opens the best available embed for this song (Spotify -> YouTube ->
@@ -3250,6 +3297,10 @@
     document.querySelectorAll('.synced-line.active, .synced-line.past').forEach(function (el) {
       el.classList.remove('active', 'past');
     });
+    if (syncedAudioEl) {
+      try { syncedAudioEl.pause(); } catch (e) { }
+      syncedAudioEl = null;
+    }
   }
 
   function getSyncedElapsedSeconds_() {
@@ -3264,10 +3315,8 @@
     tickSyncedLyrics_();
   }
 
-  function tickSyncedLyrics_() {
-    var t = getSyncedElapsedSeconds_();
-    updateSyncStatus_(t);
-    if (t === null || !syncedLyricsData || !syncedLyricsData.length) return;
+  function highlightSyncedLyricsAtTime_(t) {
+    if (t === null || t === undefined || !syncedLyricsData || !syncedLyricsData.length) return;
     var activeIdx = -1;
     for (var i = 0; i < syncedLyricsData.length; i++) {
       if (t >= syncedLyricsData[i].begin) activeIdx = i; else break;
@@ -3280,6 +3329,12 @@
     if (activeIdx >= 0 && lineEls[activeIdx]) {
       lineEls[activeIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
+  }
+
+  function tickSyncedLyrics_() {
+    var t = getSyncedElapsedSeconds_();
+    updateSyncStatus_(t);
+    highlightSyncedLyricsAtTime_(t);
   }
 
   function updateSyncStatus_(t) {
