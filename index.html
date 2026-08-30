@@ -303,7 +303,21 @@
   }
   .sync-secondary-link:hover{ color:var(--muted); }
   .sync-offset-controls{ display:flex; align-items:center; gap:6px; }
-  .synced-audio-el{ flex:1; min-width:220px; height:38px; }
+  .synced-audio-el{ display:none; }
+  .synced-player{ display:flex; flex-direction:column; gap:12px; width:100%; }
+  .synced-player-controls{ display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
+  .sync-player-btn{
+    font-family:'Press Start 2P', monospace; font-size:12px;
+    background:var(--panel); color:var(--green); border:2px solid var(--green);
+    padding:11px 16px; cursor:pointer; letter-spacing:0.5px;
+    box-shadow:3px 3px 0 rgba(0,0,0,0.4);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .sync-player-btn:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 rgba(0,0,0,0.4); }
+  .sync-player-btn.play{ min-width:56px; text-align:center; font-size:15px; }
+  .synced-player-scrub-row{ display:flex; align-items:center; gap:10px; }
+  .synced-player-time{ font-family:'VT323', monospace; font-size:17px; color:var(--muted); min-width:46px; text-align:center; }
+  .synced-player-range{ flex:1; accent-color:var(--green); height:6px; cursor:pointer; }
 
   .synced-lines{
     background:var(--panel-2); border:1px solid var(--border); border-top:none;
@@ -878,7 +892,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzE06fhZ2G0rv3j0ui-_rMzS22cgS4m7E8UFFJ9coOT_3lfKhrKnngdqseVPiYR-fNh/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxI6uWxWQpdtkPUe3_uazA0DufkQrWv1qgv5x0zOPcpDKOCoOz5y8qb-1Lx4i8frp2Z/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -972,7 +986,7 @@
   var artistsLoaded = false;
   var artistSortDir = 'asc';
   var artistSearchQuery = '';
-  var artistGroupMode = 'nerdcore'; 
+  var artistGroupMode = 'nerdcore'; // 'nerdcore' or 'friends' -- see #artist-group-tabs
   var currentArtistDetail = null;
   var artistDetailSortDir = 'asc';
   var artistDetailSearchQuery = '';
@@ -989,8 +1003,8 @@
   var currentLyricViewVariantLabel = null;
 
   // ---- synced lyrics state ----
-  var lyricsViewMode = 'text';
-  var syncedLyricsData = null;
+  var lyricsViewMode = 'text'; // 'text' or 'synced'
+  var syncedLyricsData = null; // parsed lines for the currently-open song
   var syncedLyricsLoadedForId = null;
   var syncedRafId = null;
   var syncManualRunning = false;
@@ -1001,8 +1015,10 @@
   var ytListenInterval = null;
   var syncUsingYoutube = false;
   var syncedTickInterval = null;
-  var syncedAudioUrl = null; 
-  var syncedAudioEl = null;  
+  var syncedAudioCandidates = []; // ordered list of direct-playable audio URLs to try for this song's synced lyrics
+  var syncedAudioCandidateIdx = 0;
+  var syncedAudioEl = null;        // the <audio> element driving playback-accurate sync, when in use
+  var syncedAudioScrubbing = false; // true while the user is dragging the scrub bar
 
   var releasesLoaded = false;
   var top5Loaded = false;
@@ -1040,6 +1056,8 @@
 
     var finalUrl = url;
     if (currentFloatingIsYoutube) {
+      // enablejsapi + origin are needed for the embedded player to accept
+      // our postMessage "listening" handshake below.
       var sep = url.indexOf('?') === -1 ? '?' : '&';
       finalUrl = url + sep + 'enablejsapi=1&origin=' + encodeURIComponent(window.location.origin);
     }
@@ -1053,6 +1071,13 @@
   // ----------------------------------------------------------------------
   // BEST-EFFORT YOUTUBE PLAYBACK-POSITION LISTENING (for synced lyrics)
   // ----------------------------------------------------------------------
+  // YouTube's embedded iframe player broadcasts periodic "infoDelivery"
+  // postMessage events (including currentTime) once it receives a
+  // "listening" handshake message from us. This needs no external script
+  // and no player object -- just enablejsapi=1 on the src (set above) and
+  // pinging "listening" every second or so. It's undocumented/best-effort:
+  // if YouTube ever changes this, synced lyrics just fall back to the
+  // always-available manual "tap to sync" mode further down.
   function startYoutubeListening_() {
     var iframe = document.getElementById('floating-player-iframe');
     if (!iframe || !currentFloatingIsYoutube) return;
@@ -1331,7 +1356,8 @@
     lyricsViewMode = 'text';
     syncedLyricsData = null;
     syncedLyricsLoadedForId = null;
-    syncedAudioUrl = null;
+    syncedAudioCandidates = [];
+    syncedAudioCandidateIdx = 0;
     stopManualSync_();
     loadLyricDetail(id, initialVariant);
   }
@@ -1725,6 +1751,10 @@
       if (!isNA(item.producer)) splitArtistNames(item.producer).forEach(addArtistName_);
     });
 
+    // Split by the "Friend of Nerdcore" flag (Artists sheet TRUE/FALSE
+    // column). Anyone not explicitly marked TRUE -- including artists
+    // that only show up via the Lyrics tab and aren't in the Artists
+    // sheet at all -- defaults to the main "Nerdcore Artists" group.
     names = names.filter(function (n) {
       var isFriend = !!friendMap[normalizeArtistKey(n)];
       return artistGroupMode === 'friends' ? isFriend : !isFriend;
@@ -2284,7 +2314,14 @@
   }
 
   // ----------------------------------------------------------------------
-  // PRODUCER(S)
+  // PRODUCER(S) -- same idea as Featured Artist(s) above, except:
+  //   - never shown on lyric-card list views (song lists, album tracklists,
+  //     franchise/character song lists, artist song lists)
+  //   - DOES show up on the song's own lyrics detail page, but in muted
+  //     text (see .detail-producer CSS) rather than the bright amber used
+  //     for Featured Artist(s)
+  //   - a producer's own artist page gets a "PRODUCED X SONGS" section,
+  //     the same way an artist page shows "ALSO FEATURED ON X SONGS"
   // ----------------------------------------------------------------------
   function producedSongsForArtist_(name) {
     var key = normalizeArtistKey(name);
@@ -2991,6 +3028,10 @@
         ? activeVariant.contentHtml
         : (post.contentHtml || '<p><i>No lyrics added yet.</i></p>');
 
+    // Synced lyrics only apply to the ORIGINAL version -- a "(Sped Up)"
+    // audio swap or a "[Remix]" with its own lyrics doc wouldn't line up
+    // with timing captured for the main track, so the toggle only shows
+    // up while no variant is selected.
     var canShowSynced = !!(post.hasSynced && !activeVariant);
     if (!canShowSynced) { lyricsViewMode = 'text'; stopManualSync_(); }
 
@@ -3089,7 +3130,8 @@
     api('syncedLyrics', { title: post.title, artist: post.artist }).then(function (data) {
       if (!currentLyricPost || currentLyricPost.id !== post.id) return; // navigated away meanwhile
       syncedLyricsData = (data && data.found) ? data.lines : [];
-      syncedAudioUrl = (data && data.audioUrl) || '';
+      syncedAudioCandidates = (data && data.audioUrls && data.audioUrls.length) ? data.audioUrls.slice() : [];
+      syncedAudioCandidateIdx = 0;
       syncedLyricsLoadedForId = post.id;
       renderSyncedLinesList_();
       buildSyncBar_();
@@ -3112,20 +3154,43 @@
     }).join('');
   }
 
+  // Builds the sync control bar. If this song has a direct playable audio
+  // URL (see the "Audio URL" column on the Synced Lyrics sheet tab), we use
+  // a real <audio> element as the single source of truth for playback
+  // position -- this is what actually fixes drift and "lyrics keep going
+  // after I paused" issues, since we're reading the real currentTime/paused
+  // state straight off the browser's own media element instead of guessing
+  // with a local clock. Falls back to the old manual/YouTube-postMessage
+  // sync (see autoSyncStart_ / startManualSync_ / startYoutubeSyncMode_
+  // above) for songs that don't have an Audio URL configured yet.
+  function formatSyncTime_(t) {
+    if (!isFinite(t) || t < 0) t = 0;
+    var mm = Math.floor(t / 60), ss = Math.floor(t % 60);
+    return mm + ':' + (ss < 10 ? '0' : '') + ss;
+  }
+
   function buildSyncBar_() {
     var bar = document.getElementById('synced-sync-bar');
     if (!bar) return;
 
-    if (syncedAudioUrl) {
+    if (syncedAudioCandidates.length) {
       bar.innerHTML =
-        '<audio id="synced-audio-el" class="synced-audio-el" controls preload="metadata" style="color-scheme:dark;" src="' + escapeHtml(syncedAudioUrl) + '"></audio>' +
-        '<span class="sync-status" id="sync-status">Press play to sync</span>';
+        '<div class="synced-player" id="synced-player">' +
+          '<audio id="synced-audio-el" class="synced-audio-el" preload="metadata" src="' + escapeHtml(syncedAudioCandidates[syncedAudioCandidateIdx]) + '"></audio>' +
+          '<div class="synced-player-controls">' +
+            '<button type="button" class="sync-player-btn" id="synced-rewind-btn" title="Back 10 seconds">&#9664;&#9664; 10s</button>' +
+            '<button type="button" class="sync-player-btn play" id="synced-playpause-btn" title="Play / Pause">&#9654;</button>' +
+            '<button type="button" class="sync-player-btn" id="synced-forward-btn" title="Forward 10 seconds">10s &#9658;&#9658;</button>' +
+          '</div>' +
+          '<div class="synced-player-scrub-row">' +
+            '<span class="synced-player-time" id="synced-time-current">0:00</span>' +
+            '<input type="range" class="synced-player-range" id="synced-range" min="0" max="0" step="0.1" value="0">' +
+            '<span class="synced-player-time" id="synced-time-total">0:00</span>' +
+          '</div>' +
+          '<span class="sync-status" id="sync-status">Loading audio&hellip;</span>' +
+        '</div>';
       syncedAudioEl = document.getElementById('synced-audio-el');
-      if (syncedAudioEl) {
-        ['timeupdate', 'seeking', 'play', 'pause', 'ended'].forEach(function (evt) {
-          syncedAudioEl.addEventListener(evt, onSyncedAudioUpdate_);
-        });
-      }
+      wireSyncedAudioPlayer_();
       return;
     }
 
@@ -3157,18 +3222,102 @@
     updateSyncControlsVisibility_();
   }
 
-  function onSyncedAudioUpdate_() {
+  // Wires up the custom player's buttons/scrub bar to the underlying
+  // <audio> element, and drives lyric highlighting straight off its REAL
+  // currentTime on every timeupdate -- no local clock, no drift. Lyrics
+  // freeze automatically the instant playback is paused, because the
+  // browser simply stops firing timeupdate while paused, and jump
+  // instantly to the right line when the scrub bar is dragged.
+  function wireSyncedAudioPlayer_() {
     var el = syncedAudioEl;
     if (!el) return;
-    highlightSyncedLyricsAtTime_(el.currentTime);
+    var playBtn = document.getElementById('synced-playpause-btn');
+    var rewBtn = document.getElementById('synced-rewind-btn');
+    var fwdBtn = document.getElementById('synced-forward-btn');
+    var range = document.getElementById('synced-range');
+    var curEl = document.getElementById('synced-time-current');
+    var totEl = document.getElementById('synced-time-total');
     var statusEl = document.getElementById('sync-status');
-    if (statusEl) {
-      var t = el.currentTime || 0;
-      var mm = Math.floor(t / 60), ss = Math.floor(t % 60);
-      statusEl.textContent = (el.paused ? 'Paused \u2014 ' : 'Playing \u2014 ') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+
+    if (playBtn) playBtn.onclick = function () {
+      if (el.paused) el.play().catch(function () { }); else el.pause();
+    };
+    if (rewBtn) rewBtn.onclick = function () { el.currentTime = Math.max(0, el.currentTime - 10); };
+    if (fwdBtn) fwdBtn.onclick = function () {
+      var dur = isFinite(el.duration) ? el.duration : (el.currentTime + 10);
+      el.currentTime = Math.min(dur, el.currentTime + 10);
+    };
+
+    if (range) {
+      range.addEventListener('input', function () {
+        syncedAudioScrubbing = true;
+        el.currentTime = parseFloat(range.value) || 0;
+        if (curEl) curEl.textContent = formatSyncTime_(el.currentTime);
+        highlightSyncedLyricsAtTime_(el.currentTime);
+      });
+      range.addEventListener('change', function () { syncedAudioScrubbing = false; });
     }
+
+    el.addEventListener('loadedmetadata', function () {
+      if (range) range.max = el.duration || 0;
+      if (totEl) totEl.textContent = formatSyncTime_(el.duration);
+      if (statusEl) statusEl.textContent = 'Ready \u2014 press play';
+    });
+    el.addEventListener('timeupdate', function () {
+      if (!syncedAudioScrubbing) {
+        if (range) range.value = el.currentTime;
+        if (curEl) curEl.textContent = formatSyncTime_(el.currentTime);
+      }
+      highlightSyncedLyricsAtTime_(el.currentTime);
+    });
+    el.addEventListener('play', function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; });
+    el.addEventListener('pause', function () { if (playBtn) playBtn.innerHTML = '&#9654;'; });
+    el.addEventListener('ended', function () { if (playBtn) playBtn.innerHTML = '&#9654;'; });
+    el.addEventListener('error', advanceSyncedAudioSource_);
   }
 
+  // If a Drive link format doesn't load (blocked, wrong sharing setting,
+  // etc.), try the next candidate URL automatically. If every candidate
+  // fails, drop back to the old manual/YouTube sync rather than leaving a
+  // broken player on screen.
+  function advanceSyncedAudioSource_() {
+    syncedAudioCandidateIdx++;
+    if (syncedAudioCandidateIdx < syncedAudioCandidates.length && syncedAudioEl) {
+      syncedAudioEl.src = syncedAudioCandidates[syncedAudioCandidateIdx];
+      syncedAudioEl.load();
+      var statusEl = document.getElementById('sync-status');
+      if (statusEl) statusEl.textContent = 'Trying an alternate audio link\u2026';
+      return;
+    }
+    syncedAudioCandidates = [];
+    syncedAudioCandidateIdx = 0;
+    syncedAudioEl = null;
+    buildSyncBar_();
+    var statusEl2 = document.getElementById('sync-status');
+    if (statusEl2) statusEl2.textContent = 'Couldn\'t load that audio file \u2014 check the Drive link\'s sharing is set to "Anyone with the link."';
+  }
+
+  // Opens the best available embed for this song (Spotify -> YouTube ->
+  // Apple Music, in that order) in the floating player and immediately
+  // starts syncing against it -- no separate "open the player" step.
+  //   - YouTube: openFloatingPlayer() already appends autoplay=1 (see
+  //     parseYouTubeEmbedUrl_ server-side) and kicks off the postMessage
+  //     "listening" handshake, so once that's attached we switch to the
+  //     REAL auto-synced clock (startYoutubeSyncMode_) instead of a
+  //     guessed one.
+  //   - Spotify: opened with ?autoplay=1 on the embed URL. Whether that
+  //     actually autoplays depends on the browser's autoplay policy --
+  //     since this only runs from a direct button click it usually
+  //     works, but isn't guaranteed everywhere (e.g. some mobile
+  //     browsers still block it).
+  //   - Apple Music: their embed doesn't support an autoplay parameter,
+  //     so this just opens the player and the listener taps play there.
+  // Spotify and Apple Music embeds don't expose playback position to us
+  // at all (see the SYNCED LYRICS comment block in Code.gs), so both of
+  // those fall back to the same manual "assume playback starts now"
+  // clock as the secondary "already playing it?" link -- just kicked off
+  // automatically the instant the embed opens, instead of requiring a
+  // second tap.
   function autoSyncStart_() {
     var post = currentLyricPost;
     if (!post) return;
@@ -3196,6 +3345,9 @@
     }
   }
 
+  // Shows/hides the auto-sync (YouTube) button + the running offset/stop
+  // controls depending on whether a YouTube embed is currently open in
+  // the floating player and whether a sync clock is currently running.
   function updateSyncControlsVisibility_() {
     var ytBtn = document.getElementById('sync-yt-btn');
     if (ytBtn) ytBtn.style.display = (currentFloatingIsYoutube && !syncManualRunning) ? '' : 'none';
