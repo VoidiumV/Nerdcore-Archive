@@ -368,11 +368,10 @@
     background:var(--panel); border:3px solid var(--border);
     box-shadow:5px 5px 0 rgba(0,0,0,0.35); cursor:pointer; overflow:hidden;
     display:flex; flex-direction:column;
-    content-visibility:auto; contain-intrinsic-size:320px;
     transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
   }
   .artist-card:hover{ transform:translate(-3px,-3px); box-shadow:8px 8px 0 rgba(0,0,0,0.4); border-color:var(--green); }
-  .artist-card img{ width:100%; aspect-ratio:1/1; object-fit:cover; background:#0a0d1c; border-bottom:3px solid var(--border); display:block; }
+  .artist-card img{ width:100%; height:auto; aspect-ratio:1/1; object-fit:cover; background:#0a0d1c; border-bottom:3px solid var(--border); display:block; }
   .artist-card img.image-loading{ opacity:.82; }
   .artist-card img.image-ready{ opacity:1; }
   .artist-card .name{ font-family:'Press Start 2P', monospace; font-size:12px; color:var(--green); padding:12px 10px; text-align:center; line-height:1.6; word-break:break-word; overflow-wrap:anywhere; }
