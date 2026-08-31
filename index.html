@@ -368,6 +368,7 @@
     background:var(--panel); border:3px solid var(--border);
     box-shadow:5px 5px 0 rgba(0,0,0,0.35); cursor:pointer; overflow:hidden;
     display:flex; flex-direction:column;
+    content-visibility:auto; contain-intrinsic-size:320px;
     transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
   }
   .artist-card:hover{ transform:translate(-3px,-3px); box-shadow:8px 8px 0 rgba(0,0,0,0.4); border-color:var(--green); }
@@ -918,14 +919,49 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyPU2W_erp-C97psID7iHs_uK_7GwETrnYCluYx6nOhEwBMNTfOooNpGKh8EgGDETlK/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbye7Qm0fO8tN-zzRJOgJLaqUVBaT6Y-GDH99XX6Nf0yE5Y_sLjVcUp1CjeeTBZRgVHs/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
 
+  // Reuse list responses within this page session and deduplicate requests
+  // that are already in flight. This cuts repeat navigation traffic without
+  // making data persist across browser refreshes.
+  var API_CLIENT_CACHE_TTL_MS = 120000;
+  var apiClientCache_ = Object.create(null);
+  var apiClientInflight_ = Object.create(null);
+  var API_CLIENT_CACHE_ACTIONS_ = {
+    settings: true, disclaimers: true, lyrics: true, artists: true,
+    albums: true, franchises: true, characters: true, top5: true,
+    top10yearly: true, playlists: true, artistStats: true,
+    deansAwards: true, encyclopedia: true, indieMonday: true
+  };
+
+  function apiCacheKey_(action, params) {
+    var keys = Object.keys(params || {}).sort();
+    var parts = [action];
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      parts.push(k + '=' + String(params[k]));
+    }
+    return parts.join('&');
+  }
+
   function api(action, params) {
     params = params || {};
-    return new Promise(function (resolve, reject) {
+    var cacheKey = apiCacheKey_(action, params);
+    var now = Date.now();
+
+    if (API_CLIENT_CACHE_ACTIONS_[action]) {
+      var cached = apiClientCache_[cacheKey];
+      if (cached && (now - cached.time) < API_CLIENT_CACHE_TTL_MS) {
+        return Promise.resolve(cached.data);
+      }
+    }
+
+    if (apiClientInflight_[cacheKey]) return apiClientInflight_[cacheKey];
+
+    var requestPromise = new Promise(function (resolve, reject) {
       var cbName = '_na_cb_' + (jsonpCounter++) + '_' + Date.now();
       var script = document.createElement('script');
       var settled = false;
@@ -968,6 +1004,17 @@
       script.src = url;
       document.body.appendChild(script);
     });
+
+    apiClientInflight_[cacheKey] = requestPromise;
+    requestPromise.then(function (data) {
+      if (API_CLIENT_CACHE_ACTIONS_[action]) {
+        apiClientCache_[cacheKey] = { time: Date.now(), data: data };
+      }
+      delete apiClientInflight_[cacheKey];
+    }, function () {
+      delete apiClientInflight_[cacheKey];
+    });
+    return requestPromise;
   }
 
   function escapeHtml(str) {
@@ -1423,6 +1470,8 @@
     lyricsViewMode = 'text';
     syncedLyricsData = null;
     syncedLyricsLoadedForId = null;
+    syncedLineEls_ = [];
+    syncedActiveIdx_ = -1;
     syncedAudioCandidates = [];
     syncedAudioCandidateIdx = 0;
     syncedAudioFileId = '';
@@ -1862,7 +1911,7 @@
       var priority = idx < 8 ? ' high' : '';
       return (
         '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
-          '<img data-artist-image="1" src="' + escapeHtml(img) + '" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
+          '<img data-artist-image="1" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
           groupTagHtml +
         '</div>'
@@ -3238,7 +3287,10 @@
       var isBg = !!(line.words && line.words.length && line.words.every(function (w) { return w.bg; }));
       return '<div class="synced-line' + (isBg ? ' bg-line' : '') + '" data-idx="' + i + '">' + escapeHtml(line.text) + '</div>';
     }).join('');
-    wrap.querySelectorAll('.synced-line').forEach(function (el) {
+
+    syncedLineEls_ = Array.prototype.slice.call(wrap.querySelectorAll('.synced-line'));
+    syncedActiveIdx_ = -1;
+    syncedLineEls_.forEach(function (el) {
       el.addEventListener('click', function () {
         var idx = parseInt(el.getAttribute('data-idx'), 10);
         if (!isFinite(idx) || !syncedLyricsData[idx]) return;
@@ -3359,7 +3411,13 @@
     el.onplay = function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; setCustomAudioStatus_('Playing'); };
     el.onpause = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Paused'); };
     el.onended = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Ended'); };
-    el.onerror = function () { setCustomAudioStatus_('Could not load audio.'); };
+    el.onerror = function () {
+      if (syncedAudioCandidates.length > 1) {
+        advanceSyncedAudioSource_();
+      } else {
+        setCustomAudioStatus_('Could not load audio.');
+      }
+    };
   }
 
   function seekSyncedAudioToLine_(line) {
@@ -3547,19 +3605,47 @@
     tickSyncedLyrics_();
   }
 
+  var syncedLineEls_ = [];
+  var syncedActiveIdx_ = -1;
+
   function highlightSyncedLyricsAtTime_(t) {
     if (t === null || t === undefined || !syncedLyricsData || !syncedLyricsData.length) return;
-    var activeIdx = -1;
-    for (var i = 0; i < syncedLyricsData.length; i++) {
-      if (t >= syncedLyricsData[i].begin) activeIdx = i; else break;
+
+    // Binary search the timeline instead of scanning every line every tick.
+    var lo = 0, hi = syncedLyricsData.length - 1, activeIdx = -1;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (t >= syncedLyricsData[mid].begin) {
+        activeIdx = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
     }
-    var lineEls = document.querySelectorAll('.synced-line');
-    lineEls.forEach(function (el, i) {
-      el.classList.toggle('active', i === activeIdx);
-      el.classList.toggle('past', i < activeIdx);
-    });
-    if (activeIdx >= 0 && lineEls[activeIdx]) {
-      lineEls[activeIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+    if (activeIdx === syncedActiveIdx_) return;
+
+    var previous = syncedActiveIdx_;
+    syncedActiveIdx_ = activeIdx;
+
+    if (previous >= 0 && syncedLineEls_[previous]) {
+      syncedLineEls_[previous].classList.remove('active');
+      syncedLineEls_[previous].classList.toggle('past', previous < activeIdx);
+    }
+
+    if (activeIdx >= 0 && syncedLineEls_[activeIdx]) {
+      syncedLineEls_[activeIdx].classList.add('active');
+      syncedLineEls_[activeIdx].classList.remove('past');
+      syncedLineEls_[activeIdx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+
+    // A seek can jump a long way. Update only the changed range.
+    if (previous >= 0 && activeIdx >= 0 && Math.abs(previous - activeIdx) > 1) {
+      var start = Math.min(previous, activeIdx);
+      var end = Math.max(previous, activeIdx);
+      for (var i = start + 1; i < end; i++) {
+        if (syncedLineEls_[i]) syncedLineEls_[i].classList.toggle('past', i < activeIdx);
+      }
     }
   }
 
