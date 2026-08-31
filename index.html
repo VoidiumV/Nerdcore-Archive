@@ -578,8 +578,11 @@
     flex-shrink:0;
   }
   #floating-player-close{ cursor:pointer; color:var(--magenta); font-size:14px; }
-  #floating-player-body{ width:100%; flex:1; min-height:0; background:#000; }
-  #floating-player-body iframe{ width:100%; height:100%; border:none; }
+  #floating-player-body{ width:100%; flex:1; min-height:0; background:#000; position:relative; pointer-events:auto; }
+  #floating-player-body iframe{ width:100%; height:100%; border:none; display:block; pointer-events:auto; }
+  #floating-player.custom-audio-mode #floating-player-body{ pointer-events:auto; }
+  #floating-player.custom-audio-mode .floating-custom-audio{ pointer-events:auto; }
+  #floating-player.custom-audio-mode button, #floating-player.custom-audio-mode input{ pointer-events:auto; }
   .floating-custom-audio{ width:100%; height:100%; padding:16px; display:flex; flex-direction:column; justify-content:center; gap:12px; background:var(--panel-2); }
   .floating-custom-audio audio{ display:none; }
   .floating-audio-title{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--green); text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -915,7 +918,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbz9-wDBtGvTEz3JaeVWY_NbXjZZs5c4V-8wRRHPdE82s_BkRSHkD_aPPHUCLsdw1EZL/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxLaZkZfPGrZWBgbvrl-joeO4XguoNCfBXikDpe8utI0oyqupaZDWJsmQOZGUOJDbVV/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1097,7 +1100,11 @@
       finalUrl = url.indexOf('autoplay=1') === -1 ? url + (url.indexOf('?') === -1 ? '?' : '&') + 'autoplay=1' : url;
     }
 
+    iframe.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
+    iframe.setAttribute('allowfullscreen', 'true');
+    iframe.style.pointerEvents = 'auto';
     iframe.src = finalUrl;
+    player.style.pointerEvents = 'auto';
     player.style.display = 'flex';
 
     if (currentFloatingIsYoutube) setTimeout(startYoutubeListening_, 800);
@@ -3338,8 +3345,7 @@
 
   function wireFloatingCustomAudio_() {
     var el = syncedAudioEl;
-    if (!el || el._ncWired) return;
-    el._ncWired = true;
+    if (!el) return;
 
     var playBtn = document.getElementById('floating-playpause-btn');
     var rewBtn = document.getElementById('floating-rewind-btn');
@@ -3348,18 +3354,36 @@
     var curEl = document.getElementById('floating-time-current');
     var totEl = document.getElementById('floating-time-total');
 
-    if (playBtn) playBtn.onclick = function () {
-      if (el.paused) {
-        el.play().then(function () { setCustomAudioStatus_('Playing'); }).catch(function () {});
-      } else {
-        el.pause();
-      }
-    };
-    if (rewBtn) rewBtn.onclick = function () { el.currentTime = Math.max(0, el.currentTime - 10); };
-    if (fwdBtn) fwdBtn.onclick = function () {
-      var dur = isFinite(el.duration) ? el.duration : el.currentTime + 10;
-      el.currentTime = Math.min(dur, el.currentTime + 10);
-    };
+    if (playBtn) {
+      playBtn.onclick = function (event) {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        if (el.paused) {
+          var promise = el.play();
+          if (promise && promise.then) {
+            promise.then(function () { setCustomAudioStatus_('Playing'); }).catch(function (err) { setCustomAudioStatus_('Play failed: ' + (err && err.message ? err.message : 'browser blocked playback')); });
+          } else {
+            setCustomAudioStatus_('Playing');
+          }
+        } else {
+          el.pause();
+        }
+      };
+    }
+    if (rewBtn) {
+      rewBtn.onclick = function (event) {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        try { el.currentTime = Math.max(0, (Number(el.currentTime) || 0) - 10); } catch (e) {}
+      };
+    }
+    if (fwdBtn) {
+      fwdBtn.onclick = function (event) {
+        if (event) { event.preventDefault(); event.stopPropagation(); }
+        try {
+          var dur = isFinite(el.duration) ? el.duration : (el.currentTime + 10);
+          el.currentTime = Math.min(dur, (Number(el.currentTime) || 0) + 10);
+        } catch (e) {}
+      };
+    }
 
     if (range) {
       range.addEventListener('input', function () {
