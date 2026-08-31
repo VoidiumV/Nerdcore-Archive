@@ -580,9 +580,6 @@
   #floating-player-close{ cursor:pointer; color:var(--magenta); font-size:14px; }
   #floating-player-body{ width:100%; flex:1; min-height:0; background:#000; position:relative; pointer-events:auto; }
   #floating-player-body iframe{ width:100%; height:100%; border:none; display:block; pointer-events:auto; }
-  #floating-player.custom-audio-mode #floating-player-body{ pointer-events:auto; }
-  #floating-player.custom-audio-mode .floating-custom-audio{ pointer-events:auto; }
-  #floating-player.custom-audio-mode button, #floating-player.custom-audio-mode input{ pointer-events:auto; }
   .floating-custom-audio{ width:100%; height:100%; padding:16px; display:flex; flex-direction:column; justify-content:center; gap:12px; background:var(--panel-2); }
   .floating-custom-audio audio{ display:none; }
   .floating-audio-title{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--green); text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -674,7 +671,7 @@
   </div>
 </div>
 
-
+<!-- HOME -->
 <div class="page" id="view-home">
   <div class="home-hero">
     <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
@@ -715,7 +712,7 @@
   </div>
 </div>
 
-
+<!-- LYRICS = ARTIST PROFILE GRID / FRANCHISE BROWSE -->
 <div class="page" id="view-lyrics-list" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
   <div class="page-head">
@@ -751,37 +748,37 @@
   </div>
 </div>
 
-
+<!-- ARTIST DETAIL -->
 <div class="page" id="view-artist-detail" style="display:none">
   <span class="back-link" data-route="lyrics">&larr; All Artists</span>
   <div id="artist-detail-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
-
+<!-- ALBUM DETAIL -->
 <div class="page" id="view-album-detail" style="display:none">
   <span class="back-link" id="album-detail-back">&larr; Back</span>
   <div id="album-detail-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
-
+<!-- FRANCHISE DETAIL -->
 <div class="page" id="view-franchise-detail" style="display:none">
   <span class="back-link" data-route="lyrics">&larr; All Franchises</span>
   <div id="franchise-detail-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
-
+<!-- FRANCHISE SONGS -->
 <div class="page" id="view-franchise-songs" style="display:none">
   <span class="back-link" id="franchise-songs-back">&larr; Back</span>
   <div id="franchise-songs-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
-
+<!-- LYRICS DETAIL -->
 <div class="page" id="view-lyrics-detail" style="display:none">
   <span class="back-link" id="lyric-detail-back">&larr; Back</span>
   <div id="lyrics-detail-content"><div class="loading">Loading lyrics&hellip;</div></div>
 </div>
 
-
+<!-- ENCYCLOPEDIA -->
 <div class="page" id="view-encyclopedia" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
   <div class="page-head">
@@ -813,7 +810,7 @@
   <div class="subpane" id="relpane-released"><div class="loading">Loading released songs&hellip;</div></div>
 </div>
 
-
+<!-- TOP 5 -->
 <div class="page" id="view-top5" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
   <div class="page-head">
@@ -843,7 +840,7 @@
   <div class="subpane" id="pane-stats"><div class="loading">Loading artist stats&hellip;</div></div>
 </div>
 
-
+<!-- INDIE MONDAY -->
 <div class="page" id="view-indiemonday" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
   <div class="page-head">
@@ -855,7 +852,7 @@
   <div id="indiemonday-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
-
+<!-- ABOUT -->
 <div class="page" id="view-about" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
   <div class="page-head">
@@ -866,7 +863,7 @@
   <div id="about-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
-
+<!-- FLOATING PLAYER CONTAINER -->
 <div id="floating-player">
   <div id="floating-player-header">
     <span>&#9654; MEDIA PLAYER</span>
@@ -893,7 +890,7 @@
   <div id="floating-player-resize-handle" title="Drag to resize"></div>
 </div>
 
-
+<!-- BUG / QUALITY REPORT -->
 <div class="modal-overlay" id="bug-report-overlay">
   <div class="modal-box">
     <h3 id="bug-report-modal-title">REPORT AN ISSUE</h3>
@@ -918,7 +915,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxLaZkZfPGrZWBgbvrl-joeO4XguoNCfBXikDpe8utI0oyqupaZDWJsmQOZGUOJDbVV/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxc4HLTc5kvQZ_dKT_8Qa8oRcX41IirTFTtjUys2_1x_2e_Ffvl8Qj5GjO6CudPi8k_/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1012,7 +1009,7 @@
   var artistsLoaded = false;
   var artistSortDir = 'asc';
   var artistSearchQuery = '';
-  var artistGroupMode = 'nerdcore';
+  var artistGroupMode = 'nerdcore'; // 'nerdcore' or 'friends' -- see #artist-group-tabs
   var currentArtistDetail = null;
   var artistDetailSortDir = 'asc';
   var artistDetailSearchQuery = '';
@@ -1028,9 +1025,9 @@
   var currentLyricPost = null;
   var currentLyricViewVariantLabel = null;
 
-
-  var lyricsViewMode = 'text';
-  var syncedLyricsData = null;
+  // ---- synced lyrics state ----
+  var lyricsViewMode = 'text'; // 'text' or 'synced'
+  var syncedLyricsData = null; // parsed lines for the currently-open song
   var syncedLyricsLoadedForId = null;
   var syncedRafId = null;
   var syncManualRunning = false;
@@ -1080,47 +1077,42 @@
     var iframe = document.getElementById('floating-player-iframe');
     var custom = document.getElementById('floating-custom-audio');
     if (!player || !iframe) return;
-
     stopYoutubeListening_();
-    if (syncedAudioEl && syncedAudioEl !== document.getElementById('floating-audio-el')) {
-      try { syncedAudioEl.pause(); } catch (e) {}
-    }
+    var floatingAudio = document.getElementById('floating-audio-el');
+    if (floatingAudio) { try { floatingAudio.pause(); } catch (e) {} }
     currentFloatingIsYoutube = /youtube(?:-nocookie)?\.com\/embed\//i.test(url);
-    var isSpotify = /open\.spotify\.com\/embed\//i.test(url);
-
+    youtubeCurrentTime = 0;
+    if (!currentFloatingIsYoutube && syncUsingYoutube) stopManualSync_();
     if (custom) custom.style.display = 'none';
     iframe.style.display = '';
     player.classList.remove('custom-audio-mode');
-
     var finalUrl = url;
+    var isSpotify = /open\.spotify\.com\/embed\//i.test(url);
     if (currentFloatingIsYoutube) {
       var sep = url.indexOf('?') === -1 ? '?' : '&';
       finalUrl = url + sep + 'enablejsapi=1&origin=' + encodeURIComponent(window.location.origin) + '&autoplay=1';
     } else if (isSpotify) {
       finalUrl = url.indexOf('autoplay=1') === -1 ? url + (url.indexOf('?') === -1 ? '?' : '&') + 'autoplay=1' : url;
     }
-
-    iframe.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
-    iframe.setAttribute('allowfullscreen', 'true');
+    iframe.setAttribute('allow', 'autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture');
     iframe.style.pointerEvents = 'auto';
     iframe.src = finalUrl;
     player.style.pointerEvents = 'auto';
     player.style.display = 'flex';
-
     if (currentFloatingIsYoutube) setTimeout(startYoutubeListening_, 800);
     updateSyncControlsVisibility_();
   }
 
   // ----------------------------------------------------------------------
-
+  // BEST-EFFORT YOUTUBE PLAYBACK-POSITION LISTENING (for synced lyrics)
   // ----------------------------------------------------------------------
-
-
-
-
-
-
-
+  // YouTube's embedded iframe player broadcasts periodic "infoDelivery"
+  // postMessage events (including currentTime) once it receives a
+  // "listening" handshake message from us. This needs no external script
+  // and no player object -- just enablejsapi=1 on the src (set above) and
+  // pinging "listening" every second or so. It's undocumented/best-effort:
+  // if YouTube ever changes this, synced lyrics just fall back to the
+  // always-available manual "tap to sync" mode further down.
   function startYoutubeListening_() {
     var iframe = document.getElementById('floating-player-iframe');
     if (!iframe || !currentFloatingIsYoutube) return;
@@ -1155,14 +1147,9 @@
     var player = document.getElementById('floating-player');
     var iframe = document.getElementById('floating-player-iframe');
     iframe.src = '';
-    var customAudio = document.getElementById('floating-audio-el');
-    if (customAudio) {
-      try { customAudio.pause(); } catch (e) {}
-    }
     player.style.display = 'none';
-    player.classList.remove('custom-audio-mode');
     stopYoutubeListening_();
-    if (syncUsingYoutube || syncManualRunning) stopManualSync_();
+    if (syncUsingYoutube) stopManualSync_();
     updateSyncControlsVisibility_();
   });
 
@@ -1406,6 +1393,8 @@
     syncedLyricsLoadedForId = null;
     syncedAudioCandidates = [];
     syncedAudioCandidateIdx = 0;
+    syncedAudioFileId = '';
+    syncedAudioLoading = false;
     stopManualSync_();
     loadLyricDetail(id, initialVariant);
   }
@@ -1799,10 +1788,10 @@
       if (!isNA(item.producer)) splitArtistNames(item.producer).forEach(addArtistName_);
     });
 
-
-
-
-
+    // Split by the "Friend of Nerdcore" flag (Artists sheet TRUE/FALSE
+    // column). Anyone not explicitly marked TRUE -- including artists
+    // that only show up via the Lyrics tab and aren't in the Artists
+    // sheet at all -- defaults to the main "Nerdcore Artists" group.
     names = names.filter(function (n) {
       var isFriend = !!friendMap[normalizeArtistKey(n)];
       return artistGroupMode === 'friends' ? isFriend : !isFriend;
@@ -1879,7 +1868,7 @@
   });
 
   // ----------------------------------------------------------------------
-
+  // BROWSE BY FRANCHISE
   // ----------------------------------------------------------------------
   function loadFranchiseBrowse() {
     document.getElementById('franchise-grid-content').innerHTML = '<div class="loading">Loading franchises&hellip;</div>';
@@ -2306,7 +2295,7 @@
   }
 
   // ----------------------------------------------------------------------
-
+  // Featured Artist(s)
   // ----------------------------------------------------------------------
   function featuredSongsForArtist_(name) {
     var key = normalizeArtistKey(name);
@@ -2362,14 +2351,14 @@
   }
 
   // ----------------------------------------------------------------------
-
-
-
-
-
-
-
-
+  // PRODUCER(S) -- same idea as Featured Artist(s) above, except:
+  //   - never shown on lyric-card list views (song lists, album tracklists,
+  //     franchise/character song lists, artist song lists)
+  //   - DOES show up on the song's own lyrics detail page, but in muted
+  //     text (see .detail-producer CSS) rather than the bright amber used
+  //     for Featured Artist(s)
+  //   - a producer's own artist page gets a "PRODUCED X SONGS" section,
+  //     the same way an artist page shows "ALSO FEATURED ON X SONGS"
   // ----------------------------------------------------------------------
   function producedSongsForArtist_(name) {
     var key = normalizeArtistKey(name);
@@ -2422,7 +2411,7 @@
   }
 
   // ----------------------------------------------------------------------
-
+  // ALBUMS / EPS
   // ----------------------------------------------------------------------
   function uniqueArtistAlbums_(names) {
     var list = Array.isArray(names) ? names : [names];
@@ -3076,10 +3065,10 @@
         ? activeVariant.contentHtml
         : (post.contentHtml || '<p><i>No lyrics added yet.</i></p>');
 
-
-
-
-
+    // Synced lyrics only apply to the ORIGINAL version -- a "(Sped Up)"
+    // audio swap or a "[Remix]" with its own lyrics doc wouldn't line up
+    // with timing captured for the main track, so the toggle only shows
+    // up while no variant is selected.
     var canShowSynced = !!(post.hasSynced && !activeVariant);
     if (!canShowSynced) { lyricsViewMode = 'text'; stopManualSync_(); }
 
@@ -3158,7 +3147,7 @@
   }
 
   // ----------------------------------------------------------------------
-
+  // SYNCED LYRICS -- front end
   // ----------------------------------------------------------------------
   function syncedLyricsContentShellHtml_() {
     return (
@@ -3176,7 +3165,7 @@
       return;
     }
     api('syncedLyrics', { title: post.title, artist: post.artist }).then(function (data) {
-      if (!currentLyricPost || currentLyricPost.id !== post.id) return;
+      if (!currentLyricPost || currentLyricPost.id !== post.id) return; // navigated away meanwhile
       syncedLyricsData = (data && data.found) ? data.lines : [];
       syncedAudioCandidates = (data && data.audioUrls && data.audioUrls.length) ? data.audioUrls.slice() : [];
       syncedAudioCandidateIdx = 0;
@@ -3212,15 +3201,15 @@
     });
   }
 
-
-
-
-
-
-
-
-
-
+  // Builds the sync control bar. If this song has a direct playable audio
+  // URL (see the "Audio URL" column on the Synced Lyrics sheet tab), we use
+  // a real <audio> element as the single source of truth for playback
+  // position -- this is what actually fixes drift and "lyrics keep going
+  // after I paused" issues, since we're reading the real currentTime/paused
+  // state straight off the browser's own media element instead of guessing
+  // with a local clock. Falls back to the old manual/YouTube-postMessage
+  // sync (see autoSyncStart_ / startManualSync_ / startYoutubeSyncMode_
+  // above) for songs that don't have an Audio URL configured yet.
   function formatSyncTime_(t) {
     if (!isFinite(t) || t < 0) t = 0;
     var mm = Math.floor(t / 60), ss = Math.floor(t % 60);
@@ -3232,10 +3221,7 @@
     if (!bar) return;
 
     if (syncedAudioFileId || syncedAudioCandidates.length) {
-      bar.innerHTML =
-        '<span class="sync-status" id="sync-status">' +
-        (syncedAudioFileId ? 'Private Drive audio is loading in the floating player&hellip;' : 'Loading audio&hellip;') +
-        '</span>';
+      bar.innerHTML = '<span class="sync-status" id="sync-status">Loading audio&hellip;</span>';
       return;
     }
 
@@ -3267,123 +3253,95 @@
     updateSyncControlsVisibility_();
   }
 
+  // Wires up the custom player's buttons/scrub bar to the underlying
+  // <audio> element, and drives lyric highlighting straight off its REAL
+  // currentTime on every timeupdate -- no local clock, no drift. Lyrics
+  // freeze automatically the instant playback is paused, because the
+  // browser simply stops firing timeupdate while paused, and jump
+  // instantly to the right line when the scrub bar is dragged.
   function showFloatingCustomAudio_() {
     var player = document.getElementById('floating-player');
     var iframe = document.getElementById('floating-player-iframe');
     var custom = document.getElementById('floating-custom-audio');
     if (!player || !iframe || !custom) return;
     stopYoutubeListening_();
-    iframe.src = '';
-    iframe.style.display = 'none';
+    iframe.src = ''; iframe.style.display = 'none';
     custom.style.display = 'flex';
-    player.classList.add('custom-audio-mode');
-    player.style.display = 'flex';
+    player.classList.add('custom-audio-mode'); player.style.display = 'flex';
     var titleEl = document.getElementById('floating-audio-title');
     if (titleEl && currentLyricPost) titleEl.textContent = currentLyricPost.artist + ' — ' + currentLyricPost.title;
+  }
+
+  function setCustomAudioStatus_(text) {
+    var el = document.getElementById('floating-audio-status'); if (el) el.textContent = text;
+    var syncEl = document.getElementById('sync-status'); if (syncEl) syncEl.textContent = text;
   }
 
   function loadPrivateSyncedAudio_() {
     if (!syncedAudioFileId || syncedAudioLoading) return;
     syncedAudioLoading = true;
-    var statusEl = document.getElementById('sync-status');
-    if (statusEl) statusEl.textContent = 'Loading private Drive audio…';
-
     api('syncedAudio', { id: syncedAudioFileId }).then(function (data) {
       syncedAudioLoading = false;
-      if (!data || !data.ok || !data.data) {
-        if (statusEl) statusEl.textContent = (data && data.error) || 'Could not load private Drive audio.';
-        return;
-      }
-
-      if (syncedAudioBlobUrl) {
-        try { URL.revokeObjectURL(syncedAudioBlobUrl); } catch (e) {}
-      }
-
-      var byteChars = atob(data.data);
-      var byteNumbers = new Array(byteChars.length);
-      for (var i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
-      var blob = new Blob([new Uint8Array(byteNumbers)], { type: data.mimeType || 'audio/mpeg' });
-      syncedAudioBlobUrl = URL.createObjectURL(blob);
-
-      var audio = document.getElementById('floating-audio-el');
-      if (!audio) return;
-      syncedAudioEl = audio;
-      audio.src = syncedAudioBlobUrl;
-      audio.load();
-      showFloatingCustomAudio_();
-      wireFloatingCustomAudio_();
-      audio.play().then(function () {
-        setCustomAudioStatus_('Playing');
-      }).catch(function () {
-        setCustomAudioStatus_('Ready — press play');
-      });
-    }).catch(function (err) {
-      syncedAudioLoading = false;
-      if (statusEl) statusEl.textContent = 'Could not load private Drive audio: ' + (err.message || err);
-    });
+      if (!data || !data.ok || !data.data) { setCustomAudioStatus_((data && data.error) || 'Could not load private Drive audio.'); return; }
+      if (syncedAudioBlobUrl) { try { URL.revokeObjectURL(syncedAudioBlobUrl); } catch (e) {} }
+      var chars = atob(data.data); var bytes = new Uint8Array(chars.length);
+      for (var i = 0; i < chars.length; i++) bytes[i] = chars.charCodeAt(i);
+      syncedAudioBlobUrl = URL.createObjectURL(new Blob([bytes], { type: data.mimeType || 'audio/mpeg' }));
+      var audio = document.getElementById('floating-audio-el'); if (!audio) return;
+      syncedAudioEl = audio; audio.src = syncedAudioBlobUrl; audio.load();
+      showFloatingCustomAudio_(); wireFloatingCustomAudio_();
+      audio.play().then(function () { setCustomAudioStatus_('Playing'); }).catch(function () { setCustomAudioStatus_('Ready — press play'); });
+    }).catch(function (err) { syncedAudioLoading = false; setCustomAudioStatus_('Could not load private Drive audio: ' + (err.message || err)); });
   }
 
   function loadExternalSyncedAudio_() {
-    var url = syncedAudioCandidates[0];
-    if (!url) return;
-    var audio = document.getElementById('floating-audio-el');
-    if (!audio) return;
-    syncedAudioEl = audio;
-    audio.src = url;
-    audio.load();
-    showFloatingCustomAudio_();
-    wireFloatingCustomAudio_();
-    audio.play().catch(function () {});
-  }
-
-  function setCustomAudioStatus_(text) {
-    var el = document.getElementById('floating-audio-status');
-    if (el) el.textContent = text;
-    var syncEl = document.getElementById('sync-status');
-    if (syncEl) syncEl.textContent = text;
+    var url = syncedAudioCandidates[0]; if (!url) return;
+    var audio = document.getElementById('floating-audio-el'); if (!audio) return;
+    syncedAudioEl = audio; audio.src = url; audio.load(); showFloatingCustomAudio_(); wireFloatingCustomAudio_(); audio.play().catch(function () {});
   }
 
   function wireFloatingCustomAudio_() {
+    var el = syncedAudioEl; if (!el) return;
+    var playBtn = document.getElementById('floating-playpause-btn'), rewBtn = document.getElementById('floating-rewind-btn'), fwdBtn = document.getElementById('floating-forward-btn');
+    var range = document.getElementById('floating-range'), curEl = document.getElementById('floating-time-current'), totEl = document.getElementById('floating-time-total');
+    if (playBtn) playBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); if (el.paused) el.play().catch(function (err) { setCustomAudioStatus_('Play failed: ' + (err.message || 'browser blocked playback')); }); else el.pause(); };
+    if (rewBtn) rewBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); el.currentTime = Math.max(0, el.currentTime - 10); };
+    if (fwdBtn) fwdBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); var d = isFinite(el.duration) ? el.duration : el.currentTime + 10; el.currentTime = Math.min(d, el.currentTime + 10); };
+    if (range) { range.oninput = function () { syncedAudioScrubbing = true; el.currentTime = parseFloat(range.value) || 0; highlightSyncedLyricsAtTime_(el.currentTime); }; range.onchange = function () { syncedAudioScrubbing = false; }; }
+    el.onloadedmetadata = function () { if (range) range.max = isFinite(el.duration) ? el.duration : 0; if (totEl) totEl.textContent = formatSyncTime_(el.duration); setCustomAudioStatus_('Ready — press play'); };
+    el.ontimeupdate = function () { if (!syncedAudioScrubbing) { if (range) range.value = el.currentTime; if (curEl) curEl.textContent = formatSyncTime_(el.currentTime); } highlightSyncedLyricsAtTime_(el.currentTime); };
+    el.onplay = function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; setCustomAudioStatus_('Playing'); };
+    el.onpause = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Paused'); };
+    el.onended = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Ended'); };
+    el.onerror = function () { setCustomAudioStatus_('Could not load audio.'); };
+  }
+
+  function seekSyncedAudioToLine_(line) {
+    if (!line) return; var t = Number(line.begin) || 0;
+    if (syncedAudioEl) { try { syncedAudioEl.currentTime = t; syncedAudioEl.play().catch(function () {}); highlightSyncedLyricsAtTime_(t); return; } catch (e) {} }
+    if (syncUsingYoutube) { var iframe = document.getElementById('floating-player-iframe'); if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [t, true], id: 'ncPlayer' }), '*'); youtubeCurrentTime = t; }
+    syncManualRunning = true; syncManualStartMs = Date.now() - t * 1000; syncOffsetSec = 0; updateSyncControlsVisibility_(); highlightSyncedLyricsAtTime_(t);
+  }
+
+  function wireSyncedAudioPlayer_() {
     var el = syncedAudioEl;
     if (!el) return;
+    var playBtn = document.getElementById('synced-playpause-btn');
+    var rewBtn = document.getElementById('synced-rewind-btn');
+    var fwdBtn = document.getElementById('synced-forward-btn');
+    var range = document.getElementById('synced-range');
+    var curEl = document.getElementById('synced-time-current');
+    var totEl = document.getElementById('synced-time-total');
+    var statusEl = document.getElementById('sync-status');
 
-    var playBtn = document.getElementById('floating-playpause-btn');
-    var rewBtn = document.getElementById('floating-rewind-btn');
-    var fwdBtn = document.getElementById('floating-forward-btn');
-    var range = document.getElementById('floating-range');
-    var curEl = document.getElementById('floating-time-current');
-    var totEl = document.getElementById('floating-time-total');
-
-    if (playBtn) {
-      playBtn.onclick = function (event) {
-        if (event) { event.preventDefault(); event.stopPropagation(); }
-        if (el.paused) {
-          var promise = el.play();
-          if (promise && promise.then) {
-            promise.then(function () { setCustomAudioStatus_('Playing'); }).catch(function (err) { setCustomAudioStatus_('Play failed: ' + (err && err.message ? err.message : 'browser blocked playback')); });
-          } else {
-            setCustomAudioStatus_('Playing');
-          }
-        } else {
-          el.pause();
-        }
-      };
-    }
-    if (rewBtn) {
-      rewBtn.onclick = function (event) {
-        if (event) { event.preventDefault(); event.stopPropagation(); }
-        try { el.currentTime = Math.max(0, (Number(el.currentTime) || 0) - 10); } catch (e) {}
-      };
-    }
-    if (fwdBtn) {
-      fwdBtn.onclick = function (event) {
-        if (event) { event.preventDefault(); event.stopPropagation(); }
-        try {
-          var dur = isFinite(el.duration) ? el.duration : (el.currentTime + 10);
-          el.currentTime = Math.min(dur, (Number(el.currentTime) || 0) + 10);
-        } catch (e) {}
-      };
-    }
+    if (playBtn) playBtn.onclick = function () {
+      if (el.paused) el.play().catch(function () { }); else el.pause();
+    };
+    if (rewBtn) rewBtn.onclick = function () { el.currentTime = Math.max(0, el.currentTime - 10); };
+    if (fwdBtn) fwdBtn.onclick = function () {
+      var dur = isFinite(el.duration) ? el.duration : (el.currentTime + 10);
+      el.currentTime = Math.min(dur, el.currentTime + 10);
+    };
 
     if (range) {
       range.addEventListener('input', function () {
@@ -3396,9 +3354,9 @@
     }
 
     el.addEventListener('loadedmetadata', function () {
-      if (range) range.max = isFinite(el.duration) ? el.duration : 0;
+      if (range) range.max = el.duration || 0;
       if (totEl) totEl.textContent = formatSyncTime_(el.duration);
-      setCustomAudioStatus_('Ready — press play');
+      if (statusEl) statusEl.textContent = 'Ready \u2014 press play';
     });
     el.addEventListener('timeupdate', function () {
       if (!syncedAudioScrubbing) {
@@ -3407,59 +3365,23 @@
       }
       highlightSyncedLyricsAtTime_(el.currentTime);
     });
-    el.addEventListener('play', function () {
-      if (playBtn) playBtn.innerHTML = '&#10074;&#10074;';
-      setCustomAudioStatus_('Playing');
-    });
-    el.addEventListener('pause', function () {
-      if (playBtn) playBtn.innerHTML = '&#9654;';
-      setCustomAudioStatus_('Paused');
-      highlightSyncedLyricsAtTime_(el.currentTime);
-    });
-    el.addEventListener('ended', function () {
-      if (playBtn) playBtn.innerHTML = '&#9654;';
-      setCustomAudioStatus_('Ended');
-    });
-    el.addEventListener('error', function () {
-      setCustomAudioStatus_('Could not play the private Drive audio.');
-    });
+    el.addEventListener('play', function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; });
+    el.addEventListener('pause', function () { if (playBtn) playBtn.innerHTML = '&#9654;'; });
+    el.addEventListener('ended', function () { if (playBtn) playBtn.innerHTML = '&#9654;'; });
+    el.addEventListener('error', advanceSyncedAudioSource_);
   }
 
-  function seekSyncedAudioToLine_(line) {
-    if (!line) return;
-    if (syncedAudioEl) {
-      syncedAudioEl.currentTime = Math.max(0, Number(line.begin) || 0);
-      highlightSyncedLyricsAtTime_(syncedAudioEl.currentTime);
-      if (syncedAudioEl.paused) syncedAudioEl.play().catch(function () {});
-      return;
-    }
-
-    if (currentFloatingIsYoutube) {
-      var iframe = document.getElementById('floating-player-iframe');
-      if (iframe && iframe.contentWindow) {
-        try {
-          iframe.contentWindow.postMessage(JSON.stringify({
-            event: 'command',
-            func: 'seekTo',
-            args: [Math.max(0, Number(line.begin) || 0), true]
-          }), '*');
-          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*');
-        } catch (e) {}
-      }
-      return;
-    }
-
-    syncOffsetSec = -(getSyncedElapsedSeconds_() || 0) + (Number(line.begin) || 0);
-    updateSyncStatus_(Number(line.begin) || 0);
-  }
-
+  // If a Drive link format doesn't load (blocked, wrong sharing setting,
+  // etc.), try the next candidate URL automatically. If every candidate
+  // fails, drop back to the old manual/YouTube sync rather than leaving a
+  // broken player on screen.
   function advanceSyncedAudioSource_() {
     syncedAudioCandidateIdx++;
     if (syncedAudioCandidateIdx < syncedAudioCandidates.length && syncedAudioEl) {
       syncedAudioEl.src = syncedAudioCandidates[syncedAudioCandidateIdx];
       syncedAudioEl.load();
       var statusEl = document.getElementById('sync-status');
-      if (statusEl) statusEl.textContent = 'Trying an alternate audio link…';
+      if (statusEl) statusEl.textContent = 'Trying an alternate audio link\u2026';
       return;
     }
     syncedAudioCandidates = [];
@@ -3467,9 +3389,30 @@
     syncedAudioEl = null;
     buildSyncBar_();
     var statusEl2 = document.getElementById('sync-status');
-    if (statusEl2) statusEl2.textContent = 'Couldn\'t load that audio file.';
+    if (statusEl2) statusEl2.textContent = 'Couldn\'t load that audio file \u2014 check the Drive link\'s sharing is set to "Anyone with the link."';
   }
 
+  // Opens the best available embed for this song (Spotify -> YouTube ->
+  // Apple Music, in that order) in the floating player and immediately
+  // starts syncing against it -- no separate "open the player" step.
+  //   - YouTube: openFloatingPlayer() already appends autoplay=1 (see
+  //     parseYouTubeEmbedUrl_ server-side) and kicks off the postMessage
+  //     "listening" handshake, so once that's attached we switch to the
+  //     REAL auto-synced clock (startYoutubeSyncMode_) instead of a
+  //     guessed one.
+  //   - Spotify: opened with ?autoplay=1 on the embed URL. Whether that
+  //     actually autoplays depends on the browser's autoplay policy --
+  //     since this only runs from a direct button click it usually
+  //     works, but isn't guaranteed everywhere (e.g. some mobile
+  //     browsers still block it).
+  //   - Apple Music: their embed doesn't support an autoplay parameter,
+  //     so this just opens the player and the listener taps play there.
+  // Spotify and Apple Music embeds don't expose playback position to us
+  // at all (see the SYNCED LYRICS comment block in Code.gs), so both of
+  // those fall back to the same manual "assume playback starts now"
+  // clock as the secondary "already playing it?" link -- just kicked off
+  // automatically the instant the embed opens, instead of requiring a
+  // second tap.
   function autoSyncStart_() {
     var post = currentLyricPost;
     if (!post) return;
@@ -3490,19 +3433,16 @@
     var chosen = candidates[0];
     openFloatingPlayer(chosen.embed);
 
-    if (chosen.type === 'spotify') {
-      var spotifyStatus = document.getElementById('sync-status');
-      if (spotifyStatus) spotifyStatus.textContent = 'Spotify opened — use the player controls to play.';
-    } else if (chosen.type === 'youtube') {
+    if (chosen.type === 'youtube') {
       setTimeout(startYoutubeSyncMode_, 900);
     } else {
       startManualSync_();
     }
   }
 
-
-
-
+  // Shows/hides the auto-sync (YouTube) button + the running offset/stop
+  // controls depending on whether a YouTube embed is currently open in
+  // the floating player and whether a sync clock is currently running.
   function updateSyncControlsVisibility_() {
     var ytBtn = document.getElementById('sync-yt-btn');
     if (ytBtn) ytBtn.style.display = (currentFloatingIsYoutube && !syncManualRunning) ? '' : 'none';
@@ -3550,7 +3490,6 @@
   }
 
   function getSyncedElapsedSeconds_() {
-    if (syncedAudioEl) return syncedAudioEl.currentTime;
     if (syncUsingYoutube) return youtubeCurrentTime + syncOffsetSec;
     if (syncManualRunning && syncManualStartMs !== null) return (Date.now() - syncManualStartMs) / 1000 + syncOffsetSec;
     return null;
@@ -4052,9 +3991,6 @@
 
   loadSettings();
   loadDisclaimers();
-</script>
-<script>
-window.onSpotifyIframeApiReady = function (IFrameAPI) { window.SpotifyIframeApi = IFrameAPI; };
 </script>
 </body>
 </html>
