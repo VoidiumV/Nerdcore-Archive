@@ -15,6 +15,7 @@
 <link rel="preconnect" href="https://i.scdn.co" crossorigin>
 <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
 <link rel="preconnect" href="https://placehold.co" crossorigin>
+<link rel="preconnect" href="https://drive.google.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -371,6 +372,8 @@
   }
   .artist-card:hover{ transform:translate(-3px,-3px); box-shadow:8px 8px 0 rgba(0,0,0,0.4); border-color:var(--green); }
   .artist-card img{ width:100%; aspect-ratio:1/1; object-fit:cover; background:#0a0d1c; border-bottom:3px solid var(--border); display:block; }
+  .artist-card img.image-loading{ opacity:.82; }
+  .artist-card img.image-ready{ opacity:1; }
   .artist-card .name{ font-family:'Press Start 2P', monospace; font-size:12px; color:var(--green); padding:12px 10px; text-align:center; line-height:1.6; word-break:break-word; overflow-wrap:anywhere; }
   .franchise-cat{ font-family:'VT323', monospace; font-size:13px; color:var(--amber); text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
   .group-tag{ font-family:'VT323', monospace; font-size:13px; color:#5fc9ff; text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
@@ -915,7 +918,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxc4HLTc5kvQZ_dKT_8Qa8oRcX41IirTFTtjUys2_1x_2e_Ffvl8Qj5GjO6CudPi8k_/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyPU2W_erp-C97psID7iHs_uK_7GwETrnYCluYx6nOhEwBMNTfOooNpGKh8EgGDETlK/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1001,6 +1004,35 @@
     }
     return str;
   }
+
+  function artistImageUrl_(artist, size) {
+    if (!artist) return getFallbackImage();
+    // Drive mirrors are already resized by Google's thumbnail service.
+    // Prefer the mirror over ImgBB whenever the backend has one.
+    var url = artist.pfpCached || artist.pfp || '';
+    return url ? optimizeArtUrl(url, size || 300) : getFallbackImage();
+  }
+
+  function setArtistImageWithFallback_(img, primaryUrl, fallbackUrl) {
+    if (!img) return;
+    var triedFallback = false;
+    img.classList.add('image-loading');
+    img.onload = function () {
+      img.classList.remove('image-loading');
+      img.classList.add('image-ready');
+    };
+    img.onerror = function () {
+      if (!triedFallback && fallbackUrl && img.src !== fallbackUrl) {
+        triedFallback = true;
+        img.src = fallbackUrl;
+      } else {
+        img.classList.remove('image-loading');
+        img.classList.add('image-ready');
+      }
+    };
+    img.src = primaryUrl || fallbackUrl;
+  }
+
 
   var siteSettings = { defaultImage: '', siteTitle: 'NERDCORE<br>ARCHIVE', tagline: '', social: {} };
   var allLyrics = [];
@@ -1762,7 +1794,7 @@
     allArtists.forEach(function (a) {
       var key = normalizeArtistKey(a.artist);
       if (!key) return;
-      pfpMap[key] = a.pfp;
+      pfpMap[key] = { pfp: a.pfp || '', pfpCached: a.pfpCached || '' };
       if (a.hidden) hiddenMap[key] = true;
       if (!isNA(a.members)) groupMap[key] = true;
       if (a.friend) friendMap[key] = true;
@@ -1802,7 +1834,15 @@
     names.sort(function (a, b) {
       return artistSortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
     });
-    return names.map(function (n) { return { artist: n, pfp: pfpMap[normalizeArtistKey(n)] || '', isGroup: !!groupMap[normalizeArtistKey(n)] }; });
+    return names.map(function (n) {
+      var imageMeta = pfpMap[normalizeArtistKey(n)] || {};
+      return {
+        artist: n,
+        pfp: imageMeta.pfp || '',
+        pfpCached: imageMeta.pfpCached || '',
+        isGroup: !!groupMap[normalizeArtistKey(n)]
+      };
+    });
   }
 
   function renderArtistGrid() {
@@ -1815,17 +1855,23 @@
       return;
     }
     var fallback = getFallbackImage();
-    container.innerHTML = '<div class="artist-grid">' + list.map(function (a) {
-      var img = a.pfp ? escapeHtml(optimizeArtUrl(a.pfp, 300)) : fallback;
+    container.innerHTML = '<div class="artist-grid">' + list.map(function (a, idx) {
+      var img = artistImageUrl_(a, 300);
       var groupTagHtml = a.isGroup ? '<div class="group-tag">GROUP</div>' : '';
+      var loadingMode = idx < 12 ? 'eager' : 'lazy';
+      var priority = idx < 8 ? ' high' : '';
       return (
         '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
-          '<img src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img data-artist-image="1" src="' + escapeHtml(img) + '" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
           groupTagHtml +
         '</div>'
       );
     }).join('') + '</div>';
+
+    container.querySelectorAll('[data-artist-image]').forEach(function (img) {
+      setArtistImageWithFallback_(img, img.getAttribute('src'), fallback);
+    });
 
     container.querySelectorAll('.artist-card').forEach(function (card) {
       card.addEventListener('click', function () {
