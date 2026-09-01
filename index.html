@@ -137,13 +137,8 @@
   }
   @keyframes crtFlicker{ 0%,92%,100%{opacity:.50;} 93%{opacity:.58;} 94%{opacity:.45;} }
   @keyframes crtScan{ 0%{background-position:0 0,0 -100%;} 100%{background-position:0 0,0 100%;} }
-  .activity-ticker{ border:2px solid var(--border); background:rgba(20,24,49,.92); overflow:hidden; white-space:nowrap; }
-  .home-activity-ticker{ margin-top:26px; }
-  .activity-ticker-track{ width:max-content; min-width:100%; padding:6px 0; display:flex; gap:10px; align-items:center; font-family:'VT323',monospace; font-size:16px; color:var(--muted); animation:tickerScroll 32s linear infinite; }
-  .activity-ticker-track span{ display:inline-block; }
-  .activity-dot{ color:var(--green); }
   @keyframes tickerScroll{ from{transform:translateX(0);} to{transform:translateX(-35%);} }
-  @media(prefers-reduced-motion:reduce){ .activity-ticker-track,.page.page-enter,body::after,.skeleton-card{animation:none!important;} .artist-card,.lyric-card,.track-card,.related-card{transition:none!important;} }
+  @media(prefers-reduced-motion:reduce){ .page.page-enter,body::after,.skeleton-card{animation:none!important;} .artist-card,.lyric-card,.track-card,.related-card{transition:none!important;} }
   .global-search-wrap{ position:relative; flex:0 1 270px; }
   .global-search{ width:100%; font-family:'Space Mono',monospace; font-size:12px; background:var(--panel); color:var(--ink); border:2px solid var(--border); padding:9px 11px; outline:none; }
   .global-search:focus{ border-color:var(--green); }
@@ -153,6 +148,21 @@
   .global-search-result:hover{ background:var(--panel); }
   .global-search-result-title{ font-family:'VT323',monospace; font-size:19px; color:var(--green); }
   .global-search-result-meta{ font-family:'VT323',monospace; font-size:14px; color:var(--muted-dim); margin-top:2px; }
+
+  .browse-toolbar{ display:flex; align-items:center; gap:9px; margin-bottom:10px; flex-wrap:wrap; }
+  .browse-toolbar .search-box{ flex:1 1 320px; min-width:180px; margin:0 !important; }
+  .browse-toolbar .nav-tab{ margin:0; white-space:nowrap; }
+  .browse-subtoolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+  .browse-subtoolbar .nav-tab{ margin:0; }
+  .request-missing-btn{ font-family:'VT323',monospace; font-size:15px; color:var(--muted); border:1px solid var(--border); background:transparent; padding:5px 9px; cursor:pointer; transition:color .15s,border-color .15s,transform .15s; }
+  .request-missing-btn:hover{ color:var(--green); border-color:var(--green); transform:translateY(-1px); }
+  .artist-card::after,.lyric-card::after,.album-card::after{ content:''; position:absolute; inset:0; pointer-events:none; opacity:0; background:linear-gradient(115deg,transparent 20%,rgba(255,255,255,.045) 45%,transparent 70%); transform:translateX(-110%); transition:opacity .15s; }
+  .artist-card:hover::after,.lyric-card:hover::after,.album-card:hover::after{ opacity:1; animation:cardSheen .55s ease both; }
+  @keyframes cardSheen{ to{ transform:translateX(110%); } }
+  .page h1{ animation:wikiTitleIn .45s ease both; }
+  @keyframes wikiTitleIn{ from{opacity:.4; transform:translateX(-5px); text-shadow:none;} to{opacity:1; transform:none;} }
+  .artist-card,.lyric-card,.album-card{ position:relative; overflow:hidden; }
+  @media(max-width:620px){ .browse-toolbar .search-box{ flex-basis:100%; } .browse-toolbar .nav-tab{ flex:1; text-align:center; } .browse-subtoolbar{ align-items:stretch; } .browse-subtoolbar .request-missing-btn{ flex:1; text-align:center; } }
   .artist-browse-toolbar{ display:flex; align-items:center; gap:9px; margin-bottom:16px; flex-wrap:wrap; }
   .artist-browse-toolbar .search-box{ flex:1 1 260px; min-width:180px; margin:0 !important; }
   .artist-toolbar-actions{ display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
@@ -165,6 +175,7 @@
   }
   .badge.new{ color:var(--green); border-color:var(--green); }
   .badge.updated{ color:var(--amber); border-color:var(--amber); }
+  .badge.synced{ color:#5fc9ff; border-color:#5fc9ff; }
   .related-section{ margin-top:28px; }
   .section-kicker{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--amber); letter-spacing:1px; margin-bottom:12px; }
   .related-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
@@ -405,6 +416,21 @@
   .synced-empty{ font-family:'VT323', monospace; font-size:19px; color:var(--muted); text-align:center; padding:30px 10px; }
 
   /* ---------- about me page ---------- */
+
+  .about-highlights-section{ margin-top:34px; }
+  .about-highlights-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:12px; }
+  .about-highlight-card{ background:var(--panel); border:2px solid var(--border); overflow:hidden; transition:transform .16s,border-color .16s,box-shadow .16s; }
+  .about-highlight-card:hover{ transform:translateY(-3px); border-color:var(--green); box-shadow:5px 5px 0 rgba(0,0,0,.28); }
+  .about-highlight-media{ background:#0c1024; max-height:420px; overflow:hidden; }
+  .about-highlight-media img,.about-highlight-media video{ display:block; width:100%; max-height:420px; object-fit:contain; }
+  .about-highlight-media.ratio{ aspect-ratio:16/9; }
+  .about-highlight-media.ratio iframe{ width:100%; height:100%; border:0; display:block; }
+  .about-highlight-body{ padding:14px 16px 16px; }
+  .about-highlight-body h3{ margin:0 0 7px; color:var(--ink); font-family:'VT323',monospace; font-size:24px; }
+  .about-highlight-body p{ margin:0; color:var(--muted); line-height:1.5; }
+  .about-highlight-link{ display:inline-block; margin-top:12px; color:var(--green); font-family:'VT323',monospace; font-size:15px; text-decoration:none; }
+  .about-highlight-link:hover{ text-decoration:underline; }
+  @media(max-width:700px){ .about-highlights-grid{grid-template-columns:1fr;} }
   .about-hero{
     display:flex; flex-direction:column; align-items:center; text-align:center;
     background:var(--panel); border:3px solid var(--border);
@@ -789,9 +815,6 @@
     </div>
   </div>
 
-  <div class="activity-ticker home-activity-ticker" id="activity-ticker" aria-label="Archive activity">
-    <div class="activity-ticker-track" id="activity-ticker-track"><span class="activity-dot">*</span><span>ARCHIVE ACTIVITY</span></div>
-  </div>
 </div>
 
 <!-- LYRICS = ARTIST PROFILE GRID / FRANCHISE BROWSE -->
@@ -810,20 +833,23 @@
   </div>
 
   <div class="subpane active" id="browsepane-artist">
-    <div class="artist-browse-toolbar">
+    <div class="browse-toolbar">
       <input type="text" class="search-box" id="artist-search" placeholder="Search artists&hellip;">
+      <div class="nav-tab" id="artist-sort-toggle">SORT: A<span class="sort-arrow">&#8594;</span>Z</div>
+    </div>
+    <div class="browse-subtoolbar">
       <div class="artist-toolbar-actions" id="artist-group-tabs">
         <div class="nav-tab active" data-artistgroup="nerdcore">NERDCORE ARTISTS</div>
         <div class="nav-tab" data-artistgroup="friends">FRIENDS OF NERDCORE</div>
-        <div class="nav-tab" id="artist-sort-toggle">SORT: A<span class="sort-arrow">&#8594;</span>Z</div>
       </div>
+      <button type="button" class="request-missing-btn" id="request-missing-artist-btn">REQUEST MISSING ARTIST</button>
     </div>
     <div id="artist-grid-content"><div class="skeleton-grid"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div></div>
   </div>
 
   <div class="subpane" id="browsepane-franchise">
-    <input type="text" class="search-box" id="franchise-search" placeholder="Search franchises&hellip;" style="width:100%; margin-bottom:18px;">
-    <div style="display:flex; justify-content:flex-end; margin-bottom:18px;">
+    <div class="browse-toolbar">
+      <input type="text" class="search-box" id="franchise-search" placeholder="Search franchises&hellip;">
       <div class="nav-tab" id="franchise-sort-toggle">SORT: A<span class="sort-arrow">&#8594;</span>Z</div>
     </div>
     <div id="franchise-grid-content"><div class="skeleton-grid"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div></div>
@@ -878,7 +904,7 @@
 <div class="page" id="view-releases" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
   <div class="page-head">
-    <div class="eyebrow">CALENDAR-ISH</div>
+    <div class="eyebrow">SONG DROPS</div>
     <h1>RELEASES</h1>
     <p>Tracks upcoming releases and songs dropped over the past month.</p>
   </div>
@@ -997,7 +1023,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbytgxsXaZXYWnGAO1NLRAjD_jLBtPHFkeVrhjwtc4rpuBwcIfvvR9HhDGaJQdBbIeaF/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzvLc2kT0YJllTa5Tmp2I4UFJgFcnEeuwLkcdX7Zai1wS0hmGsmZQ1a-MamzFQF76Yz/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1012,7 +1038,7 @@
     settings: true, disclaimers: true, lyrics: true, artists: true,
     albums: true, franchises: true, characters: true, top5: true,
     top10yearly: true, playlists: true, artistStats: true,
-    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, activity: true, syncedLyrics: true
+    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, aboutHighlights: true, syncedLyrics: true
   };
 
   function apiCacheKey_(action, params) {
@@ -1165,8 +1191,6 @@
 
   var siteSettings = { defaultImage: '', siteTitle: 'NERDCORE<br>ARCHIVE', tagline: '', social: {} };
   var archiveBadges = [];
-  var archiveActivity = [];
-  var archiveActivityLoaded_ = false;
   var globalSearchTimer_ = null;
   var globalSearchRequest_ = 0;
   var allLyrics = [];
@@ -1255,21 +1279,9 @@
   function badgeHtmlFor_(title, artist, pageType) {
     var b = getBadgeFor_(title, artist, pageType);
     if (!b) return '';
-    var label = b.type === 'new' ? 'NEW' : (b.type === 'updated' ? 'UPDATED' : String(b.type).toUpperCase());
+    var rawType = String(b.type || '').toLowerCase();
+    var label = rawType === 'new' ? 'NEW' : (rawType === 'updated' ? 'UPDATED' : (rawType === 'synced' ? 'SYNCED' : String(b.type).toUpperCase()));
     return '<span class="badge ' + escapeHtml(b.type) + '">' + escapeHtml(label) + '</span>';
-  }
-  function renderActivityTicker_() {
-    var track = document.getElementById('activity-ticker-track');
-    if (!track) return;
-    if (!archiveActivity.length) {
-      track.innerHTML = '<span class="activity-dot">*</span><span>ARCHIVE ACTIVITY</span>';
-      return;
-    }
-    var bits = [];
-    archiveActivity.forEach(function (a) {
-      bits.push('<span class="activity-dot">*</span><span>' + escapeHtml(a.text) + (a.artist ? ' &mdash; ' + escapeHtml(a.artist) : '') + '</span>');
-    });
-    track.innerHTML = bits.concat(bits).join('<span style="color:var(--border);margin:0 12px;">/</span>');
   }
   function loadArchiveMeta_() {
     api('badges').catch(function(){ return []; }).then(function (badges) {
@@ -1278,17 +1290,6 @@
     });
   }
 
-  function loadArchiveActivity_() {
-    if (archiveActivityLoaded_) {
-      renderActivityTicker_();
-      return;
-    }
-    api('activity').catch(function(){ return []; }).then(function (activity) {
-      archiveActivity = activity || [];
-      archiveActivityLoaded_ = true;
-      renderActivityTicker_();
-    });
-  }
   function refreshVisibleBadgeViews_() {
     // Badge-bearing cards are rendered from current data; a full refresh is only
     // needed when metadata arrives after a page has already been rendered.
@@ -1316,8 +1317,18 @@
     if (route.indexOf('franchise/') === 0) { window.location.hash = '#/' + route; routeFromHash(); return; }
   }
 
-  function openFloatingPlayer(url) {
+  var currentFloatingTitleOverride_ = '';
+  var currentFloatingArtistOverride_ = '';
+
+  function openFloatingPlayer(url, playerTitle, playerArtist) {
     if (!url) return;
+    if (playerTitle) {
+      currentFloatingTitleOverride_ = String(playerTitle);
+      currentFloatingArtistOverride_ = String(playerArtist || '');
+    } else {
+      currentFloatingTitleOverride_ = '';
+      currentFloatingArtistOverride_ = '';
+    }
     var player = document.getElementById('floating-player');
     var iframe = document.getElementById('floating-player-iframe');
     var custom = document.getElementById('floating-custom-audio');
@@ -1404,21 +1415,22 @@
     function openBugReportModal(context) {
     bugReportContext = context || {};
     var isMissing = bugReportContext.mode === 'missing';
+    var isMissingArtist = bugReportContext.mode === 'missingArtist';
 
-    document.getElementById('bug-report-modal-title').textContent = isMissing ? 'REPORT A MISSING SONG' : 'REPORT AN ISSUE';
+    document.getElementById('bug-report-modal-title').textContent = isMissing ? 'REQUEST A MISSING SONG' : (isMissingArtist ? 'REQUEST A MISSING ARTIST' : 'REPORT AN ISSUE');
     document.getElementById('bug-report-modal-desc').textContent = isMissing
       ? "Know a song by " + (bugReportContext.artist || 'this artist') + " that should be on this site but isn't? Tell us the song title below (and a link, if you have one) and we'll add it."
-      : "What's wrong with this page? Select all that apply.";
-    document.getElementById('bug-report-options').style.display = isMissing ? 'none' : '';
+      : (isMissingArtist ? "Know an artist who should be listed here? Tell us who they are and we'll take a look." : "What's wrong with this page? Select all that apply.");
+    document.getElementById('bug-report-options').style.display = (isMissing || isMissingArtist) ? 'none' : '';
 
     var noteEl = document.getElementById('bug-report-missing-note');
-    if (noteEl) noteEl.style.display = isMissing ? '' : 'none';
+    if (noteEl) noteEl.style.display = (isMissing || isMissingArtist) ? '' : 'none';
 
     document.querySelectorAll('#bug-report-options input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
     document.getElementById('bug-report-text').value = '';
     document.getElementById('bug-report-text').placeholder = isMissing
       ? 'Song title, and a YouTube/Spotify link if you have one…'
-      : "(optional) what's wrong…";
+      : (isMissingArtist ? 'Artist name, and a link if you have one…' : "(optional) what's wrong…");
     document.getElementById('bug-report-submit').textContent = 'SUBMIT';
     document.getElementById('bug-report-overlay').classList.add('open');
   }
@@ -1444,24 +1456,26 @@
   document.getElementById('bug-report-submit').addEventListener('click', function () {
     var btn = this;
     var isMissing = bugReportContext && bugReportContext.mode === 'missing';
+    var isMissingArtist = bugReportContext && bugReportContext.mode === 'missingArtist';
     var message = document.getElementById('bug-report-text').value.trim();
 
-    if (isMissing && !message) {
-      alert('Add the song title so we know what to look for.');
+    if ((isMissing || isMissingArtist) && !message) {
+      alert(isMissingArtist ? 'Add the artist name so we know who to look for.' : 'Add the song title so we know what to look for.');
       return;
     }
 
     var categories = isMissing
       ? 'Missing song'
+      : (isMissingArtist ? 'Missing artist'
       : Array.prototype.slice
           .call(document.querySelectorAll('#bug-report-options input[type="checkbox"]:checked'))
           .map(function (cb) { return cb.value; })
-          .join(', ');
+          .join(', '));
 
     btn.textContent = 'SENDING…';
     api('reportBug', {
       songId: (bugReportContext && bugReportContext.id) || '',
-      songTitle: (bugReportContext && bugReportContext.title) || (isMissing ? '(missing song)' : ''),
+      songTitle: (bugReportContext && bugReportContext.title) || (isMissing ? '(missing song)' : (isMissingArtist ? '(missing artist)' : '')),
       artist: (bugReportContext && bugReportContext.artist) || '',
       categories: categories,
       message: message
@@ -1567,7 +1581,6 @@
     document.getElementById('view-home').style.display = '';
     setActiveTab('home');
     setPath('');
-    loadArchiveActivity_();
   }
   function showLyricsList() {
     hideAllViews();
@@ -1641,6 +1654,8 @@
       (initialVariant ? '/variant/' + encodeURIComponent(initialVariant) : ''));
     document.getElementById('lyrics-detail-content').innerHTML = detailSkeletonHtml_();
     lyricsViewMode = 'text';
+    currentFloatingTitleOverride_ = '';
+    currentFloatingArtistOverride_ = '';
     syncedLyricsData = null;
     syncedLyricsLoadedForId = null;
     syncedLineEls_ = [];
@@ -1942,6 +1957,44 @@
           SOCIAL_LABELS[key] + '</a>';
       }).join('');
     }
+
+    api('aboutHighlights').then(function (items) {
+      renderAboutHighlights_(items || []);
+    }).catch(function () {});
+  }
+
+  function renderAboutHighlights_(items) {
+    var container = document.getElementById('about-content');
+    if (!container || !items || !items.length) return;
+    var groups = {};
+    items.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); }).forEach(function(item){
+      var section = String(item.section || 'HIGHLIGHTS').trim() || 'HIGHLIGHTS';
+      if (!groups[section]) groups[section] = [];
+      groups[section].push(item);
+    });
+    var html = '';
+    Object.keys(groups).forEach(function(section){
+      html += '<section class="about-highlights-section"><div class="section-kicker">' + escapeHtml(section.toUpperCase()) + '</div><div class="about-highlights-grid">';
+      groups[section].forEach(function(item){
+        var media='';
+        var type=String(item.mediaType||'').toLowerCase();
+        var url=String(item.mediaUrl||'').trim();
+        if(url){
+          if(type==='youtube' || /youtube(?:-nocookie)?\.com\/watch\?v=|youtu\.be\//i.test(url)){
+            var m=url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
+            if(m) media='<div class="about-highlight-media ratio"><iframe src="https://www.youtube.com/embed/' + encodeURIComponent(m[1]) + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>';
+          } else if(type==='video' || /\.(mp4|webm|ogg)(?:\?.*)?$/i.test(url)){
+            media='<div class="about-highlight-media"><video src="' + escapeHtml(url) + '" controls preload="metadata"></video></div>';
+          } else {
+            media='<div class="about-highlight-media"><img src="' + escapeHtml(url) + '" loading="lazy" decoding="async" alt=""></div>';
+          }
+        }
+        var link=item.linkUrl ? '<a class="about-highlight-link" href="' + escapeHtml(item.linkUrl) + '" target="_blank" rel="noopener">VIEW SOURCE</a>' : '';
+        html += '<article class="about-highlight-card">' + media + '<div class="about-highlight-body">' + (item.title ? '<h3>' + escapeHtml(item.title) + '</h3>' : '') + (item.text ? '<p>' + escapeHtml(item.text).replace(/\n/g,'<br>') + '</p>' : '') + link + '</div></article>';
+      });
+      html += '</div></section>';
+    });
+    container.insertAdjacentHTML('beforeend', html);
   }
 
   function loadSettings() {
@@ -2087,6 +2140,7 @@
           '<img data-artist-image="1" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
           groupTagHtml +
+          '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + '</div>' +
         '</div>'
       );
     }).join('') + '</div>';
@@ -2122,6 +2176,11 @@
       renderArtistGrid();
     });
   });
+
+  var requestMissingArtistBtn = document.getElementById('request-missing-artist-btn');
+  if (requestMissingArtistBtn) {
+    requestMissingArtistBtn.addEventListener('click', function () { openBugReportModal({ mode: 'missingArtist' }); });
+  }
 
   document.getElementById('artist-search').addEventListener('input', debounce_(function () {
     artistSearchQuery = this.value;
@@ -3047,7 +3106,7 @@
 
     var header =
       '<div class="detail-hero">' +
-        '<span class="report-btn-corner" id="artist-report-missing-btn">&#9873; REPORT MISSING SONG</span>' +
+        '<span class="report-btn-corner" id="artist-report-missing-btn">&#9873; REQUEST MISSING SONG</span>' +
         '<img class="detail-hero-img" src="' + escapeHtml(optimizeArtUrl(pfp, 440)) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(name) + '</h1>' +
@@ -3259,9 +3318,11 @@
   function updateFloatingPlayerTitle_() {
     var labelEl = document.getElementById('floating-player-label');
     var titleEl = document.getElementById('floating-audio-title');
-    var text = currentLyricPost
-      ? currentLyricPost.artist + ' — ' + currentLyricPost.title
-      : 'MEDIA PLAYER';
+    var overrideTitle = currentFloatingTitleOverride_;
+    var overrideArtist = currentFloatingArtistOverride_;
+    var text = overrideTitle
+      ? (overrideArtist ? overrideArtist + ' — ' + overrideTitle : overrideTitle)
+      : (currentLyricPost ? currentLyricPost.artist + ' — ' + currentLyricPost.title : 'MEDIA PLAYER');
     if (labelEl) labelEl.textContent = currentLyricPost ? 'MEDIA PLAYER — ' + text : 'MEDIA PLAYER';
     if (titleEl) titleEl.textContent = text;
   }
@@ -3452,23 +3513,10 @@
         return s.id !== post.id && !s.isLocked && !isHiddenVariantRow_(s);
       }).map(function(s){
         var score=0;
-        var sameArtist = normalizeArtistKey(s.artist) === normalizeArtistKey(post.artist);
-        var sameFranchise = !isNA(post.franchise) && !isNA(s.franchise) &&
-          splitCsv_(post.franchise).some(function(f){ return splitCsv_(s.franchise).some(function(sf){ return normalizeArtistKey(f)===normalizeArtistKey(sf); }); });
-        var sameCharacter = !isNA(post.character) && !isNA(s.character) &&
-          splitCsv_(post.character).some(function(c){ return splitCsv_(s.character).some(function(sc){ return normalizeArtistKey(c)===normalizeArtistKey(sc); }); });
-        var sameAlbum = post.albumId && s.albumId && normalizeArtistKey(post.albumId)===normalizeArtistKey(s.albumId);
-
-        // Strongly prioritize the exact combinations users are most likely
-        // looking for: another song by this artist from the same franchise
-        // or character. Then fall back to broader relationships.
-        if (sameArtist && sameCharacter) score += 100;
-        else if (sameArtist && sameFranchise) score += 90;
-        else if (sameArtist && sameAlbum) score += 80;
-        else if (sameArtist) score += 45;
-        if (sameCharacter) score += 22;
-        if (sameFranchise) score += 18;
-        if (sameAlbum) score += 16;
+        if (normalizeArtistKey(s.artist) === normalizeArtistKey(post.artist)) score += 7;
+        if (!isNA(post.franchise) && !isNA(s.franchise) && splitCsv_(post.franchise).some(function(f){ return splitCsv_(s.franchise).some(function(sf){ return normalizeArtistKey(f)===normalizeArtistKey(sf); }); })) score += 5;
+        if (!isNA(post.character) && !isNA(s.character) && splitCsv_(post.character).some(function(c){ return splitCsv_(s.character).some(function(sc){ return normalizeArtistKey(c)===normalizeArtistKey(sc); }); })) score += 6;
+        if (post.albumId && s.albumId && normalizeArtistKey(post.albumId)===normalizeArtistKey(s.albumId)) score += 6;
         if (post.featured && String(post.featured).toLowerCase().indexOf(String(s.artist||'').toLowerCase()) !== -1) score += 2;
         return {s:s,score:score};
       }).filter(function(x){return x.score>0;}).sort(function(a,b){return b.score-a.score || String(a.s.title).localeCompare(String(b.s.title));}).slice(0,4);
@@ -4003,7 +4051,7 @@
         var songHtml;
         var linkIcon = '<span class="release-link-ico">&#9654;</span>';
         if (item.linkEmbed) {
-          songHtml = '<a class="release-song release-song-link has-link" href="javascript:void(0)" onclick="openFloatingPlayer(\'' + escapeHtml(item.linkEmbed) + '\')">' + linkIcon + titleText + '</a>';
+          songHtml = '<a class="release-song release-song-link has-link" href="javascript:void(0)" onclick="openFloatingPlayer(\'' + escapeHtml(item.linkEmbed) + '\', \'' + escapeHtml(item.title) + '\', \'' + escapeHtml(item.artist) + '\')">' + linkIcon + titleText + '</a>';
         } else if (item.link) {
           songHtml = '<a class="release-song release-song-link has-link" href="' + escapeHtml(item.link) + '" target="_blank" rel="noopener">' + linkIcon + titleText + '</a>';
         } else {
