@@ -125,9 +125,20 @@
   @keyframes skeletonShimmer{ from{background-position:200% 0;} to{background-position:-20% 0;} }
   .page.page-enter{ animation:pageIn .22s ease both; }
   @keyframes pageIn{ from{opacity:0; transform:translateY(7px);} to{opacity:1; transform:none;} }
-  body::after{ content:''; position:fixed; inset:0; pointer-events:none; z-index:99999; background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0,rgba(255,255,255,.018) 1px,transparent 1px,transparent 4px); opacity:.32; animation:crtFlicker 9s steps(1,end) infinite; }
-  @keyframes crtFlicker{ 0%,92%,100%{opacity:.30;} 93%{opacity:.36;} 94%{opacity:.27;} }
-  .activity-ticker{ border-bottom:2px solid var(--border); background:rgba(20,24,49,.92); overflow:hidden; white-space:nowrap; }
+  body::after{
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:99999;
+    background:
+      repeating-linear-gradient(0deg,rgba(255,255,255,.028) 0,rgba(255,255,255,.028) 1px,transparent 1px,transparent 3px),
+      linear-gradient(180deg,transparent 0%,rgba(61,255,143,.035) 48%,transparent 52%);
+    background-size:100% 3px,100% 100%;
+    opacity:.52;
+    animation:crtFlicker 8s steps(1,end) infinite, crtScan 7s linear infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes crtFlicker{ 0%,92%,100%{opacity:.50;} 93%{opacity:.58;} 94%{opacity:.45;} }
+  @keyframes crtScan{ 0%{background-position:0 0,0 -100%;} 100%{background-position:0 0,0 100%;} }
+  .activity-ticker{ border:2px solid var(--border); background:rgba(20,24,49,.92); overflow:hidden; white-space:nowrap; }
+  .home-activity-ticker{ margin-top:26px; }
   .activity-ticker-track{ width:max-content; min-width:100%; padding:6px 0; display:flex; gap:10px; align-items:center; font-family:'VT323',monospace; font-size:16px; color:var(--muted); animation:tickerScroll 32s linear infinite; }
   .activity-ticker-track span{ display:inline-block; }
   .activity-dot{ color:var(--green); }
@@ -142,10 +153,16 @@
   .global-search-result:hover{ background:var(--panel); }
   .global-search-result-title{ font-family:'VT323',monospace; font-size:19px; color:var(--green); }
   .global-search-result-meta{ font-family:'VT323',monospace; font-size:14px; color:var(--muted-dim); margin-top:2px; }
-  .artist-browse-toolbar{ display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
-  .artist-browse-toolbar .search-box{ flex:1; min-width:200px; margin:0 !important; }
-  .artist-toolbar-actions{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .artist-browse-toolbar{ display:flex; align-items:center; gap:9px; margin-bottom:16px; flex-wrap:wrap; }
+  .artist-browse-toolbar .search-box{ flex:1 1 260px; min-width:180px; margin:0 !important; }
+  .artist-toolbar-actions{ display:flex; gap:5px; flex-wrap:wrap; align-items:center; }
+  .artist-toolbar-actions .nav-tab{ padding:8px 10px; font-size:10px; }
   .artist-toolbar-actions .nav-tab{ margin:0; }
+  @media(max-width:720px){
+    .artist-browse-toolbar{ gap:7px; }
+    .artist-toolbar-actions{ width:100%; }
+    .artist-toolbar-actions .nav-tab{ flex:1 1 auto; text-align:center; }
+  }
   .badge.new{ color:var(--green); border-color:var(--green); }
   .badge.updated{ color:var(--amber); border-color:var(--amber); }
   .related-section{ margin-top:28px; }
@@ -732,10 +749,6 @@
     </div>
   </div>
 </div>
-<div class="activity-ticker" id="activity-ticker" aria-label="Archive activity">
-  <div class="activity-ticker-track" id="activity-ticker-track"><span class="activity-dot">*</span><span>ARCHIVE ACTIVITY</span></div>
-</div>
-
 <!-- HOME -->
 <div class="page" id="view-home">
   <div class="home-hero">
@@ -774,6 +787,10 @@
       <h3>ABOUT ME</h3>
       <p>A small thing about the person who made this site.</p>
     </div>
+  </div>
+
+  <div class="activity-ticker home-activity-ticker" id="activity-ticker" aria-label="Archive activity">
+    <div class="activity-ticker-track" id="activity-ticker-track"><span class="activity-dot">*</span><span>ARCHIVE ACTIVITY</span></div>
   </div>
 </div>
 
@@ -980,7 +997,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyxSApptYzo90Lsyh5sitSmlU976EydGTlPUpBDrpNe3cIrLxCVBv-GeU9HtFRaA-aY/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbytgxsXaZXYWnGAO1NLRAjD_jLBtPHFkeVrhjwtc4rpuBwcIfvvR9HhDGaJQdBbIeaF/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -995,7 +1012,7 @@
     settings: true, disclaimers: true, lyrics: true, artists: true,
     albums: true, franchises: true, characters: true, top5: true,
     top10yearly: true, playlists: true, artistStats: true,
-    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, activity: true
+    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, activity: true, syncedLyrics: true
   };
 
   function apiCacheKey_(action, params) {
@@ -1149,6 +1166,7 @@
   var siteSettings = { defaultImage: '', siteTitle: 'NERDCORE<br>ARCHIVE', tagline: '', social: {} };
   var archiveBadges = [];
   var archiveActivity = [];
+  var archiveActivityLoaded_ = false;
   var globalSearchTimer_ = null;
   var globalSearchRequest_ = 0;
   var allLyrics = [];
@@ -1193,6 +1211,7 @@
   var syncedAudioFileId = '';
   var syncedAudioLoading = false;
   var syncedAudioBlobUrl = '';
+  var syncedAudioRequestToken_ = 0;
 
   var releasesLoaded = false;
   var top5Loaded = false;
@@ -1210,7 +1229,6 @@
   var franchiseCharSearchQuery = '';
   var currentFranchiseCharDetail = null;
   var currentFranchiseAllDetail = null;
-  var currentFranchiseGeneralDetail = null;
   var currentFranchiseGeneralDetail = null;
   var currentArtistFeaturedDetail = null;
   var currentArtistProducedDetail = null;
@@ -1254,11 +1272,21 @@
     track.innerHTML = bits.concat(bits).join('<span style="color:var(--border);margin:0 12px;">/</span>');
   }
   function loadArchiveMeta_() {
-    Promise.all([api('badges').catch(function(){return [];}), api('activity').catch(function(){return [];} )]).then(function(r){
-      archiveBadges = r[0] || [];
-      archiveActivity = r[1] || [];
-      renderActivityTicker_();
+    api('badges').catch(function(){ return []; }).then(function (badges) {
+      archiveBadges = badges || [];
       if (lyricsLoaded) refreshVisibleBadgeViews_();
+    });
+  }
+
+  function loadArchiveActivity_() {
+    if (archiveActivityLoaded_) {
+      renderActivityTicker_();
+      return;
+    }
+    api('activity').catch(function(){ return []; }).then(function (activity) {
+      archiveActivity = activity || [];
+      archiveActivityLoaded_ = true;
+      renderActivityTicker_();
     });
   }
   function refreshVisibleBadgeViews_() {
@@ -1316,8 +1344,7 @@
     iframe.src = finalUrl;
     player.style.pointerEvents = 'auto';
     player.style.display = 'flex';
-    var labelEl = document.getElementById('floating-player-label');
-    if (labelEl) labelEl.textContent = currentLyricPost ? ('MEDIA PLAYER — ' + currentLyricPost.artist + ' — ' + currentLyricPost.title) : 'MEDIA PLAYER';
+    updateFloatingPlayerTitle_();
     if (currentFloatingIsYoutube) setTimeout(startYoutubeListening_, 800);
     updateSyncControlsVisibility_();
   }
@@ -1540,6 +1567,7 @@
     document.getElementById('view-home').style.display = '';
     setActiveTab('home');
     setPath('');
+    loadArchiveActivity_();
   }
   function showLyricsList() {
     hideAllViews();
@@ -2083,12 +2111,13 @@
     };
   }
 
-  document.querySelectorAll('#artist-group-tabs .subtab').forEach(function (tab) {
+  document.querySelectorAll('#artist-group-tabs [data-artistgroup]').forEach(function (tab) {
     tab.addEventListener('click', function () {
       var mode = tab.getAttribute('data-artistgroup');
+      if (mode !== 'nerdcore' && mode !== 'friends') return;
       if (mode === artistGroupMode) return;
       artistGroupMode = mode;
-      document.querySelectorAll('#artist-group-tabs .subtab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('#artist-group-tabs [data-artistgroup]').forEach(function (t) { t.classList.remove('active'); });
       tab.classList.add('active');
       renderArtistGrid();
     });
@@ -3227,8 +3256,48 @@
     });
   }
 
+  function updateFloatingPlayerTitle_() {
+    var labelEl = document.getElementById('floating-player-label');
+    var titleEl = document.getElementById('floating-audio-title');
+    var text = currentLyricPost
+      ? currentLyricPost.artist + ' — ' + currentLyricPost.title
+      : 'MEDIA PLAYER';
+    if (labelEl) labelEl.textContent = currentLyricPost ? 'MEDIA PLAYER — ' + text : 'MEDIA PLAYER';
+    if (titleEl) titleEl.textContent = text;
+  }
+
+  function resetSyncedAudioState_() {
+    syncedAudioRequestToken_++;
+    syncedAudioLoading = false;
+    syncedAudioCandidates = [];
+    syncedAudioCandidateIdx = 0;
+    syncedAudioFileId = '';
+    syncedAudioScrubbing = false;
+    if (syncedAudioEl) {
+      try {
+        syncedAudioEl.pause();
+        syncedAudioEl.removeAttribute('src');
+        syncedAudioEl.load();
+      } catch (e) {}
+    }
+    syncedAudioEl = null;
+    if (syncedAudioBlobUrl) {
+      try { URL.revokeObjectURL(syncedAudioBlobUrl); } catch (e) {}
+      syncedAudioBlobUrl = '';
+    }
+  }
+
   function renderLyricDetail(post, initialVariant) {
+    var previousId = currentLyricPost && currentLyricPost.id;
+    if (previousId && (!post || previousId !== post.id)) {
+      stopManualSync_();
+      resetSyncedAudioState_();
+      syncedLyricsData = null;
+      syncedLyricsLoadedForId = null;
+      lyricsViewMode = 'text';
+    }
     currentLyricPost = post || null;
+    updateFloatingPlayerTitle_();
     currentLyricViewVariantLabel = (post && post.variants && initialVariant &&
       post.variants.some(function (v) { return v.label === initialVariant; })) ? initialVariant : null;
     renderLyricDetailBody_();
@@ -3323,7 +3392,7 @@
     var lyricsViewToggleHtml = canShowSynced
       ? '<div class="lyrics-view-toggle">' +
           '<button type="button" class="lyrics-view-btn' + (lyricsViewMode === 'text' ? ' active' : '') + '" data-lyricsview="text">LYRICS</button>' +
-          '<button type="button" class="lyrics-view-btn' + (lyricsViewMode === 'synced' ? ' active' : '') + '" data-lyricsview="synced">&#9835; SYNCED LYRICS</button>' +
+          '<button type="button" class="lyrics-view-btn' + (lyricsViewMode === 'synced' ? ' active' : '') + '" data-lyricsview="synced">SYNCED LYRICS</button>' +
         '</div>'
       : '';
 
@@ -3383,10 +3452,23 @@
         return s.id !== post.id && !s.isLocked && !isHiddenVariantRow_(s);
       }).map(function(s){
         var score=0;
-        if (normalizeArtistKey(s.artist) === normalizeArtistKey(post.artist)) score += 7;
-        if (!isNA(post.franchise) && !isNA(s.franchise) && splitCsv_(post.franchise).some(function(f){ return splitCsv_(s.franchise).some(function(sf){ return normalizeArtistKey(f)===normalizeArtistKey(sf); }); })) score += 5;
-        if (!isNA(post.character) && !isNA(s.character) && splitCsv_(post.character).some(function(c){ return splitCsv_(s.character).some(function(sc){ return normalizeArtistKey(c)===normalizeArtistKey(sc); }); })) score += 6;
-        if (post.albumId && s.albumId && normalizeArtistKey(post.albumId)===normalizeArtistKey(s.albumId)) score += 6;
+        var sameArtist = normalizeArtistKey(s.artist) === normalizeArtistKey(post.artist);
+        var sameFranchise = !isNA(post.franchise) && !isNA(s.franchise) &&
+          splitCsv_(post.franchise).some(function(f){ return splitCsv_(s.franchise).some(function(sf){ return normalizeArtistKey(f)===normalizeArtistKey(sf); }); });
+        var sameCharacter = !isNA(post.character) && !isNA(s.character) &&
+          splitCsv_(post.character).some(function(c){ return splitCsv_(s.character).some(function(sc){ return normalizeArtistKey(c)===normalizeArtistKey(sc); }); });
+        var sameAlbum = post.albumId && s.albumId && normalizeArtistKey(post.albumId)===normalizeArtistKey(s.albumId);
+
+        // Strongly prioritize the exact combinations users are most likely
+        // looking for: another song by this artist from the same franchise
+        // or character. Then fall back to broader relationships.
+        if (sameArtist && sameCharacter) score += 100;
+        else if (sameArtist && sameFranchise) score += 90;
+        else if (sameArtist && sameAlbum) score += 80;
+        else if (sameArtist) score += 45;
+        if (sameCharacter) score += 22;
+        if (sameFranchise) score += 18;
+        if (sameAlbum) score += 16;
         if (post.featured && String(post.featured).toLowerCase().indexOf(String(s.artist||'').toLowerCase()) !== -1) score += 2;
         return {s:s,score:score};
       }).filter(function(x){return x.score>0;}).sort(function(a,b){return b.score-a.score || String(a.s.title).localeCompare(String(b.s.title));}).slice(0,4);
@@ -3542,8 +3624,7 @@
     iframe.src = ''; iframe.style.display = 'none';
     custom.style.display = 'flex';
     player.classList.add('custom-audio-mode'); player.style.display = 'flex';
-    var titleEl = document.getElementById('floating-audio-title');
-    if (titleEl && currentLyricPost) titleEl.textContent = currentLyricPost.artist + ' — ' + currentLyricPost.title;
+    updateFloatingPlayerTitle_();
   }
 
   function setCustomAudioStatus_(text) {
@@ -3552,20 +3633,54 @@
   }
 
   function loadPrivateSyncedAudio_() {
-    if (!syncedAudioFileId || syncedAudioLoading) return;
+    var fileId = syncedAudioFileId;
+    if (!fileId) return;
+
+    var token = ++syncedAudioRequestToken_;
     syncedAudioLoading = true;
-    api('syncedAudio', { id: syncedAudioFileId }).then(function (data) {
+    setCustomAudioStatus_('Loading audio…');
+
+    api('syncedAudio', { id: fileId }).then(function (data) {
+      if (token !== syncedAudioRequestToken_ || fileId !== syncedAudioFileId || !currentLyricPost) return;
       syncedAudioLoading = false;
-      if (!data || !data.ok || !data.data) { setCustomAudioStatus_((data && data.error) || 'Could not load private Drive audio.'); return; }
-      if (syncedAudioBlobUrl) { try { URL.revokeObjectURL(syncedAudioBlobUrl); } catch (e) {} }
-      var chars = atob(data.data); var bytes = new Uint8Array(chars.length);
+
+      if (!data || !data.ok || !data.data) {
+        setCustomAudioStatus_((data && data.error) || 'Could not load private Drive audio.');
+        return;
+      }
+
+      if (syncedAudioBlobUrl) {
+        try { URL.revokeObjectURL(syncedAudioBlobUrl); } catch (e) {}
+      }
+
+      var chars = atob(data.data);
+      var bytes = new Uint8Array(chars.length);
       for (var i = 0; i < chars.length; i++) bytes[i] = chars.charCodeAt(i);
-      syncedAudioBlobUrl = URL.createObjectURL(new Blob([bytes], { type: data.mimeType || 'audio/mpeg' }));
-      var audio = document.getElementById('floating-audio-el'); if (!audio) return;
-      syncedAudioEl = audio; audio.src = syncedAudioBlobUrl; audio.load();
-      showFloatingCustomAudio_(); wireFloatingCustomAudio_();
-      audio.play().then(function () { setCustomAudioStatus_('Playing'); }).catch(function () { setCustomAudioStatus_('Ready — press play'); });
-    }).catch(function (err) { syncedAudioLoading = false; setCustomAudioStatus_('Could not load private Drive audio: ' + (err.message || err)); });
+
+      syncedAudioBlobUrl = URL.createObjectURL(
+        new Blob([bytes], { type: data.mimeType || 'audio/mpeg' })
+      );
+
+      var audio = document.getElementById('floating-audio-el');
+      if (!audio) return;
+
+      syncedAudioEl = audio;
+      audio.src = syncedAudioBlobUrl;
+      audio.load();
+      updateFloatingPlayerTitle_();
+      showFloatingCustomAudio_();
+      wireFloatingCustomAudio_();
+
+      audio.play().then(function () {
+        if (token === syncedAudioRequestToken_) setCustomAudioStatus_('Playing');
+      }).catch(function () {
+        if (token === syncedAudioRequestToken_) setCustomAudioStatus_('Ready — press play');
+      });
+    }).catch(function (err) {
+      if (token !== syncedAudioRequestToken_) return;
+      syncedAudioLoading = false;
+      setCustomAudioStatus_('Could not load private Drive audio: ' + (err.message || err));
+    });
   }
 
   function loadExternalSyncedAudio_() {
