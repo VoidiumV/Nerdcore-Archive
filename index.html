@@ -214,6 +214,15 @@
   }
   .home-hero p{ font-size:19px; color:var(--muted); margin:0; max-width:520px; line-height:1.5; }
 
+  .recently-viewed-section{margin-top:28px;}
+  .recently-viewed-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .recently-viewed-card{background:var(--panel);border:2px solid var(--border);padding:12px;cursor:pointer;transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;}
+  .recently-viewed-card:hover{transform:translateY(-3px);border-color:var(--green);box-shadow:4px 4px 0 rgba(0,0,0,.28);}
+  .recently-viewed-type{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--amber);margin-bottom:7px;}
+  .recently-viewed-title{font-family:'VT323',monospace;font-size:21px;color:var(--ink);line-height:1.15;}
+  .recently-viewed-meta{font-family:'VT323',monospace;font-size:15px;color:var(--muted);margin-top:4px;}
+  @media(max-width:700px){.recently-viewed-grid{grid-template-columns:repeat(2,1fr);}}
+  .image-switching{opacity:.55;}
   .home-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
   .home-tile{
     background:var(--panel); border:3px solid var(--border);
@@ -743,6 +752,8 @@
   .app-loading-inner{ text-align:center; }
   .app-loading-title{ font-size:16px; color:var(--ink); text-shadow:2px 2px 0 var(--magenta); line-height:1.6; margin-bottom:14px; }
   .app-loading-sub{ font-size:22px; color:var(--muted); letter-spacing:0.5px; }
+
+  .sync-btn.retry{margin-left:10px;}
 </style>
 </head>
 <body>
@@ -814,6 +825,11 @@
       <p>A small thing about the person who made this site.</p>
     </div>
   </div>
+
+  <section class="recently-viewed-section" id="recently-viewed-section" style="display:none;">
+    <div class="section-kicker">RECENTLY VIEWED</div>
+    <div class="recently-viewed-grid" id="recently-viewed-grid"></div>
+  </section>
 
 </div>
 
@@ -1023,7 +1039,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwAv02Rl99MTYEnbgiFKTMDDFDdDUDbjvw2UZKft7xOw75GnoPxvD-meASWv2RlpuYP/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxq_aZc5BL9EQqIuw8BxMx3bm3uTP-ZJ2lwmzawz5_3_PJjWsyMnjquMGjC7_2D1dEl/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1121,6 +1137,19 @@
     return requestPromise;
   }
 
+  document.addEventListener('mouseover', function(ev){
+    var img=ev.target&&ev.target.closest?ev.target.closest('img[data-alt-images]'):null; if(!img)return;
+    if(img.getAttribute('data-alt-preloaded')==='1')return;
+    var raw=img.getAttribute('data-alt-images'),list=[]; try{list=JSON.parse(decodeURIComponent(raw||''));}catch(e){return;}
+    if(list.length){var preload=new Image();preload.src=list[0];img.setAttribute('data-alt-preloaded','1');}
+  });
+
+  document.addEventListener('click', function(ev){
+    var img=ev.target&&ev.target.closest?ev.target.closest('img[data-alt-images]'):null; if(!img)return;
+    var raw=img.getAttribute('data-alt-images'), list=[]; try{list=JSON.parse(decodeURIComponent(raw||''));}catch(e){return;} if(!list.length)return;
+    ev.stopPropagation(); var urls=[img.getAttribute('src')].concat(list).filter(Boolean); var index=parseInt(img.getAttribute('data-alt-index')||'0',10)||0; index=(index+1)%urls.length; img.setAttribute('data-alt-index',String(index)); img.src=urls[index]; img.classList.add('image-switching'); setTimeout(function(){img.classList.remove('image-switching');},180);
+  }, true);
+
   function escapeHtml(str) {
     return String(str || '')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1166,6 +1195,21 @@
     // Prefer the mirror over ImgBB whenever the backend has one.
     var url = artist.pfpCached || artist.pfp || '';
     return url ? optimizeArtUrl(url, size || 300) : getFallbackImage();
+  }
+
+  function parseImageList_(value){
+    if(Array.isArray(value)) return value.map(function(x){return String(x).trim();}).filter(Boolean);
+    return String(value||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
+  }
+  function encodeImageListAttr_(list){ return escapeHtml(encodeURIComponent(JSON.stringify(parseImageList_(list)))); }
+  function wireAlternateImageControls_(root){
+    if(!root)return;
+    root.querySelectorAll('img[data-alt-images]').forEach(function(img){
+      if(img.getAttribute('data-alt-wired')==='1')return;
+      var raw=img.getAttribute('data-alt-images'), list=[]; try{list=JSON.parse(decodeURIComponent(raw||''));}catch(e){return;} if(!list.length)return;
+      var urls=[img.getAttribute('src')].concat(list).filter(Boolean), index=0; img.setAttribute('data-alt-wired','1'); img.title='Click to view alternate artwork';
+      img.addEventListener('click',function(ev){ ev.stopPropagation(); index=(index+1)%urls.length; img.classList.add('image-switching'); img.src=urls[index]; setTimeout(function(){img.classList.remove('image-switching');},180); });
+    });
   }
 
   function setArtistImageWithFallback_(img, primaryUrl, fallbackUrl) {
@@ -1223,7 +1267,6 @@
   var syncManualRunning = false;
   var syncManualStartMs = null;
   var syncOffsetSec = 0;
-  var syncedBaseOffsetMs = 0;
   var currentFloatingIsYoutube = false;
   var youtubeCurrentTime = 0;
   var ytListenInterval = null;
@@ -1236,6 +1279,7 @@
   var syncedAudioFileId = '';
   var syncedAudioLoading = false;
   var syncedAudioBlobUrl = '';
+  var syncedOffsetMs = 0;
   var syncedAudioRequestToken_ = 0;
 
   var releasesLoaded = false;
@@ -1577,11 +1621,18 @@
     if (tab) tab.classList.add('active');
   }
 
+  var RECENTLY_VIEWED_KEY_='nerdcoreArchiveRecentlyViewed';
+  function getRecentlyViewed_(){try{var x=JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY_)||'[]');return Array.isArray(x)?x:[];}catch(e){return [];}}
+  function saveRecentlyViewed_(entry){if(!entry||!entry.route)return;var list=getRecentlyViewed_().filter(function(x){return x.route!==entry.route;});list.unshift(entry);try{localStorage.setItem(RECENTLY_VIEWED_KEY_,JSON.stringify(list.slice(0,8)));}catch(e){}}
+  function recordRecentlyViewed_(type,title,route,meta){saveRecentlyViewed_({type:type,title:title,route:route,meta:meta||''});}
+  function renderRecentlyViewed_(){var s=document.getElementById('recently-viewed-section'),g=document.getElementById('recently-viewed-grid');if(!s||!g)return;var list=getRecentlyViewed_();if(!list.length){s.style.display='none';return;}s.style.display='';g.innerHTML=list.map(function(x){return '<div class="recently-viewed-card" data-recent-route="'+escapeHtml(x.route)+'"><div class="recently-viewed-type">'+escapeHtml(String(x.type||'').toUpperCase())+'</div><div class="recently-viewed-title">'+escapeHtml(x.title||'')+'</div>'+(x.meta?'<div class="recently-viewed-meta">'+escapeHtml(x.meta)+'</div>':'')+'</div>';}).join('');g.querySelectorAll('[data-recent-route]').forEach(function(el){el.addEventListener('click',function(){navigateSearchRoute_(el.getAttribute('data-recent-route'));});});}
+
   function showHome() {
     hideAllViews();
     document.getElementById('view-home').style.display = '';
     setActiveTab('home');
     setPath('');
+    renderRecentlyViewed_();
   }
   function showLyricsList() {
     hideAllViews();
@@ -1603,6 +1654,7 @@
     document.getElementById('view-artist-detail').style.display = '';
     setActiveTab('lyrics');
     setPath('artist-' + encodeURIComponent(name));
+    recordRecentlyViewed_('artist', name, 'artist-' + encodeURIComponent(name));
     currentArtistDetail = name;
     currentFranchiseDetail = null;
     currentFranchiseCharDetail = null;
@@ -1653,6 +1705,8 @@
     setActiveTab('lyrics');
     setPath('lyric-' + id +
       (initialVariant ? '/variant/' + encodeURIComponent(initialVariant) : ''));
+    var recentSong = (allLyrics || []).filter(function(x){return x.id===String(id);})[0] || {};
+    recordRecentlyViewed_('song', recentSong.title || 'Song', 'lyric-' + id, recentSong.artist || '');
     document.getElementById('lyrics-detail-content').innerHTML = detailSkeletonHtml_();
     lyricsViewMode = 'text';
     currentFloatingTitleOverride_ = '';
@@ -1665,7 +1719,7 @@
     syncedAudioCandidateIdx = 0;
     syncedAudioFileId = '';
     syncedAudioLoading = false;
-    syncedBaseOffsetMs = 0;
+    syncedOffsetMs = 0;
     stopManualSync_();
     loadLyricDetail(id, initialVariant);
   }
@@ -2071,7 +2125,7 @@
     allArtists.forEach(function (a) {
       var key = normalizeArtistKey(a.artist);
       if (!key) return;
-      pfpMap[key] = { pfp: a.pfp || '', pfpCached: a.pfpCached || '' };
+      pfpMap[key] = { pfp: a.pfp || '', pfpCached: a.pfpCached || '', alternatePfps: a.alternatePfps || [] };
       if (a.hidden) hiddenMap[key] = true;
       if (!isNA(a.members)) groupMap[key] = true;
       if (a.friend) friendMap[key] = true;
@@ -2117,6 +2171,7 @@
         artist: n,
         pfp: imageMeta.pfp || '',
         pfpCached: imageMeta.pfpCached || '',
+        alternatePfps: imageMeta.alternatePfps || [],
         isGroup: !!groupMap[normalizeArtistKey(n)]
       };
     });
@@ -2139,7 +2194,7 @@
       var priority = idx < 8 ? ' high' : '';
       return (
         '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
-          '<img data-artist-image="1" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
+          '<img data-artist-image="1" data-alt-images="' + encodeImageListAttr_(a.alternatePfps) + '" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
           groupTagHtml +
           '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + '</div>' +
@@ -2150,6 +2205,7 @@
     container.querySelectorAll('[data-artist-image]').forEach(function (img) {
       setArtistImageWithFallback_(img, img.getAttribute('src'), fallback);
     });
+    wireAlternateImageControls_(container);
 
     container.querySelectorAll('.artist-card').forEach(function (card) {
       card.addEventListener('click', function () {
@@ -2263,7 +2319,7 @@
       var catHtml = f.category ? '<div class="franchise-cat">' + escapeHtml(f.category.toUpperCase()) + '</div>' : '';
       return (
         '<div class="artist-card" data-franchise="' + escapeHtml(f.franchise) + '">' +
-          '<img src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img data-alt-images="' + encodeImageListAttr_(a.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="name">' + escapeHtml(f.franchise) + '</div>' +
           catHtml +
         '</div>'
@@ -2374,6 +2430,7 @@
     document.getElementById('view-franchise-detail').style.display = '';
     setActiveTab('lyrics');
     setPath('franchise/' + encodeURIComponent(name));
+    recordRecentlyViewed_('franchise', name, 'franchise/' + encodeURIComponent(name));
     currentFranchiseDetail = name;
     currentFranchiseCharDetail = null;
     currentFranchiseAllDetail = null;
@@ -2502,6 +2559,7 @@
     document.getElementById('view-franchise-songs').style.display = '';
     setActiveTab('lyrics');
     setPath('franchise/' + encodeURIComponent(franchise) + '/char/' + encodeURIComponent(character));
+    recordRecentlyViewed_('character', character, 'franchise/' + encodeURIComponent(franchise) + '/char/' + encodeURIComponent(character), franchise);
     currentFranchiseCharDetail = { franchise: franchise, character: character };
     currentFranchiseAllDetail = null;
     currentFranchiseGeneralDetail = null;
@@ -2800,6 +2858,8 @@
     document.getElementById('view-album-detail').style.display = '';
     setActiveTab('lyrics');
     setPath('album-' + id);
+    var recentAlbum = (allAlbums || []).filter(function(x){return x.id===String(id);})[0] || {};
+    recordRecentlyViewed_('album', recentAlbum.title || 'Album', 'album-' + encodeURIComponent(id), recentAlbum.artist || '');
     currentFranchiseDetail = null;
     currentFranchiseCharDetail = null;
     currentFranchiseAllDetail = null;
@@ -2835,6 +2895,7 @@
     var container = document.getElementById('album-detail-content');
     var album = allAlbums.filter(function (a) { return a.id === String(id); })[0];
     if (!album) { container.innerHTML = '<div class="empty">Album not found.</div>'; return; }
+    recordRecentlyViewed_('album', album.title, 'album-' + encodeURIComponent(id), album.artist || '');
 
     var fallback = getFallbackImage();
     var img = album.cover ? optimizeArtUrl(album.cover, 440) : fallback;
@@ -2868,7 +2929,7 @@
 
     var header =
       '<div class="detail-hero">' +
-        '<img class="detail-hero-img" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
+        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(album.alternateCovers) + '" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(album.title) + '</h1>' +
           '<div class="detail-meta">' +
@@ -2904,7 +2965,7 @@
           return (
             '<div class="track-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '"' + mainAttrs + '>' +
               '<div class="track-num">' + escapeHtml(String(numLabel)) + '</div>' +
-              '<img class="lyric-cover" src="' + tImg + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+              '<img class="lyric-cover" data-alt-images="' + encodeImageListAttr_(item.alternateCovers) + '" src="' + tImg + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
               '<div class="lyric-body">' +
                 '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
                 '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
@@ -3003,7 +3064,7 @@
       var badge = item.isLocked ? '<span class="badge locked">Locked</span>' : (item.isUpcoming ? '<span class="badge upcoming">Upcoming</span>' : '');
       return (
         '<div class="lyric-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '">' +
-          '<img class="lyric-cover" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img class="lyric-cover" data-alt-images="' + encodeImageListAttr_(item.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="lyric-body">' +
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
@@ -3109,7 +3170,7 @@
     var header =
       '<div class="detail-hero">' +
         '<span class="report-btn-corner" id="artist-report-missing-btn">&#9873; REQUEST MISSING SONG</span>' +
-        '<img class="detail-hero-img" src="' + escapeHtml(optimizeArtUrl(pfp, 440)) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
+        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(pfpEntry && pfpEntry.alternatePfps) + '" src="' + escapeHtml(optimizeArtUrl(pfp, 440)) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(name) + '</h1>' +
           '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span></div>' +
@@ -3235,7 +3296,7 @@
           (item.isUpcoming ? '<span class="badge upcoming">Upcoming</span>' : '');
         return (
           '<div class="lyric-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '">' +
-            '<img class="lyric-cover" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+            '<img class="lyric-cover" data-alt-images="' + encodeImageListAttr_(item.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
             '<div class="lyric-body">' +
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
@@ -3310,6 +3371,7 @@
         showLyricsDetail(post.redirectId, post.redirectVariant || initialVariant);
         return;
       }
+      if (post && post.title) recordRecentlyViewed_('song', post.title, 'lyric-' + id, post.artist || '');
       renderLyricDetail(post, initialVariant);
     }).catch(function (err) {
       renderErrorWithRetry(document.getElementById('lyrics-detail-content'),
@@ -3335,6 +3397,7 @@
     syncedAudioCandidates = [];
     syncedAudioCandidateIdx = 0;
     syncedAudioFileId = '';
+    syncedOffsetMs = 0;
     syncedAudioScrubbing = false;
     if (syncedAudioEl) {
       try {
@@ -3445,15 +3508,6 @@
         ? activeVariant.contentHtml
         : (post.contentHtml || '<p><i>No lyrics added yet.</i></p>');
 
-    // Some alternate-version source files can pick up a generated heading such
-    // as "[Remix] Lyrics" even though that text is not part of the lyrics.
-    // Strip only an exact leading version heading so real lyric lines are safe.
-    if (activeVariant && activeVariant.label) {
-      var variantHeading = String(activeVariant.label).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      var variantHeadingRe = new RegExp('^\\s*<(?:h[1-6]|p|div)[^>]*>\\s*(?:\\[' + variantHeading + '\\]|\\(' + variantHeading + '\\)|' + variantHeading + ')\\s+Lyrics\\s*</(?:h[1-6]|p|div)>\\s*', 'i');
-      lyricsBodyHtml = lyricsBodyHtml.replace(variantHeadingRe, '');
-    }
-
     // Synced lyrics only apply to the ORIGINAL version -- a "(Sped Up)"
     // audio swap or a "[Remix]" with its own lyrics doc wouldn't line up
     // with timing captured for the main track, so the toggle only shows
@@ -3475,7 +3529,7 @@
     container.innerHTML =
       '<div class="detail-hero">' +
         '<span class="report-btn-corner" id="lyric-report-btn">&#9873; REPORT ISSUE</span>' +
-        '<img class="detail-hero-img" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
+        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(src.alternateCovers || post.alternateCovers) + '" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
           '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + '</div>' +
@@ -3582,7 +3636,7 @@
       syncedAudioCandidates = (data && data.audioUrls && data.audioUrls.length) ? data.audioUrls.slice() : [];
       syncedAudioCandidateIdx = 0;
       syncedAudioFileId = (data && data.audioFileId) ? data.audioFileId : '';
-      syncedBaseOffsetMs = (data && isFinite(Number(data.offsetMs))) ? Math.round(Number(data.offsetMs)) : 0;
+      syncedOffsetMs = (data && isFinite(Number(data.offsetMs))) ? Number(data.offsetMs) : 0;
       syncedLyricsLoadedForId = post.id;
       renderSyncedLinesList_();
       buildSyncBar_();
@@ -3637,7 +3691,8 @@
     if (!bar) return;
 
     if (syncedAudioFileId || syncedAudioCandidates.length) {
-      bar.innerHTML = '<span class="sync-status" id="sync-status">Loading audio&hellip;</span>';
+      bar.innerHTML = '<span class="sync-status" id="sync-status">Loading audio&hellip;</span><button type="button" class="sync-btn retry" id="sync-retry-audio" style="display:none;">RETRY AUDIO</button>';
+      var rb=document.getElementById('sync-retry-audio'); if(rb) rb.onclick=function(){loadPrivateSyncedAudio_(true);};
       return;
     }
 
@@ -3692,55 +3747,31 @@
     var syncEl = document.getElementById('sync-status'); if (syncEl) syncEl.textContent = text;
   }
 
-  function loadPrivateSyncedAudio_() {
-    var fileId = syncedAudioFileId;
-    if (!fileId) return;
-
-    var token = ++syncedAudioRequestToken_;
-    syncedAudioLoading = true;
-    setCustomAudioStatus_('Loading audio…');
-
-    api('syncedAudio', { id: fileId }).then(function (data) {
-      if (token !== syncedAudioRequestToken_ || fileId !== syncedAudioFileId || !currentLyricPost) return;
-      syncedAudioLoading = false;
-
-      if (!data || !data.ok || !data.data) {
-        setCustomAudioStatus_((data && data.error) || 'Could not load private Drive audio.');
-        return;
-      }
-
-      if (syncedAudioBlobUrl) {
-        try { URL.revokeObjectURL(syncedAudioBlobUrl); } catch (e) {}
-      }
-
-      var chars = atob(data.data);
-      var bytes = new Uint8Array(chars.length);
-      for (var i = 0; i < chars.length; i++) bytes[i] = chars.charCodeAt(i);
-
-      syncedAudioBlobUrl = URL.createObjectURL(
-        new Blob([bytes], { type: data.mimeType || 'audio/mpeg' })
-      );
-
-      var audio = document.getElementById('floating-audio-el');
-      if (!audio) return;
-
-      syncedAudioEl = audio;
-      audio.src = syncedAudioBlobUrl;
-      audio.load();
-      updateFloatingPlayerTitle_();
-      showFloatingCustomAudio_();
-      wireFloatingCustomAudio_();
-
-      audio.play().then(function () {
-        if (token === syncedAudioRequestToken_) setCustomAudioStatus_('Playing');
-      }).catch(function () {
-        if (token === syncedAudioRequestToken_) setCustomAudioStatus_('Ready — press play');
+  function loadPrivateSyncedAudio_(manualRetry) {
+    var fileId=syncedAudioFileId; if(!fileId)return;
+    var token=++syncedAudioRequestToken_; syncedAudioLoading=true; setCustomAudioStatus_('Loading audio…');
+    var attempt=manualRetry?1:0;
+    function request_(){
+      api('syncedAudio',{id:fileId,attempt:attempt,nonce:Date.now()}).then(function(data){
+        if(token!==syncedAudioRequestToken_||fileId!==syncedAudioFileId||!currentLyricPost)return;
+        if(!data||!data.ok||!data.data){
+          if(attempt<3){attempt++;setCustomAudioStatus_('Audio load failed — retrying ('+(attempt+1)+'/4)…');setTimeout(request_,700*attempt);return;}
+          syncedAudioLoading=false;var rb=document.getElementById('sync-retry-audio');if(rb)rb.style.display='';setCustomAudioStatus_((data&&data.error)||'Could not load private Drive audio. Use RETRY AUDIO to try again.');return;
+        }
+        syncedAudioLoading=false;
+        if(syncedAudioBlobUrl){try{URL.revokeObjectURL(syncedAudioBlobUrl);}catch(e){}}
+        var chars=atob(data.data),bytes=new Uint8Array(chars.length);for(var i=0;i<chars.length;i++)bytes[i]=chars.charCodeAt(i);
+        syncedAudioBlobUrl=URL.createObjectURL(new Blob([bytes],{type:data.mimeType||'audio/mpeg'}));
+        var audio=document.getElementById('floating-audio-el');if(!audio)return;
+        syncedAudioEl=audio;audio.src=syncedAudioBlobUrl;audio.load();updateFloatingPlayerTitle_();showFloatingCustomAudio_();wireFloatingCustomAudio_();
+        audio.play().then(function(){if(token===syncedAudioRequestToken_)setCustomAudioStatus_('Playing');}).catch(function(){if(token===syncedAudioRequestToken_)setCustomAudioStatus_('Ready — press play');});
+      }).catch(function(err){
+        if(token!==syncedAudioRequestToken_)return;
+        if(attempt<3){attempt++;setCustomAudioStatus_('Audio load failed — retrying ('+(attempt+1)+'/4)…');setTimeout(request_,700*attempt);return;}
+        syncedAudioLoading=false;var rb=document.getElementById('sync-retry-audio');if(rb)rb.style.display='';setCustomAudioStatus_('Could not load private Drive audio. Use RETRY AUDIO to try again.');
       });
-    }).catch(function (err) {
-      if (token !== syncedAudioRequestToken_) return;
-      syncedAudioLoading = false;
-      setCustomAudioStatus_('Could not load private Drive audio: ' + (err.message || err));
-    });
+    }
+    request_();
   }
 
   function loadExternalSyncedAudio_() {
@@ -3756,9 +3787,9 @@
     if (playBtn) playBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); if (el.paused) el.play().catch(function (err) { setCustomAudioStatus_('Play failed: ' + (err.message || 'browser blocked playback')); }); else el.pause(); };
     if (rewBtn) rewBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); el.currentTime = Math.max(0, el.currentTime - 10); };
     if (fwdBtn) fwdBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); var d = isFinite(el.duration) ? el.duration : el.currentTime + 10; el.currentTime = Math.min(d, el.currentTime + 10); };
-    if (range) { range.oninput = function () { syncedAudioScrubbing = true; el.currentTime = parseFloat(range.value) || 0; highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime)); }; range.onchange = function () { syncedAudioScrubbing = false; }; }
+    if (range) { range.oninput = function () { syncedAudioScrubbing = true; el.currentTime = parseFloat(range.value) || 0; highlightSyncedLyricsAtTime_(el.currentTime); }; range.onchange = function () { syncedAudioScrubbing = false; }; }
     el.onloadedmetadata = function () { if (range) range.max = isFinite(el.duration) ? el.duration : 0; if (totEl) totEl.textContent = formatSyncTime_(el.duration); setCustomAudioStatus_('Ready — press play'); };
-    el.ontimeupdate = function () { if (!syncedAudioScrubbing) { if (range) range.value = el.currentTime; if (curEl) curEl.textContent = formatSyncTime_(el.currentTime); } highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime)); };
+    el.ontimeupdate = function () { if (!syncedAudioScrubbing) { if (range) range.value = el.currentTime; if (curEl) curEl.textContent = formatSyncTime_(el.currentTime); } highlightSyncedLyricsAtTime_(el.currentTime); };
     el.onplay = function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; setCustomAudioStatus_('Playing'); };
     el.onpause = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Paused'); };
     el.onended = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Ended'); };
@@ -3772,26 +3803,10 @@
   }
 
   function seekSyncedAudioToLine_(line) {
-    if (!line) return;
-    var t = Number(line.begin) || 0;
-    var sourceTime = Math.max(0, t + (syncedBaseOffsetMs / 1000) - syncOffsetSec);
-    if (syncedAudioEl) {
-      try {
-        syncedAudioEl.currentTime = sourceTime;
-        syncedAudioEl.play().catch(function () {});
-        highlightSyncedLyricsAtTime_(t);
-        return;
-      } catch (e) {}
-    }
-    if (syncUsingYoutube) {
-      var iframe = document.getElementById('floating-player-iframe');
-      if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [sourceTime, true], id: 'ncPlayer' }), '*');
-      youtubeCurrentTime = sourceTime;
-    }
-    syncManualRunning = true;
-    syncManualStartMs = Date.now() - sourceTime * 1000;
-    updateSyncControlsVisibility_();
-    highlightSyncedLyricsAtTime_(t);
+    if (!line) return; var t = Number(line.begin) || 0;
+    if (syncedAudioEl) { try { syncedAudioEl.currentTime = t; syncedAudioEl.play().catch(function () {}); highlightSyncedLyricsAtTime_(t); return; } catch (e) {} }
+    if (syncUsingYoutube) { var iframe = document.getElementById('floating-player-iframe'); if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [t, true], id: 'ncPlayer' }), '*'); youtubeCurrentTime = t; }
+    syncManualRunning = true; syncManualStartMs = Date.now() - t * 1000; syncOffsetSec = 0; updateSyncControlsVisibility_(); highlightSyncedLyricsAtTime_(t);
   }
 
   function wireSyncedAudioPlayer_() {
@@ -3819,7 +3834,7 @@
         syncedAudioScrubbing = true;
         el.currentTime = parseFloat(range.value) || 0;
         if (curEl) curEl.textContent = formatSyncTime_(el.currentTime);
-        highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime));
+        highlightSyncedLyricsAtTime_(el.currentTime);
       });
       range.addEventListener('change', function () { syncedAudioScrubbing = false; });
     }
@@ -3834,7 +3849,7 @@
         if (range) range.value = el.currentTime;
         if (curEl) curEl.textContent = formatSyncTime_(el.currentTime);
       }
-      highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime));
+      highlightSyncedLyricsAtTime_(el.currentTime);
     });
     el.addEventListener('play', function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; });
     el.addEventListener('pause', function () { if (playBtn) playBtn.innerHTML = '&#9654;'; });
@@ -3960,15 +3975,9 @@
     }
   }
 
-  function getSyncedAudioTimelineSeconds_(sourceSeconds) {
-    if (!isFinite(Number(sourceSeconds))) return 0;
-    return Number(sourceSeconds) - (syncedBaseOffsetMs / 1000) + syncOffsetSec;
-  }
-
   function getSyncedElapsedSeconds_() {
-    if (syncUsingYoutube) return getSyncedAudioTimelineSeconds_(youtubeCurrentTime);
-    if (syncedAudioEl && !syncedAudioEl.paused) return getSyncedAudioTimelineSeconds_(syncedAudioEl.currentTime);
-    if (syncManualRunning && syncManualStartMs !== null) return (Date.now() - syncManualStartMs) / 1000 - (syncedBaseOffsetMs / 1000) + syncOffsetSec;
+    if (syncUsingYoutube) return youtubeCurrentTime + syncOffsetSec;
+    if (syncManualRunning && syncManualStartMs !== null) return (Date.now() - syncManualStartMs) / 1000 + syncOffsetSec;
     return null;
   }
 
@@ -4035,8 +4044,7 @@
     if (t === null) { statusEl.textContent = ''; return; }
     if (t < 0) t = 0;
     var mm = Math.floor(t / 60), ss = Math.floor(t % 60);
-    var totalOffsetSec = syncOffsetSec - (syncedBaseOffsetMs / 1000);
-    var offsetTxt = totalOffsetSec ? ' (offset ' + (totalOffsetSec > 0 ? '+' : '') + totalOffsetSec + 's)' : '';
+    var offsetTxt = syncOffsetSec ? ' (offset ' + (syncOffsetSec > 0 ? '+' : '') + syncOffsetSec + 's)' : '';
     statusEl.textContent = (syncUsingYoutube ? 'Auto-synced \u2014 ' : 'Manual \u2014 ') + mm + ':' + (ss < 10 ? '0' : '') + ss + offsetTxt;
   }
 
@@ -4086,7 +4094,7 @@
         var songHtml;
         var linkIcon = '<span class="release-link-ico">&#9654;</span>';
         if (item.linkEmbed) {
-          songHtml = '<a class="release-song release-song-link has-link release-player-link" href="javascript:void(0)" data-player-url="' + escapeHtml(item.linkEmbed) + '" data-player-title="' + escapeHtml(item.title) + '" data-player-artist="' + escapeHtml(item.artist) + '">' + linkIcon + titleText + '</a>';
+          songHtml = '<a class="release-song release-song-link has-link" href="javascript:void(0)" onclick="openFloatingPlayer(\'' + escapeHtml(item.linkEmbed) + '\', \'' + escapeHtml(item.title) + '\', \'' + escapeHtml(item.artist) + '\')">' + linkIcon + titleText + '</a>';
         } else if (item.link) {
           songHtml = '<a class="release-song release-song-link has-link" href="' + escapeHtml(item.link) + '" target="_blank" rel="noopener">' + linkIcon + titleText + '</a>';
         } else {
@@ -4123,17 +4131,6 @@
         '</div>'
       );
     }).join('');
-
-    container.querySelectorAll('.release-player-link').forEach(function (el) {
-      el.addEventListener('click', function (e) {
-        e.preventDefault();
-        openFloatingPlayer(
-          el.getAttribute('data-player-url') || '',
-          el.getAttribute('data-player-title') || '',
-          el.getAttribute('data-player-artist') || ''
-        );
-      });
-    });
   }
 
   function loadTop5() {
