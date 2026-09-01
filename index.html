@@ -1023,7 +1023,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzvLc2kT0YJllTa5Tmp2I4UFJgFcnEeuwLkcdX7Zai1wS0hmGsmZQ1a-MamzFQF76Yz/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwAv02Rl99MTYEnbgiFKTMDDFDdDUDbjvw2UZKft7xOw75GnoPxvD-meASWv2RlpuYP/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1038,7 +1038,7 @@
     settings: true, disclaimers: true, lyrics: true, artists: true,
     albums: true, franchises: true, characters: true, top5: true,
     top10yearly: true, playlists: true, artistStats: true,
-    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, aboutHighlights: true, syncedLyrics: true
+    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, aboutHighlights: true
   };
 
   function apiCacheKey_(action, params) {
@@ -1223,6 +1223,7 @@
   var syncManualRunning = false;
   var syncManualStartMs = null;
   var syncOffsetSec = 0;
+  var syncedBaseOffsetMs = 0;
   var currentFloatingIsYoutube = false;
   var youtubeCurrentTime = 0;
   var ytListenInterval = null;
@@ -1664,6 +1665,7 @@
     syncedAudioCandidateIdx = 0;
     syncedAudioFileId = '';
     syncedAudioLoading = false;
+    syncedBaseOffsetMs = 0;
     stopManualSync_();
     loadLyricDetail(id, initialVariant);
   }
@@ -3443,6 +3445,15 @@
         ? activeVariant.contentHtml
         : (post.contentHtml || '<p><i>No lyrics added yet.</i></p>');
 
+    // Some alternate-version source files can pick up a generated heading such
+    // as "[Remix] Lyrics" even though that text is not part of the lyrics.
+    // Strip only an exact leading version heading so real lyric lines are safe.
+    if (activeVariant && activeVariant.label) {
+      var variantHeading = String(activeVariant.label).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      var variantHeadingRe = new RegExp('^\\s*<(?:h[1-6]|p|div)[^>]*>\\s*(?:\\[' + variantHeading + '\\]|\\(' + variantHeading + '\\)|' + variantHeading + ')\\s+Lyrics\\s*</(?:h[1-6]|p|div)>\\s*', 'i');
+      lyricsBodyHtml = lyricsBodyHtml.replace(variantHeadingRe, '');
+    }
+
     // Synced lyrics only apply to the ORIGINAL version -- a "(Sped Up)"
     // audio swap or a "[Remix]" with its own lyrics doc wouldn't line up
     // with timing captured for the main track, so the toggle only shows
@@ -3571,6 +3582,7 @@
       syncedAudioCandidates = (data && data.audioUrls && data.audioUrls.length) ? data.audioUrls.slice() : [];
       syncedAudioCandidateIdx = 0;
       syncedAudioFileId = (data && data.audioFileId) ? data.audioFileId : '';
+      syncedBaseOffsetMs = (data && isFinite(Number(data.offsetMs))) ? Math.round(Number(data.offsetMs)) : 0;
       syncedLyricsLoadedForId = post.id;
       renderSyncedLinesList_();
       buildSyncBar_();
@@ -3744,9 +3756,9 @@
     if (playBtn) playBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); if (el.paused) el.play().catch(function (err) { setCustomAudioStatus_('Play failed: ' + (err.message || 'browser blocked playback')); }); else el.pause(); };
     if (rewBtn) rewBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); el.currentTime = Math.max(0, el.currentTime - 10); };
     if (fwdBtn) fwdBtn.onclick = function (e) { e.preventDefault(); e.stopPropagation(); var d = isFinite(el.duration) ? el.duration : el.currentTime + 10; el.currentTime = Math.min(d, el.currentTime + 10); };
-    if (range) { range.oninput = function () { syncedAudioScrubbing = true; el.currentTime = parseFloat(range.value) || 0; highlightSyncedLyricsAtTime_(el.currentTime); }; range.onchange = function () { syncedAudioScrubbing = false; }; }
+    if (range) { range.oninput = function () { syncedAudioScrubbing = true; el.currentTime = parseFloat(range.value) || 0; highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime)); }; range.onchange = function () { syncedAudioScrubbing = false; }; }
     el.onloadedmetadata = function () { if (range) range.max = isFinite(el.duration) ? el.duration : 0; if (totEl) totEl.textContent = formatSyncTime_(el.duration); setCustomAudioStatus_('Ready — press play'); };
-    el.ontimeupdate = function () { if (!syncedAudioScrubbing) { if (range) range.value = el.currentTime; if (curEl) curEl.textContent = formatSyncTime_(el.currentTime); } highlightSyncedLyricsAtTime_(el.currentTime); };
+    el.ontimeupdate = function () { if (!syncedAudioScrubbing) { if (range) range.value = el.currentTime; if (curEl) curEl.textContent = formatSyncTime_(el.currentTime); } highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime)); };
     el.onplay = function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; setCustomAudioStatus_('Playing'); };
     el.onpause = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Paused'); };
     el.onended = function () { if (playBtn) playBtn.innerHTML = '&#9654;'; setCustomAudioStatus_('Ended'); };
@@ -3760,10 +3772,26 @@
   }
 
   function seekSyncedAudioToLine_(line) {
-    if (!line) return; var t = Number(line.begin) || 0;
-    if (syncedAudioEl) { try { syncedAudioEl.currentTime = t; syncedAudioEl.play().catch(function () {}); highlightSyncedLyricsAtTime_(t); return; } catch (e) {} }
-    if (syncUsingYoutube) { var iframe = document.getElementById('floating-player-iframe'); if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [t, true], id: 'ncPlayer' }), '*'); youtubeCurrentTime = t; }
-    syncManualRunning = true; syncManualStartMs = Date.now() - t * 1000; syncOffsetSec = 0; updateSyncControlsVisibility_(); highlightSyncedLyricsAtTime_(t);
+    if (!line) return;
+    var t = Number(line.begin) || 0;
+    var sourceTime = Math.max(0, t + (syncedBaseOffsetMs / 1000) - syncOffsetSec);
+    if (syncedAudioEl) {
+      try {
+        syncedAudioEl.currentTime = sourceTime;
+        syncedAudioEl.play().catch(function () {});
+        highlightSyncedLyricsAtTime_(t);
+        return;
+      } catch (e) {}
+    }
+    if (syncUsingYoutube) {
+      var iframe = document.getElementById('floating-player-iframe');
+      if (iframe && iframe.contentWindow) iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [sourceTime, true], id: 'ncPlayer' }), '*');
+      youtubeCurrentTime = sourceTime;
+    }
+    syncManualRunning = true;
+    syncManualStartMs = Date.now() - sourceTime * 1000;
+    updateSyncControlsVisibility_();
+    highlightSyncedLyricsAtTime_(t);
   }
 
   function wireSyncedAudioPlayer_() {
@@ -3791,7 +3819,7 @@
         syncedAudioScrubbing = true;
         el.currentTime = parseFloat(range.value) || 0;
         if (curEl) curEl.textContent = formatSyncTime_(el.currentTime);
-        highlightSyncedLyricsAtTime_(el.currentTime);
+        highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime));
       });
       range.addEventListener('change', function () { syncedAudioScrubbing = false; });
     }
@@ -3806,7 +3834,7 @@
         if (range) range.value = el.currentTime;
         if (curEl) curEl.textContent = formatSyncTime_(el.currentTime);
       }
-      highlightSyncedLyricsAtTime_(el.currentTime);
+      highlightSyncedLyricsAtTime_(getSyncedAudioTimelineSeconds_(el.currentTime));
     });
     el.addEventListener('play', function () { if (playBtn) playBtn.innerHTML = '&#10074;&#10074;'; });
     el.addEventListener('pause', function () { if (playBtn) playBtn.innerHTML = '&#9654;'; });
@@ -3932,9 +3960,15 @@
     }
   }
 
+  function getSyncedAudioTimelineSeconds_(sourceSeconds) {
+    if (!isFinite(Number(sourceSeconds))) return 0;
+    return Number(sourceSeconds) - (syncedBaseOffsetMs / 1000) + syncOffsetSec;
+  }
+
   function getSyncedElapsedSeconds_() {
-    if (syncUsingYoutube) return youtubeCurrentTime + syncOffsetSec;
-    if (syncManualRunning && syncManualStartMs !== null) return (Date.now() - syncManualStartMs) / 1000 + syncOffsetSec;
+    if (syncUsingYoutube) return getSyncedAudioTimelineSeconds_(youtubeCurrentTime);
+    if (syncedAudioEl && !syncedAudioEl.paused) return getSyncedAudioTimelineSeconds_(syncedAudioEl.currentTime);
+    if (syncManualRunning && syncManualStartMs !== null) return (Date.now() - syncManualStartMs) / 1000 - (syncedBaseOffsetMs / 1000) + syncOffsetSec;
     return null;
   }
 
@@ -4001,7 +4035,8 @@
     if (t === null) { statusEl.textContent = ''; return; }
     if (t < 0) t = 0;
     var mm = Math.floor(t / 60), ss = Math.floor(t % 60);
-    var offsetTxt = syncOffsetSec ? ' (offset ' + (syncOffsetSec > 0 ? '+' : '') + syncOffsetSec + 's)' : '';
+    var totalOffsetSec = syncOffsetSec - (syncedBaseOffsetMs / 1000);
+    var offsetTxt = totalOffsetSec ? ' (offset ' + (totalOffsetSec > 0 ? '+' : '') + totalOffsetSec + 's)' : '';
     statusEl.textContent = (syncUsingYoutube ? 'Auto-synced \u2014 ' : 'Manual \u2014 ') + mm + ':' + (ss < 10 ? '0' : '') + ss + offsetTxt;
   }
 
@@ -4051,7 +4086,7 @@
         var songHtml;
         var linkIcon = '<span class="release-link-ico">&#9654;</span>';
         if (item.linkEmbed) {
-          songHtml = '<a class="release-song release-song-link has-link" href="javascript:void(0)" onclick="openFloatingPlayer(\'' + escapeHtml(item.linkEmbed) + '\', \'' + escapeHtml(item.title) + '\', \'' + escapeHtml(item.artist) + '\')">' + linkIcon + titleText + '</a>';
+          songHtml = '<a class="release-song release-song-link has-link release-player-link" href="javascript:void(0)" data-player-url="' + escapeHtml(item.linkEmbed) + '" data-player-title="' + escapeHtml(item.title) + '" data-player-artist="' + escapeHtml(item.artist) + '">' + linkIcon + titleText + '</a>';
         } else if (item.link) {
           songHtml = '<a class="release-song release-song-link has-link" href="' + escapeHtml(item.link) + '" target="_blank" rel="noopener">' + linkIcon + titleText + '</a>';
         } else {
@@ -4088,6 +4123,17 @@
         '</div>'
       );
     }).join('');
+
+    container.querySelectorAll('.release-player-link').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        openFloatingPlayer(
+          el.getAttribute('data-player-url') || '',
+          el.getAttribute('data-player-title') || '',
+          el.getAttribute('data-player-artist') || ''
+        );
+      });
+    });
   }
 
   function loadTop5() {
