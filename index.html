@@ -112,6 +112,59 @@
     text-align:center; color:var(--muted); font-family:'VT323', monospace;
     font-size:20px; padding:60px 20px; letter-spacing:0.5px;
   }
+  .skeleton-detail{ display:flex; gap:20px; background:var(--panel); border:3px solid var(--border); padding:18px; margin-bottom:20px; }
+  .skeleton-detail-image{ width:220px; aspect-ratio:1; flex-shrink:0; }
+  .skeleton-detail-copy{ flex:1; display:flex; flex-direction:column; justify-content:center; gap:12px; }
+  .skeleton-line{ height:18px; width:55%; }
+  .skeleton-line.wide{ width:85%; height:32px; }
+  .skeleton-line.short{ width:35%; }
+  .skeleton-list{ display:grid; gap:12px; }
+  .skeleton-card{ height:112px; background:linear-gradient(90deg,var(--panel) 20%,var(--panel-2) 40%,var(--panel) 60%); background-size:220% 100%; border:2px solid var(--border); animation:skeletonShimmer 1.35s linear infinite; }
+  .skeleton-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .skeleton-grid .skeleton-card{ height:auto; aspect-ratio:1/1.2; }
+  @keyframes skeletonShimmer{ from{background-position:200% 0;} to{background-position:-20% 0;} }
+  .page.page-enter{ animation:pageIn .22s ease both; }
+  @keyframes pageIn{ from{opacity:0; transform:translateY(7px);} to{opacity:1; transform:none;} }
+  body::after{ content:''; position:fixed; inset:0; pointer-events:none; z-index:99999; background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0,rgba(255,255,255,.018) 1px,transparent 1px,transparent 4px); opacity:.32; animation:crtFlicker 9s steps(1,end) infinite; }
+  @keyframes crtFlicker{ 0%,92%,100%{opacity:.30;} 93%{opacity:.36;} 94%{opacity:.27;} }
+  .activity-ticker{ border-bottom:2px solid var(--border); background:rgba(20,24,49,.92); overflow:hidden; white-space:nowrap; }
+  .activity-ticker-track{ width:max-content; min-width:100%; padding:6px 0; display:flex; gap:10px; align-items:center; font-family:'VT323',monospace; font-size:16px; color:var(--muted); animation:tickerScroll 32s linear infinite; }
+  .activity-ticker-track span{ display:inline-block; }
+  .activity-dot{ color:var(--green); }
+  @keyframes tickerScroll{ from{transform:translateX(0);} to{transform:translateX(-35%);} }
+  @media(prefers-reduced-motion:reduce){ .activity-ticker-track,.page.page-enter,body::after,.skeleton-card{animation:none!important;} .artist-card,.lyric-card,.track-card,.related-card{transition:none!important;} }
+  .global-search-wrap{ position:relative; flex:0 1 270px; }
+  .global-search{ width:100%; font-family:'Space Mono',monospace; font-size:12px; background:var(--panel); color:var(--ink); border:2px solid var(--border); padding:9px 11px; outline:none; }
+  .global-search:focus{ border-color:var(--green); }
+  .global-search-results{ position:absolute; top:calc(100% + 6px); right:0; width:min(420px,80vw); max-height:65vh; overflow:auto; background:var(--panel-2); border:2px solid var(--border); box-shadow:6px 6px 0 rgba(0,0,0,.45); z-index:10001; }
+  .global-search-result{ padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; }
+  .global-search-result:last-child{ border-bottom:none; }
+  .global-search-result:hover{ background:var(--panel); }
+  .global-search-result-title{ font-family:'VT323',monospace; font-size:19px; color:var(--green); }
+  .global-search-result-meta{ font-family:'VT323',monospace; font-size:14px; color:var(--muted-dim); margin-top:2px; }
+  .artist-browse-toolbar{ display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+  .artist-browse-toolbar .search-box{ flex:1; min-width:200px; margin:0 !important; }
+  .artist-toolbar-actions{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .artist-toolbar-actions .nav-tab{ margin:0; }
+  .badge.new{ color:var(--green); border-color:var(--green); }
+  .badge.updated{ color:var(--amber); border-color:var(--amber); }
+  .related-section{ margin-top:28px; }
+  .section-kicker{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--amber); letter-spacing:1px; margin-bottom:12px; }
+  .related-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .related-card{ background:var(--panel); border:2px solid var(--border); padding:12px 14px; cursor:pointer; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease; }
+  .related-card:hover{ transform:translate(-2px,-2px); border-color:var(--green); box-shadow:4px 4px 0 rgba(0,0,0,.35); }
+  .related-title{ font-family:'VT323',monospace; font-size:19px; color:var(--green); }
+  .related-meta{ font-family:'VT323',monospace; font-size:14px; color:var(--muted); margin-top:3px; }
+  .album-completion{ margin:0 0 22px; padding:14px 16px; border:2px solid var(--border); background:var(--panel-2); }
+  .album-completion-head{ display:flex; justify-content:space-between; gap:12px; align-items:baseline; font-family:'VT323',monospace; font-size:17px; color:var(--muted); }
+  .album-completion-count{ color:var(--green); }
+  .album-completion-bar{ height:7px; margin-top:9px; background:var(--panel); border:1px solid var(--border); overflow:hidden; }
+  .album-completion-fill{ height:100%; background:var(--green); transform-origin:left; }
+  .artist-card img,.album-art-hover{ transition:transform .18s ease,filter .18s ease; }
+  .artist-card:hover img{ transform:scale(1.025); filter:saturate(1.08) contrast(1.03); }
+  .track-card:hover .lyric-cover,.lyric-card:hover .lyric-cover{ transform:scale(1.025); filter:saturate(1.06); }
+  @media(max-width:700px){ .skeleton-detail{flex-direction:column;} .skeleton-detail-image{width:100%;} .global-search-wrap{ flex-basis:100%; order:3; } .related-grid{grid-template-columns:1fr;} }
+  @media(max-width:620px){ .skeleton-grid{grid-template-columns:repeat(2,1fr);} .artist-browse-toolbar{align-items:stretch;} .artist-toolbar-actions{width:100%;} .artist-toolbar-actions .nav-tab{flex:1;text-align:center;} }
   .retry-link{ cursor:pointer; text-decoration:underline; color:var(--green); }
 
   /* ---------- home ---------- */
@@ -376,6 +429,7 @@
   .artist-card img.image-ready{ opacity:1; }
   .artist-card .name{ font-family:'Press Start 2P', monospace; font-size:12px; color:var(--green); padding:12px 10px; text-align:center; line-height:1.6; word-break:break-word; overflow-wrap:anywhere; }
   .franchise-cat{ font-family:'VT323', monospace; font-size:13px; color:var(--amber); text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
+  .artist-card-badges{ min-height:0; display:flex; justify-content:center; gap:6px; flex-wrap:wrap; padding:0 10px 6px; }
   .group-tag{ font-family:'VT323', monospace; font-size:13px; color:#5fc9ff; text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
   .group-members-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
   .group-member-chip{ font-family:'VT323', monospace; font-size:17px; color:var(--ink); background:var(--panel-2); border:2px solid var(--border); padding:6px 13px; cursor:pointer; letter-spacing:0.3px; }
@@ -591,6 +645,7 @@
   .floating-audio-controls .sync-player-btn.play{ min-width:42px; }
   .floating-audio-status{ font-family:'VT323',monospace; font-size:15px; color:var(--muted); text-align:center; min-height:18px; }
   #floating-player.custom-audio-mode{ height:210px; }
+  @media(max-width:600px){ #floating-player{ left:12px; right:12px; bottom:12px; width:auto; max-width:none; } #floating-player.dragging-resize{ left:12px; right:auto; width:calc(100vw - 24px) !important; } }
   #floating-player-resize-handle{
     position:absolute; right:0; bottom:0; width:18px; height:18px;
     cursor:nwse-resize; z-index:2;
@@ -671,7 +726,14 @@
       <div class="nav-tab" data-route="top5">Awards</div>
       <div class="nav-tab" data-route="indiemonday">Indie Monday</div>
     </div>
+    <div class="global-search-wrap">
+      <input id="global-search" class="global-search" type="search" autocomplete="off" placeholder="Search archive..." aria-label="Search archive">
+      <div id="global-search-results" class="global-search-results" style="display:none;"></div>
+    </div>
   </div>
+</div>
+<div class="activity-ticker" id="activity-ticker" aria-label="Archive activity">
+  <div class="activity-ticker-track" id="activity-ticker-track"><span class="activity-dot">*</span><span>ARCHIVE ACTIVITY</span></div>
 </div>
 
 <!-- HOME -->
@@ -731,15 +793,15 @@
   </div>
 
   <div class="subpane active" id="browsepane-artist">
-    <div class="subtabs" id="artist-group-tabs" style="margin-bottom:18px;">
-      <div class="subtab active" data-artistgroup="nerdcore">NERDCORE ARTISTS</div>
-      <div class="subtab" data-artistgroup="friends">FRIENDS OF NERDCORE</div>
+    <div class="artist-browse-toolbar">
+      <input type="text" class="search-box" id="artist-search" placeholder="Search artists&hellip;">
+      <div class="artist-toolbar-actions" id="artist-group-tabs">
+        <div class="nav-tab active" data-artistgroup="nerdcore">NERDCORE ARTISTS</div>
+        <div class="nav-tab" data-artistgroup="friends">FRIENDS OF NERDCORE</div>
+        <div class="nav-tab" id="artist-sort-toggle">SORT: A<span class="sort-arrow">&#8594;</span>Z</div>
+      </div>
     </div>
-    <input type="text" class="search-box" id="artist-search" placeholder="Search artists&hellip;" style="width:100%; margin-bottom:18px;">
-    <div style="display:flex; justify-content:flex-end; margin-bottom:18px;">
-      <div class="nav-tab" id="artist-sort-toggle">SORT: A<span class="sort-arrow">&#8594;</span>Z</div>
-    </div>
-    <div id="artist-grid-content"><div class="loading">Loading artists&hellip;</div></div>
+    <div id="artist-grid-content"><div class="skeleton-grid"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div></div>
   </div>
 
   <div class="subpane" id="browsepane-franchise">
@@ -747,7 +809,7 @@
     <div style="display:flex; justify-content:flex-end; margin-bottom:18px;">
       <div class="nav-tab" id="franchise-sort-toggle">SORT: A<span class="sort-arrow">&#8594;</span>Z</div>
     </div>
-    <div id="franchise-grid-content"><div class="loading">Loading franchises&hellip;</div></div>
+    <div id="franchise-grid-content"><div class="skeleton-grid"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div></div>
   </div>
 </div>
 
@@ -869,7 +931,7 @@
 <!-- FLOATING PLAYER CONTAINER -->
 <div id="floating-player">
   <div id="floating-player-header">
-    <span>&#9654; MEDIA PLAYER</span>
+    <span id="floating-player-label">&#9654; MEDIA PLAYER</span>
     <span id="floating-player-close">&#10005;</span>
   </div>
   <div id="floating-player-body">
@@ -918,7 +980,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbye7Qm0fO8tN-zzRJOgJLaqUVBaT6Y-GDH99XX6Nf0yE5Y_sLjVcUp1CjeeTBZRgVHs/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyxSApptYzo90Lsyh5sitSmlU976EydGTlPUpBDrpNe3cIrLxCVBv-GeU9HtFRaA-aY/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -933,7 +995,7 @@
     settings: true, disclaimers: true, lyrics: true, artists: true,
     albums: true, franchises: true, characters: true, top5: true,
     top10yearly: true, playlists: true, artistStats: true,
-    deansAwards: true, encyclopedia: true, indieMonday: true
+    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, activity: true
   };
 
   function apiCacheKey_(action, params) {
@@ -1032,6 +1094,10 @@
     return (siteSettings && siteSettings.defaultImage) || 'https://placehold.co/220x220/141831/3dff8f?text=%3F';
   }
 
+  function detailSkeletonHtml_() {
+    return '<div class="skeleton-detail"><div class="skeleton-detail-image skeleton-card"></div><div class="skeleton-detail-copy"><div class="skeleton-line wide skeleton-card"></div><div class="skeleton-line skeleton-card"></div><div class="skeleton-line short skeleton-card"></div></div></div>';
+  }
+
   function hideAppLoadingOverlay() {
     var el = document.getElementById('app-loading-overlay');
     if (el) el.style.display = 'none';
@@ -1081,6 +1147,10 @@
 
 
   var siteSettings = { defaultImage: '', siteTitle: 'NERDCORE<br>ARCHIVE', tagline: '', social: {} };
+  var archiveBadges = [];
+  var archiveActivity = [];
+  var globalSearchTimer_ = null;
+  var globalSearchRequest_ = 0;
   var allLyrics = [];
   var allWeeklyData = [];
   var allArtists = [];
@@ -1149,6 +1219,75 @@
   var franchiseSongsArtistSecondaryDir = 'asc';
   var franchiseSongsSearchQuery = '';
 
+  function badgeKey_(title, artist) {
+    return normalizeArtistKey(title) + '|' + normalizeArtistKey(artist);
+  }
+  function getBadgeFor_(title, artist, pageType) {
+    var key = badgeKey_(title, artist);
+    var desired = String(pageType || 'song').toLowerCase();
+    for (var i = 0; i < archiveBadges.length; i++) {
+      var b = archiveBadges[i];
+      var bType = String(b.pageType || 'song').toLowerCase();
+      if (bType !== desired) continue;
+      if (badgeKey_(b.title, b.artist) === key) return b;
+      if (!b.artist && normalizeArtistKey(b.title) === normalizeArtistKey(title)) return b;
+    }
+    return null;
+  }
+  function badgeHtmlFor_(title, artist, pageType) {
+    var b = getBadgeFor_(title, artist, pageType);
+    if (!b) return '';
+    var label = b.type === 'new' ? 'NEW' : (b.type === 'updated' ? 'UPDATED' : String(b.type).toUpperCase());
+    return '<span class="badge ' + escapeHtml(b.type) + '">' + escapeHtml(label) + '</span>';
+  }
+  function renderActivityTicker_() {
+    var track = document.getElementById('activity-ticker-track');
+    if (!track) return;
+    if (!archiveActivity.length) {
+      track.innerHTML = '<span class="activity-dot">*</span><span>ARCHIVE ACTIVITY</span>';
+      return;
+    }
+    var bits = [];
+    archiveActivity.forEach(function (a) {
+      bits.push('<span class="activity-dot">*</span><span>' + escapeHtml(a.text) + (a.artist ? ' &mdash; ' + escapeHtml(a.artist) : '') + '</span>');
+    });
+    track.innerHTML = bits.concat(bits).join('<span style="color:var(--border);margin:0 12px;">/</span>');
+  }
+  function loadArchiveMeta_() {
+    Promise.all([api('badges').catch(function(){return [];}), api('activity').catch(function(){return [];} )]).then(function(r){
+      archiveBadges = r[0] || [];
+      archiveActivity = r[1] || [];
+      renderActivityTicker_();
+      if (lyricsLoaded) refreshVisibleBadgeViews_();
+    });
+  }
+  function refreshVisibleBadgeViews_() {
+    // Badge-bearing cards are rendered from current data; a full refresh is only
+    // needed when metadata arrives after a page has already been rendered.
+    if (currentArtistDetail) renderArtistDetail(currentArtistDetail);
+  }
+
+  function renderGlobalSearchResults_(data) {
+    var box = document.getElementById('global-search-results');
+    if (!box) return;
+    var results = (data && data.results) || [];
+    if (!results.length) { box.innerHTML = '<div class="global-search-result"><div class="global-search-result-meta">No results found.</div></div>'; box.style.display=''; return; }
+    box.innerHTML = results.slice(0,12).map(function(r){
+      return '<div class="global-search-result" data-search-route="' + escapeHtml(r.route) + '"><div class="global-search-result-title">' + escapeHtml(r.title) + '</div><div class="global-search-result-meta">' + escapeHtml(r.type.toUpperCase()) + (r.subtitle ? ' &mdash; ' + escapeHtml(r.subtitle) : '') + '</div></div>';
+    }).join('');
+    box.querySelectorAll('[data-search-route]').forEach(function(el){
+      el.addEventListener('click', function(){ var route=el.getAttribute('data-search-route'); box.style.display='none'; document.getElementById('global-search').value=''; if(route) navigateSearchRoute_(route); });
+    });
+    box.style.display='';
+  }
+  function navigateSearchRoute_(route) {
+    if (!route) return;
+    if (route.indexOf('lyric-') === 0) { showLyricsDetail(route.slice(6)); return; }
+    if (route.indexOf('artist-') === 0) { showArtistDetail(decodeURIComponent(route.slice(7))); return; }
+    if (route.indexOf('album-') === 0) { showAlbumDetail(decodeURIComponent(route.slice(6))); return; }
+    if (route.indexOf('franchise/') === 0) { window.location.hash = '#/' + route; routeFromHash(); return; }
+  }
+
   function openFloatingPlayer(url) {
     if (!url) return;
     var player = document.getElementById('floating-player');
@@ -1177,6 +1316,8 @@
     iframe.src = finalUrl;
     player.style.pointerEvents = 'auto';
     player.style.display = 'flex';
+    var labelEl = document.getElementById('floating-player-label');
+    if (labelEl) labelEl.textContent = currentLyricPost ? ('MEDIA PLAYER — ' + currentLyricPost.artist + ' — ' + currentLyricPost.title) : 'MEDIA PLAYER';
     if (currentFloatingIsYoutube) setTimeout(startYoutubeListening_, 800);
     updateSyncControlsVisibility_();
   }
@@ -1379,9 +1520,14 @@
 
   function hideAllViews() {
     ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','encyclopedia','releases','top5','indiemonday','about'].forEach(function (v) {
-      document.getElementById('view-' + v).style.display = 'none';
+      var el=document.getElementById('view-' + v);
+      if (el) { el.style.display = 'none'; el.classList.remove('page-enter'); }
     });
-    document.querySelectorAll('.nav-tab').forEach(function (t) { t.classList.remove('active'); });
+    document.querySelectorAll('.nav-tab[data-route]').forEach(function (t) { t.classList.remove('active'); });
+    requestAnimationFrame(function(){
+      var visible=document.querySelector('.page:not([style*="display: none"])');
+      if (visible) { visible.classList.remove('page-enter'); void visible.offsetWidth; visible.classList.add('page-enter'); }
+    });
   }
 
   function setActiveTab(route) {
@@ -1431,7 +1577,7 @@
     var needLyricsForArtist = !lyricsLoaded;
     var needArtistsForArtist = !artistsLoaded;
     if (needLyricsForArtist || needArtistsForArtist) {
-      document.getElementById('artist-detail-content').innerHTML = '<div class="loading">Loading&hellip;</div>';
+      document.getElementById('artist-detail-content').innerHTML = '<div class="skeleton-list"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>';
       var lyricsPromiseForArtist = needLyricsForArtist ? api('lyrics') : Promise.resolve(allLyrics);
       var artistsPromiseForArtist = needArtistsForArtist ? api('artists').catch(function () { return []; }) : Promise.resolve(allArtists);
       Promise.all([lyricsPromiseForArtist, artistsPromiseForArtist]).then(function (r) {
@@ -1465,7 +1611,7 @@
     setActiveTab('lyrics');
     setPath('lyric-' + id +
       (initialVariant ? '/variant/' + encodeURIComponent(initialVariant) : ''));
-    document.getElementById('lyrics-detail-content').innerHTML = '<div class="loading">Loading lyrics&hellip;</div>';
+    document.getElementById('lyrics-detail-content').innerHTML = detailSkeletonHtml_();
     lyricsViewMode = 'text';
     syncedLyricsData = null;
     syncedLyricsLoadedForId = null;
@@ -2149,7 +2295,7 @@
     franchiseCharSearchQuery = '';
 
     if (!lyricsLoaded || !charactersLoaded) {
-      document.getElementById('franchise-detail-content').innerHTML = '<div class="loading">Loading&hellip;</div>';
+      document.getElementById('franchise-detail-content').innerHTML = '<div class="skeleton-list"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>';
       var lyricsPromise = lyricsLoaded ? Promise.resolve(allLyrics) : api('lyrics');
       var charsPromise = charactersLoaded ? Promise.resolve(allCharacters) : api('characters').catch(function () { return []; });
       Promise.all([lyricsPromise, charsPromise]).then(function (r) {
@@ -2291,7 +2437,7 @@
     var needLyrics = !lyricsLoaded;
     var needChars = !charactersLoaded;
     if (needLyrics || needChars) {
-      document.getElementById('franchise-songs-content').innerHTML = '<div class="loading">Loading&hellip;</div>';
+      document.getElementById('franchise-songs-content').innerHTML = '<div class="skeleton-list"><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div></div>';
       var lyricsPromise = needLyrics ? api('lyrics') : Promise.resolve(allLyrics);
       var charsPromise = needChars ? api('characters').catch(function () { return []; }) : Promise.resolve(allCharacters);
       Promise.all([lyricsPromise, charsPromise]).then(function (r) {
@@ -2532,7 +2678,7 @@
         '<div class="artist-card" data-album-id="' + escapeHtml(a.id) + '">' +
           '<img src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="name">' + escapeHtml(a.title) + '</div>' +
-          '<div class="album-card-badge"><span class="' + badgeClass + '">' + escapeHtml(a.type) + '</span>' +
+          '<div class="album-card-badge"><span class="' + badgeClass + '">' + escapeHtml(a.type) + '</span>' + badgeHtmlFor_(a.title, a.artist) +
             (a.dateStr ? '<span class="date-str">' + escapeHtml(a.dateStr) + '</span>' : '') +
           '</div>' +
         '</div>'
@@ -2579,7 +2725,7 @@
     var needAlbums = !albumsLoaded;
     var needLyrics = !lyricsLoaded;
     if (needAlbums || needLyrics) {
-      document.getElementById('album-detail-content').innerHTML = '<div class="loading">Loading&hellip;</div>';
+      document.getElementById('album-detail-content').innerHTML = detailSkeletonHtml_();
       var albumsPromise = needAlbums ? api('albums') : Promise.resolve(allAlbums);
       var lyricsPromise = needLyrics ? api('lyrics') : Promise.resolve(allLyrics);
       Promise.all([albumsPromise, lyricsPromise]).then(function (r) {
@@ -2639,10 +2785,18 @@
             '<span>by <b>' + escapeHtml(album.artist) + '</b></span>' +
             '<span class="' + badgeClass + '">' + escapeHtml(album.type) + '</span>' +
             (album.dateStr ? '<span>' + escapeHtml(album.dateStr) + '</span>' : '') +
+            badgeHtmlFor_(album.title, album.artist, 'album') +
             '<span>' + tracks.length + (tracks.length === 1 ? ' track' : ' tracks') + '</span>' +
           '</div>' +
         '</div>' +
       '</div>';
+
+    var completionTotal = album.trackCount || 0;
+    var completionDone = tracks.filter(function (t) { return !isHiddenVariantRow_(t) && !t.isLocked; }).length;
+    var completionPct = completionTotal ? Math.max(0, Math.min(100, Math.round((completionDone / completionTotal) * 100))) : 0;
+    var completionHtml = completionTotal
+      ? '<div class="album-completion"><div class="album-completion-head"><span>ARCHIVE COMPLETION</span><span class="album-completion-count">' + completionDone + ' / ' + completionTotal + ' TRACKS' + (completionPct === 100 ? ' — COMPLETE' : '') + '</span></div><div class="album-completion-bar"><div class="album-completion-fill" style="width:' + completionPct + '%"></div></div></div>'
+      : '<div class="album-completion"><div class="album-completion-head"><span>ARCHIVE STATUS</span><span class="album-completion-count">' + completionDone + ' TRACKS ARCHIVED</span></div></div>';
 
     var tracksHtml = !tracks.length
       ? '<div class="empty">No tracklist added for this album yet.</div>'
@@ -2671,7 +2825,7 @@
           );
         }).join('');
 
-    container.innerHTML = header + (streamBtns ? '<div class="stream-row">' + streamBtns + '</div>' : '') + tracksHtml;
+    container.innerHTML = header + (streamBtns ? '<div class="stream-row">' + streamBtns + '</div>' : '') + completionHtml + tracksHtml;
 
     container.querySelectorAll('.track-card[data-id]').forEach(function (card) {
       card.addEventListener('click', function () {
@@ -2764,7 +2918,7 @@
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
               (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-              '<div class="lyric-meta-row">' + badge + '</div>' +
+              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + '</div>' +
             '<span class="date-str">' + escapeHtml(item.dateStr) + '</span>' +
           '</div>' +
         '</div>'
@@ -2996,7 +3150,7 @@
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
               (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-              '<div class="lyric-meta-row">' + badge + '</div>' +
+              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + '</div>' +
               '<span class="date-str">' + escapeHtml(item.dateStr) + '</span>' +
             '</div>' +
           '</div>'
@@ -3183,7 +3337,7 @@
         '<img class="detail-hero-img" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
-          '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span></div>' +
+          '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + '</div>' +
           (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + escapeHtml(post.featured) + '</span></div>' : '') +
           (post.producer && !isNA(post.producer) ? '<div class="detail-producer">Produced by ' + escapeHtml(post.producer) + '</div>' : '') +
           tagsHtml +
@@ -3223,6 +3377,29 @@
         else showFranchiseDetail(el.getAttribute('data-tag-character'));
       });
     });
+
+    function renderRelatedSongsHtml_() {
+      var candidates = (allLyrics || []).filter(function(s){
+        return s.id !== post.id && !s.isLocked && !isHiddenVariantRow_(s);
+      }).map(function(s){
+        var score=0;
+        if (normalizeArtistKey(s.artist) === normalizeArtistKey(post.artist)) score += 7;
+        if (!isNA(post.franchise) && !isNA(s.franchise) && splitCsv_(post.franchise).some(function(f){ return splitCsv_(s.franchise).some(function(sf){ return normalizeArtistKey(f)===normalizeArtistKey(sf); }); })) score += 5;
+        if (!isNA(post.character) && !isNA(s.character) && splitCsv_(post.character).some(function(c){ return splitCsv_(s.character).some(function(sc){ return normalizeArtistKey(c)===normalizeArtistKey(sc); }); })) score += 6;
+        if (post.albumId && s.albumId && normalizeArtistKey(post.albumId)===normalizeArtistKey(s.albumId)) score += 6;
+        if (post.featured && String(post.featured).toLowerCase().indexOf(String(s.artist||'').toLowerCase()) !== -1) score += 2;
+        return {s:s,score:score};
+      }).filter(function(x){return x.score>0;}).sort(function(a,b){return b.score-a.score || String(a.s.title).localeCompare(String(b.s.title));}).slice(0,4);
+      if (!candidates.length) return '';
+      return '<div class="related-section"><div class="section-kicker">RELATED SONGS</div><div class="related-grid">' + candidates.map(function(x){
+        return '<div class="related-card" data-related-id="' + escapeHtml(x.s.id) + '"><div class="related-title">' + escapeHtml(x.s.title) + '</div><div class="related-meta">by ' + escapeHtml(x.s.artist) + '</div></div>';
+      }).join('') + '</div></div>';
+    }
+    var relatedHtml = renderRelatedSongsHtml_();
+    var existingDetailContent = container.innerHTML;
+    // Append related songs after the lyric content while keeping the existing layout intact.
+    if (relatedHtml) container.insertAdjacentHTML('beforeend', relatedHtml);
+    container.querySelectorAll('[data-related-id]').forEach(function(el){ el.addEventListener('click', function(){ showLyricsDetail(el.getAttribute('data-related-id')); }); });
 
     function setLyricDetailPath_() {
       setPath('lyric-' + post.id +
@@ -3732,6 +3909,7 @@
               songHtml +
               '<div class="release-artist">' + escapeHtml(item.artist) + '</div>' +
               featuredHtml +
+              badgeHtmlFor_(item.title, item.artist) +
             '</div>' +
           '</div>'
         );
@@ -4111,6 +4289,25 @@
   }
   document.addEventListener('keydown', encKeyHandler);
 
+  (function wireGlobalSearch_(){
+    var input=document.getElementById('global-search');
+    var box=document.getElementById('global-search-results');
+    if(!input) return;
+    input.addEventListener('input', function(){
+      var q=input.value.trim();
+      clearTimeout(globalSearchTimer_);
+      if(!q){ box.style.display='none'; return; }
+      var req=++globalSearchRequest_;
+      box.style.display='';
+      box.innerHTML='<div class="global-search-result"><div class="global-search-result-meta">Searching...</div></div>';
+      globalSearchTimer_=setTimeout(function(){
+        api('search',{q:q}).then(function(data){ if(req===globalSearchRequest_) renderGlobalSearchResults_(data); }).catch(function(){ if(req===globalSearchRequest_) box.innerHTML='<div class="global-search-result"><div class="global-search-result-meta">Search unavailable right now.</div></div>'; });
+      },220);
+    });
+    input.addEventListener('keydown',function(e){ if(e.key==='Escape'){input.value='';box.style.display='none';input.blur();} if(e.key==='Enter'){var first=box.querySelector('[data-search-route]'); if(first) first.click();} });
+    document.addEventListener('click',function(e){ if(!e.target.closest('.global-search-wrap')) box.style.display='none'; });
+  })();
+
   function initialPathIsHome_() {
     var path = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
     return !path || path === 'home';
@@ -4122,6 +4319,7 @@
 
   loadSettings();
   loadDisclaimers();
+  loadArchiveMeta_();
 </script>
 </body>
 </html>
