@@ -52,7 +52,22 @@
     display:flex; align-items:center; justify-content:space-between;
     gap:14px; flex-wrap:wrap;
   }
-  .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .brand{ display:flex; align-items:center; gap:10px; cursor:default; }
+  .brand-title{ cursor:default; }
+  .cover-switcher{ position:relative; flex-shrink:0; }
+  .cover-switcher .detail-hero-img{ display:block; }
+  .alt-art-hint{ position:absolute; left:8px; bottom:8px; z-index:2; font-family:'Press Start 2P',monospace; font-size:8px; line-height:1.4; color:var(--ink); background:rgba(11,14,26,.88); border:2px solid var(--green); padding:6px 7px; pointer-events:none; box-shadow:3px 3px 0 rgba(0,0,0,.45); }
+  .alt-art-controls{ position:absolute; right:8px; bottom:8px; z-index:3; display:flex; gap:4px; }
+  .alt-art-controls button{ font-family:'VT323',monospace; font-size:16px; color:var(--ink); background:rgba(11,14,26,.92); border:1px solid var(--green); padding:3px 7px; cursor:pointer; }
+  .alt-art-controls button:hover{ color:var(--green); }
+  .alt-art-count{ font-family:'VT323',monospace; font-size:15px; color:var(--green); background:rgba(11,14,26,.92); border:1px solid var(--border); padding:3px 7px; }
+  .alt-art-card-hint{ position:absolute; left:7px; bottom:7px; z-index:2; font-family:'VT323',monospace; font-size:14px; color:var(--ink); background:rgba(11,14,26,.88); border:1px solid var(--green); padding:2px 5px; pointer-events:none; }
+  .archive-updated{ font-family:'VT323',monospace; font-size:15px; color:var(--muted-dim); margin-top:8px; }
+  .changelog-entry{ background:var(--panel); border:2px solid var(--border); padding:16px 18px; margin-bottom:10px; }
+  .changelog-date{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--amber); margin-bottom:9px; }
+  .changelog-summary{ font-family:'VT323',monospace; font-size:19px; color:var(--ink); line-height:1.5; white-space:pre-line; }
+  .not-found-glitch{ font-family:'VT323',monospace; font-size:22px; color:var(--muted); line-height:1.5; }
+  @media(max-width:620px){ .cover-switcher{ width:100%; } .cover-switcher .detail-hero-img{ width:100%; } .alt-art-hint{ left:10px; bottom:10px; } }
   .brand-title{
     font-size:16px; color:var(--ink);
     text-shadow:2px 2px 0 var(--magenta);
@@ -761,7 +776,7 @@
 <div id="app-loading-overlay">
   <div class="app-loading-inner">
     <div class="pixel app-loading-title" id="app-loading-title">NERDCORE<br>ARCHIVE</div>
-    <div class="retro app-loading-sub">Loading&hellip;</div>
+    <div class="retro app-loading-sub">Loading the good stuff&hellip;</div>
   </div>
 </div>
 
@@ -779,9 +794,10 @@
       <div class="nav-tab" data-route="releases">Releases</div>
       <div class="nav-tab" data-route="top5">Awards</div>
       <div class="nav-tab" data-route="indiemonday">Indie Monday</div>
+      <div class="nav-tab" data-route="changelog">Changelog</div>
     </div>
     <div class="global-search-wrap">
-      <input id="global-search" class="global-search" type="search" autocomplete="off" placeholder="Search archive..." aria-label="Search archive">
+      <input id="global-search" class="global-search" type="search" autocomplete="off" placeholder="Search the shelves..." aria-label="Search archive">
       <div id="global-search-results" class="global-search-results" style="display:none;"></div>
     </div>
   </div>
@@ -819,6 +835,7 @@
       <h3>INDIE MONDAY</h3>
       <p>Nerdcore artists featured on the Indie Monday blog.</p>
     </div>
+    <div class="home-tile" data-route="changelog"><div class="tag">ARCHIVE LOG</div><h3>CHANGELOG</h3><p>What changed, when it changed, and what got added.</p></div>
     <div class="home-tile" data-route="about">
       <div class="tag">WHO'S BEHIND THIS</div>
       <h3>ABOUT ME</h3>
@@ -976,6 +993,17 @@
   <div id="indiemonday-content"><div class="loading">Loading&hellip;</div></div>
 </div>
 
+<!-- CHANGELOG -->
+<div class="page" id="view-changelog" style="display:none">
+  <span class="back-link" data-route="home">&larr; Back to Home</span>
+  <div class="page-head">
+    <div class="eyebrow">ARCHIVE LOG</div>
+    <h1>CHANGELOG</h1>
+    <p>A running record of what changed in the archive.</p>
+  </div>
+  <div id="changelog-content"><div class="loading">Checking the paper trail&hellip;</div></div>
+</div>
+
 <!-- ABOUT -->
 <div class="page" id="view-about" style="display:none">
   <span class="back-link" data-route="home">&larr; Back to Home</span>
@@ -985,6 +1013,20 @@
   </div>
   <div data-disclaimer-page="about"></div>
   <div id="about-content"><div class="loading">Loading&hellip;</div></div>
+</div>
+
+<!-- ARCHIVE 404 EASTER EGG -->
+<div class="page" id="view-404" style="display:none">
+  <div class="page-head">
+    <div class="eyebrow">ARCHIVE ERROR</div>
+    <h1>ENTRY NOT FOUND</h1>
+    <p class="not-found-glitch">Archive error, entry not found&hellip; probably for the best.</p>
+  </div>
+  <div class="home-hero">
+    <h2>404</h2>
+    <p>The archivist checked the shelves. Nothing. Not even a suspiciously labeled box.</p>
+    <p class="archive-updated">Try <span class="retry-link" id="not-found-home">going back home</span>.</p>
+  </div>
 </div>
 
 <!-- FLOATING PLAYER CONTAINER -->
@@ -1039,7 +1081,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbz0scgbOUnjRenuqoxvQ1XLNyjRYFsG9GVPm8k-UfgligqWHMmD__vej3VtOVu8ZMi5/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwkTldKUep25IL0Iui5UGOOCfc8WmpiPfUuJi6i86bCNBBHpKJOxeLPQ41VHrAb4DDx/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1054,7 +1096,7 @@
     settings: true, disclaimers: true, lyrics: true, artists: true,
     albums: true, franchises: true, characters: true, top5: true,
     top10yearly: true, playlists: true, artistStats: true,
-    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, aboutHighlights: true
+    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, changelog: true, activity: true, aboutHighlights: true
   };
 
   function apiCacheKey_(action, params) {
@@ -1144,11 +1186,6 @@
     if(list.length){var preload=new Image();preload.src=list[0];img.setAttribute('data-alt-preloaded','1');}
   });
 
-  document.addEventListener('click', function(ev){
-    var img=ev.target&&ev.target.closest?ev.target.closest('img[data-alt-images]'):null; if(!img)return;
-    var raw=img.getAttribute('data-alt-images'), list=[]; try{list=JSON.parse(decodeURIComponent(raw||''));}catch(e){return;} if(!list.length)return;
-    ev.stopPropagation(); var urls=[img.getAttribute('src')].concat(list).filter(Boolean); var index=parseInt(img.getAttribute('data-alt-index')||'0',10)||0; index=(index+1)%urls.length; img.setAttribute('data-alt-index',String(index)); img.src=urls[index]; img.classList.add('image-switching'); setTimeout(function(){img.classList.remove('image-switching');},180);
-  }, true);
 
   function escapeHtml(str) {
     return String(str || '')
@@ -1207,8 +1244,32 @@
     root.querySelectorAll('img[data-alt-images]').forEach(function(img){
       if(img.getAttribute('data-alt-wired')==='1')return;
       var raw=img.getAttribute('data-alt-images'), list=[]; try{list=JSON.parse(decodeURIComponent(raw||''));}catch(e){return;} if(!list.length)return;
-      var urls=[img.getAttribute('src')].concat(list).filter(Boolean), index=0; img.setAttribute('data-alt-wired','1'); img.title='Click to view alternate artwork';
-      img.addEventListener('click',function(ev){ ev.stopPropagation(); index=(index+1)%urls.length; img.classList.add('image-switching'); img.src=urls[index]; setTimeout(function(){img.classList.remove('image-switching');},180); });
+      var urls=[img.getAttribute('src')].concat(list).filter(Boolean), index=0;
+      img.setAttribute('data-alt-wired','1');
+      img.setAttribute('data-alt-index','0');
+      img.title='Alternate artwork available';
+      var parent=img.parentElement;
+      if(parent && !parent.querySelector('.alt-art-card-hint') && !parent.classList.contains('cover-switcher')){
+        var hint=document.createElement('span'); hint.className='alt-art-card-hint'; hint.textContent='ALT ART'; parent.appendChild(hint);
+      }
+      img.addEventListener('click',function(ev){ ev.stopPropagation(); index=(index+1)%urls.length; img.setAttribute('data-alt-index',String(index)); img.classList.add('image-switching'); img.src=urls[index]; setTimeout(function(){img.classList.remove('image-switching');},180); });
+    });
+  }
+  function wireCoverSwitcher_(root){
+    if(!root)return;
+    root.querySelectorAll('.cover-switcher[data-alt-list]').forEach(function(wrap){
+      if(wrap.getAttribute('data-alt-wired')==='1')return;
+      var img=wrap.querySelector('img[data-cover-image]'); if(!img)return;
+      var list=[]; try{list=JSON.parse(decodeURIComponent(wrap.getAttribute('data-alt-list')||''));}catch(e){return;}
+      var urls=[img.getAttribute('src')].concat(list).filter(Boolean); if(urls.length<2)return;
+      var index=0; wrap.setAttribute('data-alt-wired','1');
+      var count=wrap.querySelector('.alt-art-count');
+      function update(){ img.classList.add('image-switching'); img.src=urls[index]; if(count) count.textContent=(index+1)+'/'+urls.length; setTimeout(function(){img.classList.remove('image-switching');},180); }
+      var prev=wrap.querySelector('[data-alt-prev]'), next=wrap.querySelector('[data-alt-next]'), reset=wrap.querySelector('[data-alt-reset]');
+      if(prev)prev.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();index=(index-1+urls.length)%urls.length;update();});
+      if(next)next.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();index=(index+1)%urls.length;update();});
+      if(reset)reset.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();index=0;update();});
+      img.addEventListener('click',function(e){e.stopPropagation();index=(index+1)%urls.length;update();});
     });
   }
 
@@ -1235,6 +1296,8 @@
 
   var siteSettings = { defaultImage: '', siteTitle: 'NERDCORE<br>ARCHIVE', tagline: '', social: {} };
   var archiveBadges = [];
+  var archiveChangelog = [];
+  var archiveLastUpdatedStr = '';
   var globalSearchTimer_ = null;
   var globalSearchRequest_ = 0;
   var allLyrics = [];
@@ -1329,6 +1392,11 @@
     return '<span class="badge ' + escapeHtml(b.type) + '">' + escapeHtml(label) + '</span>';
   }
   function loadArchiveMeta_() {
+    api('changelog').catch(function(){ return []; }).then(function (changes) {
+      archiveChangelog=changes||[]; archiveLastUpdatedStr=archiveChangelog.length ? archiveChangelog[0].dateStr : '';
+      refreshArchiveUpdatedLabels_();
+      if(document.getElementById('view-changelog').style.display!=='none') renderChangelog_();
+    });
     api('badges').catch(function(){ return []; }).then(function (badges) {
       archiveBadges = badges || [];
       if (lyricsLoaded) refreshVisibleBadgeViews_();
@@ -1345,7 +1413,7 @@
     var box = document.getElementById('global-search-results');
     if (!box) return;
     var results = (data && data.results) || [];
-    if (!results.length) { box.innerHTML = '<div class="global-search-result"><div class="global-search-result-meta">No results found.</div></div>'; box.style.display=''; return; }
+    if (!results.length) { box.innerHTML = '<div class="global-search-result"><div class="global-search-result-meta">Nothing on the shelf.</div></div>'; box.style.display=''; return; }
     box.innerHTML = results.slice(0,12).map(function(r){
       return '<div class="global-search-result" data-search-route="' + escapeHtml(r.route) + '"><div class="global-search-result-title">' + escapeHtml(r.title) + '</div><div class="global-search-result-meta">' + escapeHtml(r.type.toUpperCase()) + (r.subtitle ? ' &mdash; ' + escapeHtml(r.subtitle) : '') + '</div></div>';
     }).join('');
@@ -1605,11 +1673,12 @@
   })();
 
   function hideAllViews() {
-    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','encyclopedia','releases','top5','indiemonday','about'].forEach(function (v) {
+    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','encyclopedia','releases','top5','indiemonday','changelog','about'].forEach(function (v) {
       var el=document.getElementById('view-' + v);
       if (el) { el.style.display = 'none'; el.classList.remove('page-enter'); }
     });
     document.querySelectorAll('.nav-tab[data-route]').forEach(function (t) { t.classList.remove('active'); });
+    refreshArchiveUpdatedLabels_();
     requestAnimationFrame(function(){
       var visible=document.querySelector('.page:not([style*="display: none"])');
       if (visible) { visible.classList.remove('page-enter'); void visible.offsetWidth; visible.classList.add('page-enter'); }
@@ -1626,6 +1695,15 @@
   function saveRecentlyViewed_(entry){if(!entry||!entry.route)return;var list=getRecentlyViewed_().filter(function(x){return x.route!==entry.route;});list.unshift(entry);try{localStorage.setItem(RECENTLY_VIEWED_KEY_,JSON.stringify(list.slice(0,8)));}catch(e){}}
   function recordRecentlyViewed_(type,title,route,meta){saveRecentlyViewed_({type:type,title:title,route:route,meta:meta||''});}
   function renderRecentlyViewed_(){var s=document.getElementById('recently-viewed-section'),g=document.getElementById('recently-viewed-grid');if(!s||!g)return;var list=getRecentlyViewed_();if(!list.length){s.style.display='none';return;}s.style.display='';g.innerHTML=list.map(function(x){return '<div class="recently-viewed-card" data-recent-route="'+escapeHtml(x.route)+'"><div class="recently-viewed-type">'+escapeHtml(String(x.type||'').toUpperCase())+'</div><div class="recently-viewed-title">'+escapeHtml(x.title||'')+'</div>'+(x.meta?'<div class="recently-viewed-meta">'+escapeHtml(x.meta)+'</div>':'')+'</div>';}).join('');g.querySelectorAll('[data-recent-route]').forEach(function(el){el.addEventListener('click',function(){navigateSearchRoute_(el.getAttribute('data-recent-route'));});});}
+
+  function refreshArchiveUpdatedLabels_() {
+    if (!archiveLastUpdatedStr) return;
+    document.querySelectorAll('.page-head').forEach(function(head){
+      if (head.querySelector('.global-archive-updated')) return;
+      var el=document.createElement('div'); el.className='archive-updated global-archive-updated';
+      el.textContent='ARCHIVE LAST UPDATED: ' + archiveLastUpdatedStr; head.appendChild(el);
+    });
+  }
 
   function showHome() {
     hideAllViews();
@@ -1752,6 +1830,20 @@
     setPath('indiemonday');
     if (!indieMondayLoaded) loadIndieMonday();
   }
+  function showChangelog() {
+    hideAllViews();
+    document.getElementById('view-changelog').style.display = '';
+    setActiveTab('changelog');
+    setPath('changelog');
+    renderChangelog_();
+  }
+
+  function renderChangelog_() {
+    var c=document.getElementById('changelog-content'); if(!c)return;
+    if(!archiveChangelog.length){ c.innerHTML='<div class="empty">No changes logged yet. The archive is suspiciously quiet.</div>'; return; }
+    c.innerHTML=archiveChangelog.map(function(x){ return '<article class="changelog-entry"><div class="changelog-date">'+escapeHtml(String(x.dateStr||'').toUpperCase())+'</div><div class="changelog-summary">'+escapeHtml(x.summary||'')+'</div></article>'; }).join('');
+  }
+
   function showAbout() {
     hideAllViews();
     document.getElementById('view-about').style.display = '';
@@ -1819,6 +1911,12 @@
     if (window.location.hash !== full) window.history.pushState({ path: p }, '', full);
   }
 
+    function showNotFound() {
+    hideAllViews();
+    document.getElementById('view-404').style.display='';
+    setPath('404');
+  }
+
     function routeFromHash() {
     var path = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
     if (!path || path === 'home') { showHome(); return; }
@@ -1857,8 +1955,9 @@
     if (path === 'releases') { if (isRouteHidden_('releases')) { showHome(); return; } showReleases(); return; }
     if (path === 'top5') { if (isRouteHidden_('top5')) { showHome(); return; } showTop5(); return; }
     if (path === 'indiemonday') { if (isRouteHidden_('indiemonday')) { showHome(); return; } showIndieMonday(); return; }
+    if (path === 'changelog') { showChangelog(); return; }
     if (path === 'about') { if (isRouteHidden_('about')) { showHome(); return; } showAbout(); return; }
-    showHome();
+    showNotFound();
   }
   
   window.addEventListener('popstate', routeFromHash);
@@ -1907,6 +2006,7 @@
       else if (r === 'releases') showReleases();
       else if (r === 'top5') showTop5();
       else if (r === 'indiemonday') showIndieMonday();
+      else if (r === 'changelog') showChangelog();
       else if (r === 'about') showAbout();
     });
   });
@@ -3529,10 +3629,10 @@
     container.innerHTML =
       '<div class="detail-hero">' +
         '<span class="report-btn-corner" id="lyric-report-btn">&#9873; REPORT ISSUE</span>' +
-        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(src.alternateCovers || post.alternateCovers) + '" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
+        (function(){ var altList=parseImageList_(src.alternateCovers || post.alternateCovers); return '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(altList) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'"><span class="alt-art-hint">' + (altList.length ? 'ALT ART AVAILABLE' : 'ORIGINAL ART') + '</span>' + (altList.length ? '<div class="alt-art-controls"><button type="button" data-alt-prev aria-label="Previous artwork">&larr;</button><span class="alt-art-count">1/' + (altList.length+1) + '</span><button type="button" data-alt-reset aria-label="Original artwork">ORIG</button><button type="button" data-alt-next aria-label="Next artwork">&rarr;</button></div>' : '') + '</div>'; })() +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
-          '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + '</div>' +
+          '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + '</div>' + (post.pageUpdatedStr ? '<div class="archive-updated">PAGE LAST UPDATED: ' + escapeHtml(post.pageUpdatedStr) + '</div>' : (archiveLastUpdatedStr ? '<div class="archive-updated">ARCHIVE LAST UPDATED: ' + escapeHtml(archiveLastUpdatedStr) + '</div>' : '')) +
           (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + escapeHtml(post.featured) + '</span></div>' : '') +
           (post.producer && !isNA(post.producer) ? '<div class="detail-producer">Produced by ' + escapeHtml(post.producer) + '</div>' : '') +
           tagsHtml +
@@ -3543,6 +3643,7 @@
       lyricsViewToggleHtml +
       lyricsContentAreaHtml;
 
+    wireCoverSwitcher_(container);
     if (canShowSynced && lyricsViewMode === 'synced') loadSyncedLyricsIfNeeded_();
 
     container.querySelectorAll('[data-lyricsview]').forEach(function (btn) {
@@ -3652,7 +3753,7 @@
     var wrap = document.getElementById('synced-lines');
     if (!wrap) return;
     if (!syncedLyricsData || !syncedLyricsData.length) {
-      wrap.innerHTML = '<div class="synced-empty">No synced lyrics found for this song yet.</div>';
+      wrap.innerHTML = '<div class="synced-empty">No synced lyrics found for this song yet. The timing gremlin may have won this round.</div>';
       return;
     }
     wrap.innerHTML = syncedLyricsData.map(function (line, i) {
@@ -4513,6 +4614,8 @@
     input.addEventListener('keydown',function(e){ if(e.key==='Escape'){input.value='';box.style.display='none';input.blur();} if(e.key==='Enter'){var first=box.querySelector('[data-search-route]'); if(first) first.click();} });
     document.addEventListener('click',function(e){ if(!e.target.closest('.global-search-wrap')) box.style.display='none'; });
   })();
+
+  var notFoundHome=document.getElementById('not-found-home'); if(notFoundHome) notFoundHome.addEventListener('click',showHome);
 
   function initialPathIsHome_() {
     var path = window.location.hash.replace(/^#\/?/, '').replace(/\/+$/, '');
