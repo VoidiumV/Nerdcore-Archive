@@ -67,6 +67,10 @@
 .alt-art-multi-indicator span:first-child{ background:var(--muted); opacity:.9; }
 .lyrics-updated{ margin:28px 0 8px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); text-align:center; font-family:'VT323',monospace; font-size:15px; letter-spacing:.04em; color:var(--muted); text-transform:none; }
 .alt-art-card-hint{ position:absolute; left:7px; bottom:7px; z-index:2; font-family:'VT323',monospace; font-size:14px; color:var(--ink); background:rgba(11,14,26,.88); border:1px solid var(--green); padding:2px 5px; pointer-events:none; }
+.alt-stack-badge{ position:absolute; z-index:3; top:7px; left:7px; display:inline-flex; align-items:center; gap:4px; font-family:'VT323',monospace; font-size:15px; letter-spacing:.3px; color:var(--amber); background:rgba(11,14,26,.9); border:1px solid var(--amber); padding:3px 8px; pointer-events:none; white-space:nowrap; }
+.alt-stack-badge .arrow{ font-size:13px; line-height:1; }
+img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gradient(135deg, transparent 0 44%, var(--border) 44% 49%, var(--panel-2) 49% 58%, var(--border) 58% 63%, transparent 63% 100%) 0 0 / 100% 100% no-repeat; }
+.detail-hero-img.alt-stack{ padding:0 0 13px 13px; }
   .archive-updated{ font-family:'VT323',monospace; font-size:15px; color:var(--muted-dim); margin-top:8px; }
   .changelog-entry{ background:var(--panel); border:2px solid var(--border); padding:16px 18px; margin-bottom:10px; }
   .changelog-date{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--amber); margin-bottom:9px; }
@@ -321,6 +325,8 @@
     margin-top:8px; line-height:1.5; white-space:normal; overflow-wrap:break-word; word-break:break-word;
   }
   .detail-featured .feat-name{ color:var(--amber); font-weight:normal; }
+  .artist-name-link{ cursor:pointer; display:inline-block; transition:transform .12s ease, text-shadow .12s ease; }
+  .artist-name-link:hover{ transform:translateY(-1px); text-shadow:0 0 8px currentColor; }
   .detail-producer{
     font-family:'VT323', monospace; font-size:16px; color:var(--muted-dim);
     margin-top:6px; line-height:1.5; white-space:normal; overflow-wrap:break-word; word-break:break-word;
@@ -652,46 +658,6 @@
   .stats-table td.num{ color:var(--green); text-align:center; }
   .stats-table tr:hover td{ background:var(--panel-2); }
 
-  .flip-wrap{ display:flex; flex-direction:column; align-items:center; gap:16px; }
-  .flip-toolbar{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
-  .flip-btn{ font-family:'Press Start 2P', monospace; font-size:10px; background:var(--panel); color:var(--green); border:2px solid var(--green); padding:9px 14px; cursor:pointer; box-shadow:3px 3px 0 #000; }
-  .flip-btn:disabled{ opacity:0.4; cursor:not-allowed; }
-  .flip-page-label{ font-family:'VT323', monospace; font-size:18px; color:var(--muted); }
-  .flip-fallback{ text-align:center; font-family:'VT323', monospace; font-size:18px; color:var(--muted); padding:40px 20px; max-width:500px; }
-  .flip-fallback a{ color:var(--green); text-decoration:underline; }
-
-  /* ---------- encyclopedia page viewer ---------- */
-  .enc-book{
-    position:relative;
-    width:100%; max-width:760px;
-    background:var(--panel); border:3px solid var(--border);
-    box-shadow:0 0 0 4px #0b0e1a, 0 0 34px rgba(61,255,143,0.10), 6px 6px 0 rgba(0,0,0,0.4);
-    padding:16px;
-  }
-  .enc-page-inner{
-    position:relative;
-    background:#0a0d1c; border:1px solid var(--border);
-    min-height:240px;
-    display:flex; align-items:center; justify-content:center; overflow:hidden;
-    cursor:pointer;
-  }
-  .enc-page-inner img{
-    width:100%; height:auto; display:block;
-    opacity:1; transform:scale(1) rotateY(0deg);
-    transition:opacity .2s ease, transform .2s ease;
-  }
-  .enc-page-inner.enc-turning-next img{ opacity:0; transform:scale(0.97) rotateY(-6deg); }
-  .enc-page-inner.enc-turning-prev img{ opacity:0; transform:scale(0.97) rotateY(6deg); }
-  .enc-page-zone{ position:absolute; top:0; bottom:0; width:34%; z-index:2; }
-  .enc-page-zone.left{ left:0; }
-  .enc-page-zone.right{ right:0; }
-  .enc-jump-row{ display:flex; align-items:center; gap:8px; justify-content:center; flex-wrap:wrap; }
-  .enc-jump-row input{
-    font-family:'Space Mono', monospace; font-size:14px; width:64px; text-align:center;
-    background:var(--panel); border:2px solid var(--border); color:var(--ink); padding:8px 6px; outline:none;
-  }
-  .enc-jump-row input:focus{ border-color:var(--green); }
-
   /* ---------- DRAGGABLE + RESIZABLE FLOATING PLAYER WIDGET ---------- */
   #floating-player{
     position:fixed; bottom:20px; right:20px; z-index:9999;
@@ -795,7 +761,6 @@
     <div class="nav-tabs">
       <div class="nav-tab" data-route="home">Home</div>
       <div class="nav-tab" data-route="lyrics">Lyrics</div>
-      <div class="nav-tab" data-route="encyclopedia">Encyclopedia</div>
       <div class="nav-tab" data-route="releases">Releases</div>
       <div class="nav-tab" data-route="top5">Awards</div>
       <div class="nav-tab" data-route="indiemonday">Indie Monday</div>
@@ -829,11 +794,6 @@
       <div class="tag">BROWSE</div>
       <h3>LYRICS</h3>
       <p>Full lyric pages for every nerdcore song.</p>
-    </div>
-    <div class="home-tile" data-route="encyclopedia">
-      <div class="tag">REFERENCE</div>
-      <h3>ENCYCLOPEDIA</h3>
-      <p>The full Nerdcore Artist Encyclopedia of everyone in the scene.</p>
     </div>
     <div class="home-tile" data-route="indiemonday">
       <div class="tag">WEEKLY SPOTLIGHT</div>
@@ -922,20 +882,6 @@
 <div class="page" id="view-lyrics-detail" style="display:none">
   <span class="back-link" id="lyric-detail-back">&larr; Back</span>
   <div id="lyrics-detail-content"><div class="loading">Loading lyrics&hellip;</div></div>
-</div>
-
-<!-- ENCYCLOPEDIA -->
-<div class="page" id="view-encyclopedia" style="display:none">
-  <span class="back-link" data-route="home">&larr; Back to Home</span>
-  <div class="page-head">
-    <div class="eyebrow">REFERENCE</div>
-    <h1>THE ENCYCLOPEDIA</h1>
-    <p>The full Nerdcore Artist Encyclopedia of everyone in the scene.</p>
-  </div>
-  <div data-disclaimer-page="encyclopedia"></div>
-  <div class="flip-wrap" id="enc-wrap">
-    <div class="loading">Loading encyclopedia&hellip;</div>
-  </div>
 </div>
 
 <!-- RELEASES -->
@@ -1086,7 +1032,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyMhXvCkzHdO9UhLWcM03_aaeza7tZGEcOJ1dX4xF0I5n3D53iWdeusAOxWF-3BC7Nn/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxQt7WM_YvsKWQqw1DK673NQxLAsTcW1cAiQKj0wRRpUCCYU-jzkgvCNviUA7HvzJT4/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1101,7 +1047,7 @@
     settings: true, disclaimers: true, lyrics: true, artists: true,
     albums: true, franchises: true, characters: true, top5: true,
     top10yearly: true, playlists: true, artistStats: true,
-    deansAwards: true, encyclopedia: true, indieMonday: true, badges: true, changelog: true, activity: true, aboutHighlights: true
+    deansAwards: true, indieMonday: true, badges: true, changelog: true, activity: true, aboutHighlights: true
   };
 
   function apiCacheKey_(action, params) {
@@ -1201,6 +1147,10 @@
     var c = String(val).trim().toUpperCase();
     return c === '' || c === 'N/A' || c === 'NA';
   }
+  var EMPTY_EASTER_EGG_TEXT_ = "Yeah, I'm not putting that here.";
+  function maybeEasterEggEmpty_(text) {
+    return (Math.random() < 0.03) ? EMPTY_EASTER_EGG_TEXT_ : text;
+  }
     function isHiddenVariantRow_(item) {
     return !!(item && item.isVariant && item.mainId && item.variantKind === 'paren');
   }
@@ -1253,9 +1203,10 @@
       img.setAttribute('data-alt-wired','1');
       img.setAttribute('data-alt-index','0');
       img.title='Alternate artwork available';
+      img.classList.add('alt-stack');
       var parent=img.parentElement;
-      if(parent && !parent.querySelector('.alt-art-card-hint') && !parent.classList.contains('cover-switcher')){
-        var hint=document.createElement('span'); hint.className='alt-art-card-hint'; hint.textContent='ALT ART'; parent.appendChild(hint);
+      if(parent && !parent.querySelector('.alt-stack-badge') && !parent.classList.contains('cover-switcher')){
+        var badge=document.createElement('span'); badge.className='alt-stack-badge'; badge.innerHTML='<span class="arrow">&#10530;</span> '+urls.length; parent.appendChild(badge);
       }
       img.addEventListener('click',function(ev){ ev.stopPropagation(); index=(index+1)%urls.length; img.setAttribute('data-alt-index',String(index)); img.classList.add('image-switching'); img.src=urls[index]; setTimeout(function(){img.classList.remove('image-switching');},180); });
     });
@@ -1268,12 +1219,11 @@
       var list=[]; try{list=JSON.parse(decodeURIComponent(wrap.getAttribute('data-alt-list')||''));}catch(e){return;}
       var urls=[img.getAttribute('src')].concat(list).filter(Boolean); if(urls.length<2)return;
       var index=0; wrap.setAttribute('data-alt-wired','1');
-      var count=wrap.querySelector('.alt-art-count');
-      function update(){ img.classList.add('image-switching'); img.src=urls[index]; if(count) count.textContent=(index+1)+'/'+urls.length; setTimeout(function(){img.classList.remove('image-switching');},180); }
-      var prev=wrap.querySelector('[data-alt-prev]'), next=wrap.querySelector('[data-alt-next]'), reset=wrap.querySelector('[data-alt-reset]');
-      if(prev)prev.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();index=(index-1+urls.length)%urls.length;update();});
-      if(next)next.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();index=(index+1)%urls.length;update();});
-      if(reset)reset.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();index=0;update();});
+      img.classList.add('alt-stack');
+      if(!wrap.querySelector('.alt-stack-badge')){
+        var badge=document.createElement('span'); badge.className='alt-stack-badge'; badge.innerHTML='<span class="arrow">&#10530;</span> '+urls.length+' COVERS'; wrap.appendChild(badge);
+      }
+      function update(){ img.classList.add('image-switching'); img.src=urls[index]; setTimeout(function(){img.classList.remove('image-switching');},180); }
       img.addEventListener('click',function(e){e.stopPropagation();index=(index+1)%urls.length;update();});
     });
   }
@@ -1352,7 +1302,6 @@
 
   var releasesLoaded = false;
   var top5Loaded = false;
-  var encyclopediaLoaded = false;
 
   var lyricsBrowseMode = 'artist';
   var allFranchises = [];
@@ -1418,7 +1367,7 @@
     var box = document.getElementById('global-search-results');
     if (!box) return;
     var results = (data && data.results) || [];
-    if (!results.length) { box.innerHTML = '<div class="global-search-result"><div class="global-search-result-meta">Nothing on the shelf.</div></div>'; box.style.display=''; return; }
+    if (!results.length) { box.innerHTML = '<div class="global-search-result"><div class="global-search-result-meta">' + maybeEasterEggEmpty_('Nothing on the shelf.') + '</div></div>'; box.style.display=''; return; }
     box.innerHTML = results.slice(0,12).map(function(r){
       return '<div class="global-search-result" data-search-route="' + escapeHtml(r.route) + '"><div class="global-search-result-title">' + escapeHtml(r.title) + '</div><div class="global-search-result-meta">' + escapeHtml(r.type.toUpperCase()) + (r.subtitle ? ' &mdash; ' + escapeHtml(r.subtitle) : '') + '</div></div>';
     }).join('');
@@ -1542,7 +1491,7 @@
     document.getElementById('bug-report-options').style.display = (isMissing || isMissingArtist) ? 'none' : '';
 
     var noteEl = document.getElementById('bug-report-missing-note');
-    if (noteEl) noteEl.style.display = (isMissing || isMissingArtist) ? '' : 'none';
+    if (noteEl) noteEl.style.display = isMissing ? '' : 'none';
 
     document.querySelectorAll('#bug-report-options input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
     document.getElementById('bug-report-text').value = '';
@@ -1678,7 +1627,7 @@
   })();
 
   function hideAllViews() {
-    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','encyclopedia','releases','top5','indiemonday','changelog','about','404'].forEach(function (v) {
+    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','releases','top5','indiemonday','changelog','about','404'].forEach(function (v) {
       var el=document.getElementById('view-' + v);
       if (el) { el.style.display = 'none'; el.classList.remove('page-enter'); }
     });
@@ -1806,13 +1755,6 @@
     stopManualSync_();
     loadLyricDetail(id, initialVariant);
   }
-  function showEncyclopedia() {
-    hideAllViews();
-    document.getElementById('view-encyclopedia').style.display = '';
-    setActiveTab('encyclopedia');
-    setPath('encyclopedia');
-    if (!encyclopediaLoaded) loadEncyclopedia();
-  }
   function showReleases() {
     hideAllViews();
     document.getElementById('view-releases').style.display = '';
@@ -1845,7 +1787,7 @@
 
   function renderChangelog_() {
     var c=document.getElementById('changelog-content'); if(!c)return;
-    if(!archiveChangelog.length){ c.innerHTML='<div class="empty">No changes logged yet. The archive is suspiciously quiet.</div>'; return; }
+    if(!archiveChangelog.length){ c.innerHTML='<div class="empty">' + maybeEasterEggEmpty_('No changes logged yet. The archive is suspiciously quiet.') + '</div>'; return; }
     c.innerHTML=archiveChangelog.map(function(x){ return '<article class="changelog-entry"><div class="changelog-date">'+escapeHtml(String(x.dateStr||'').toUpperCase())+'</div><div class="changelog-summary">'+escapeHtml(x.summary||'')+'</div></article>'; }).join('');
   }
 
@@ -1889,7 +1831,7 @@
   function renderIndieMonday(list) {
     var container = document.getElementById('indiemonday-content');
     if (!list.length) {
-      container.innerHTML = '<div class="empty">No Indie Monday features posted yet. Check back soon!</div>';
+      container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_('No Indie Monday features posted yet. Check back soon!') + '</div>';
       return;
     }
     var fallback = getFallbackImage();
@@ -1957,7 +1899,6 @@
       if (segs.length === 2 && segs[1] === 'general') { showFranchiseGeneralSongs(decodeURIComponent(segs[0])); return; }
       if (segs.length === 3 && segs[1] === 'char') { showFranchiseCharacterDetail(decodeURIComponent(segs[0]), decodeURIComponent(segs[2])); return; }
     }
-    if (path === 'encyclopedia') { if (isRouteHidden_('encyclopedia')) { showHome(); return; } showEncyclopedia(); return; }
     if (path === 'releases') { if (isRouteHidden_('releases')) { showHome(); return; } showReleases(); return; }
     if (path === 'top5') { if (isRouteHidden_('top5')) { showHome(); return; } showTop5(); return; }
     if (path === 'indiemonday') { if (isRouteHidden_('indiemonday')) { showHome(); return; } showIndieMonday(); return; }
@@ -2008,7 +1949,6 @@
       var r = el.getAttribute('data-route');
       if (r === 'home') showHome();
       else if (r === 'lyrics') showLyricsList();
-      else if (r === 'encyclopedia') showEncyclopedia();
       else if (r === 'releases') showReleases();
       else if (r === 'top5') showTop5();
       else if (r === 'indiemonday') showIndieMonday();
@@ -2184,6 +2124,26 @@
     return String(name || '').replace(/\s+/g, ' ').trim().toLowerCase();
   }
 
+  var ARTIST_NAME_SPLIT_RE_ = /(\s*,\s*|\s*&\s*|\s+x\s+|\s+vs\.?\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+)/gi;
+  function linkedArtistNamesHtml_(raw) {
+    var str = String(raw || '');
+    if (!str) return '';
+    var parts = str.split(ARTIST_NAME_SPLIT_RE_);
+    var html = '';
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i];
+      if (!part) continue;
+      if (i % 2 === 1) {
+        html += escapeHtml(part);
+        continue;
+      }
+      var name = part.trim();
+      if (!name) { html += escapeHtml(part); continue; }
+      html += '<span class="artist-name-link" data-artist-link="' + escapeHtml(name) + '">' + escapeHtml(part) + '</span>';
+    }
+    return html;
+  }
+
   function songArtistsMatchQuery_(item, q) {
     if (!isNA(item.artist) && String(item.artist).toLowerCase().indexOf(q) !== -1) return true;
     if (!isNA(item.featured) && String(item.featured).toLowerCase().indexOf(q) !== -1) return true;
@@ -2288,7 +2248,7 @@
     var list = uniqueArtistList();
     if (!list.length) {
       container.innerHTML = '<div class="empty">' +
-        (artistGroupMode === 'friends' ? 'No friends of nerdcore tagged yet.' : 'No artists found.') +
+        maybeEasterEggEmpty_(artistGroupMode === 'friends' ? 'No friends of nerdcore tagged yet.' : 'No artists found.') +
         '</div>';
       return;
     }
@@ -2418,14 +2378,14 @@
   function renderFranchiseGrid() {
     var container = document.getElementById('franchise-grid-content');
     var list = uniqueFranchiseList();
-    if (!list.length) { container.innerHTML = '<div class="empty">No franchises tagged yet. Add a "Franchise" column to your Lyrics sheet to get started.</div>'; return; }
+    if (!list.length) { container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_('No franchises tagged yet. Add a "Franchise" column to your Lyrics sheet to get started.') + '</div>'; return; }
     var fallback = getFallbackImage();
     container.innerHTML = '<div class="artist-grid">' + list.map(function (f) {
       var img = f.image ? escapeHtml(optimizeArtUrl(f.image, 300)) : fallback;
       var catHtml = f.category ? '<div class="franchise-cat">' + escapeHtml(f.category.toUpperCase()) + '</div>' : '';
       return (
         '<div class="artist-card" data-franchise="' + escapeHtml(f.franchise) + '">' +
-          '<img data-alt-images="' + encodeImageListAttr_(a.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img data-alt-images="' + encodeImageListAttr_(f.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="name">' + escapeHtml(f.franchise) + '</div>' +
           catHtml +
         '</div>'
@@ -2609,7 +2569,7 @@
 
     var gridHtml;
     if (!characters.length) {
-      gridHtml = '<div class="empty">No characters tagged for this franchise yet.</div>';
+      gridHtml = '<div class="empty">' + maybeEasterEggEmpty_('No characters tagged for this franchise yet.') + '</div>';
     } else {
       gridHtml = '<div class="artist-grid">' + characters.map(function (c) {
         var img = c.image ? escapeHtml(optimizeArtUrl(c.image, 300)) : fallback;
@@ -2923,7 +2883,7 @@
     var pane = document.getElementById('artist-albums-pane');
     if (!pane) return;
     var albums = uniqueArtistAlbums_(matchNames);
-    if (!albums.length) { pane.innerHTML = '<div class="empty">No albums or EPs posted for this artist yet.</div>'; return; }
+    if (!albums.length) { pane.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_('No albums or EPs posted for this artist yet.') + '</div>'; return; }
     var fallback = getFallbackImage();
     pane.innerHTML = '<div class="artist-grid">' + albums.map(function (a) {
       var img = a.cover ? escapeHtml(optimizeArtUrl(a.cover, 300)) : fallback;
@@ -3056,7 +3016,7 @@
       : '<div class="album-completion"><div class="album-completion-head"><span>ARCHIVE STATUS</span><span class="album-completion-count">' + completionDone + ' TRACKS ARCHIVED</span></div></div>';
 
     var tracksHtml = !tracks.length
-      ? '<div class="empty">No tracklist added for this album yet.</div>'
+      ? '<div class="empty">' + maybeEasterEggEmpty_('No tracklist added for this album yet.') + '</div>'
       : tracks.map(function (item) {
           var tImg = item.cover ? escapeHtml(optimizeArtUrl(item.cover, 160)) : fallback;
           var lockedClass = item.isLocked ? ' locked' : '';
@@ -3137,7 +3097,7 @@
       '</div>';
 
     if (!sorted.length) {
-      container.innerHTML = header + '<div class="empty">No songs found.</div>';
+      container.innerHTML = header + '<div class="empty">' + maybeEasterEggEmpty_('No songs found.') + '</div>';
       return;
     }
 
@@ -3164,7 +3124,7 @@
         '</div>' +
       '</div>';
 
-    var cardsHtml = !songs.length ? '<div class="empty">No songs match your search.</div>' : songs.map(function (item) {
+    var cardsHtml = !songs.length ? '<div class="empty">' + maybeEasterEggEmpty_('No songs match your search.') + '</div>' : songs.map(function (item) {
       var img = item.cover ? escapeHtml(optimizeArtUrl(item.cover, 240)) : fallback;
       var lockedClass = item.isLocked ? ' locked' : '';
       var badge = item.isLocked ? '<span class="badge locked">Locked</span>' : (item.isUpcoming ? '<span class="badge upcoming">Upcoming</span>' : '');
@@ -3365,7 +3325,7 @@
       : '';
 
     if (!allSongs.length) {
-      container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + producedTile + '<div class="empty">No songs posted for this artist yet.</div>';
+      container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + producedTile + '<div class="empty">' + maybeEasterEggEmpty_('No songs posted for this artist yet.') + '</div>';
       wireArtistMissingSongButton_(name);
       wireArtistViewTabs_(name);
       wireGroupUi_();
@@ -3393,7 +3353,7 @@
 
     var cardsHtml;
     if (!songs.length) {
-      cardsHtml = '<div class="empty">No songs match your search.</div>';
+      cardsHtml = '<div class="empty">' + maybeEasterEggEmpty_('No songs match your search.') + '</div>';
     } else {
       cardsHtml = songs.map(function (item) {
         var img = item.cover ? escapeHtml(optimizeArtUrl(item.cover, 240)) : fallback;
@@ -3635,11 +3595,11 @@
     container.innerHTML =
       '<div class="detail-hero">' +
         '<span class="report-btn-corner" id="lyric-report-btn">&#9873; REPORT ISSUE</span>' +
-        (function(){ var altList=parseImageList_(src.alternateCovers || post.alternateCovers); var total=altList.length+1; var dots=''; if(altList.length){ for(var di=0;di<total;di++) dots+='<span aria-hidden="true"></span>'; } return '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(altList) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' + (dots ? '<div class="alt-art-multi-indicator" title="Multiple cover arts available">' + dots + '</div>' : '') + '</div>'; })() +
+        (function(){ var altList=parseImageList_(src.alternateCovers || post.alternateCovers); return '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(altList) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'"></div>'; })() +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
-          '<div class="detail-meta"><span>by <b>' + escapeHtml(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + '</div>' +
-          (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + escapeHtml(post.featured) + '</span></div>' : '') +
+          '<div class="detail-meta"><span>by <b>' + linkedArtistNamesHtml_(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + '</div>' +
+          (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + linkedArtistNamesHtml_(post.featured) + '</span></div>' : '') +
           (post.producer && !isNA(post.producer) ? '<div class="detail-producer">Produced by ' + escapeHtml(post.producer) + '</div>' : '') +
           tagsHtml +
         '</div>' +
@@ -3670,6 +3630,9 @@
       });
     }
 
+    container.querySelectorAll('[data-artist-link]').forEach(function (el) {
+      el.addEventListener('click', function (e) { e.stopPropagation(); showArtistDetail(el.getAttribute('data-artist-link')); });
+    });
     container.querySelectorAll('[data-tag-franchise]').forEach(function (el) {
       el.addEventListener('click', function () { showFranchiseDetail(el.getAttribute('data-tag-franchise')); });
     });
@@ -4185,7 +4148,7 @@
   }
 
   function renderReleaseGroup(container, list, emptyMsg) {
-    if (!list.length) { container.innerHTML = '<div class="empty">' + emptyMsg + '</div>'; return; }
+    if (!list.length) { container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_(emptyMsg) + '</div>'; return; }
 
     var groups = [];
     var byDate = {};
@@ -4276,7 +4239,7 @@
       allWeeklyData = weeks || [];
       if (!allWeeklyData.length) {
         document.getElementById('weekly-year-filter').style.display = 'none';
-        container.innerHTML = '<div class="empty">No weekly Top 5 lists posted yet.</div>';
+        container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_('No weekly Top 5 lists posted yet.') + '</div>';
         return;
       }
       populateWeeklyYearSelect();
@@ -4325,7 +4288,7 @@
       : allWeeklyData;
 
     if (!weeksForYear.length) {
-      container.innerHTML = '<div class="empty">No weekly Top 5 lists for ' + escapeHtml(selectedWeeklyYear || '') + '.</div>';
+      container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_('No weekly Top 5 lists for ' + escapeHtml(selectedWeeklyYear || '') + '.') + '</div>';
       return;
     }
 
@@ -4359,7 +4322,7 @@
     var container = document.getElementById('pane-yearly');
     api('top10yearly').then(function (years) {
       years = years || [];
-      if (!years.length) { container.innerHTML = '<div class="empty">No yearly Top 10 posted yet.</div>'; return; }
+      if (!years.length) { container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_('No yearly Top 10 posted yet.') + '</div>'; return; }
 
       container.innerHTML = years.map(function (yr, yIdx) {
         var collapsed = yIdx > 0;
@@ -4395,7 +4358,7 @@
     api('deansAwards').then(function (years) {
       years = years || [];
       if (!years.length) {
-        container.innerHTML = '<div class="empty">No Dean\'s Nerdcore Honors Awards posted yet.</div>';
+        container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_("No Dean's Nerdcore Honors Awards posted yet.") + '</div>';
         return;
       }
 
@@ -4458,7 +4421,7 @@
     var container = document.getElementById('pane-playlists');
     api('playlists').then(function (list) {
       list = list || [];
-      if (!list.length) { container.innerHTML = '<div class="empty">No playlists linked yet.</div>'; return; }
+      if (!list.length) { container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_('No playlists linked yet.') + '</div>'; return; }
       container.innerHTML = list.map(function (p) {
         return (
           '<div class="playlist-card">' +
@@ -4476,7 +4439,7 @@
     var container = document.getElementById('pane-stats');
     api('artistStats').then(function (list) {
       list = list || [];
-      if (!list.length) { container.innerHTML = '<div class="empty">No rankings posted yet, so there\'s nothing to count.</div>'; return; }
+      if (!list.length) { container.innerHTML = '<div class="empty">' + maybeEasterEggEmpty_("No rankings posted yet, so there's nothing to count.") + '</div>'; return; }
       var rows = list.map(function (a) {
         return (
           '<tr><td>' + escapeHtml(a.artist) + '</td>' +
@@ -4494,114 +4457,6 @@
       renderErrorWithRetry(container, "Couldn't load artist stats: " + escapeHtml(err.message || err), loadArtistStats);
     });
   }
-
-  var encPages = [];
-  var encPageNum = 1;
-  var encPreloaded = {};
-
-  function loadEncyclopedia() {
-    encyclopediaLoaded = true;
-    var wrap = document.getElementById('enc-wrap');
-    api('encyclopedia').then(function (pages) {
-      encPages = pages || [];
-      if (!encPages.length) {
-        wrap.innerHTML = '<div class="flip-fallback">Check back later!</div>';
-        return;
-      }
-      renderEncyclopediaShell(wrap);
-      showEncPage(1, null);
-    }).catch(function (err) {
-      encyclopediaLoaded = false;
-      renderErrorWithRetry(wrap, "Couldn't load the encyclopedia: " + escapeHtml(err.message || err), loadEncyclopedia);
-    });
-  }
-
-  function renderEncyclopediaShell(wrap) {
-    wrap.innerHTML =
-      '<div class="flip-toolbar">' +
-        '<button class="flip-btn" id="enc-prev">&larr; PREV</button>' +
-        '<span class="flip-page-label" id="enc-page-label"></span>' +
-        '<button class="flip-btn" id="enc-next">NEXT &rarr;</button>' +
-      '</div>' +
-      '<div class="enc-book">' +
-        '<div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>' +
-        '<div class="enc-page-inner" id="enc-page-inner">' +
-          '<div class="enc-page-zone left" id="enc-zone-prev" title="Previous page"></div>' +
-          '<img id="enc-page-img" alt="Encyclopedia page" decoding="async">' +
-          '<div class="enc-page-zone right" id="enc-zone-next" title="Next page"></div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="enc-jump-row">' +
-        '<span class="date-str">Jump to page:</span>' +
-        '<input type="number" id="enc-jump-input" min="1" max="' + encPages.length + '">' +
-        '<div class="flip-btn" id="enc-jump-go">GO</div>' +
-      '</div>';
-
-    document.getElementById('enc-prev').addEventListener('click', function () { showEncPage(encPageNum - 1, 'prev'); });
-    document.getElementById('enc-next').addEventListener('click', function () { showEncPage(encPageNum + 1, 'next'); });
-    document.getElementById('enc-zone-prev').addEventListener('click', function () { showEncPage(encPageNum - 1, 'prev'); });
-    document.getElementById('enc-zone-next').addEventListener('click', function () { showEncPage(encPageNum + 1, 'next'); });
-    document.getElementById('enc-jump-go').addEventListener('click', encJumpToInput);
-    document.getElementById('enc-jump-input').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') encJumpToInput();
-    });
-  }
-
-  function encJumpToInput() {
-    var input = document.getElementById('enc-jump-input');
-    var n = parseInt(input.value, 10);
-    if (!n) return;
-    showEncPage(n, null);
-  }
-
-  function preloadEncPage_(n) {
-    if (n < 1 || n > encPages.length || encPreloaded[n]) return;
-    encPreloaded[n] = true;
-    var im = new Image();
-    im.src = encPages[n - 1].url;
-  }
-
-  function showEncPage(n, direction) {
-    if (!encPages.length) return;
-    n = Math.max(1, Math.min(encPages.length, n));
-    encPageNum = n;
-    var page = encPages[n - 1];
-
-    var inner = document.getElementById('enc-page-inner');
-    var img = document.getElementById('enc-page-img');
-    var fallback = getFallbackImage();
-
-    if (direction) inner.classList.add('enc-turning-' + direction);
-    var pre = new Image();
-    pre.onload = function () {
-      img.src = page.url;
-      inner.classList.remove('enc-turning-next', 'enc-turning-prev');
-    };
-    pre.onerror = function () {
-      img.src = fallback;
-      inner.classList.remove('enc-turning-next', 'enc-turning-prev');
-    };
-    pre.src = page.url;
-
-    document.getElementById('enc-page-label').textContent =
-      'Page ' + n + ' of ' + encPages.length + (page.label ? ' \u2014 ' + page.label : '');
-    document.getElementById('enc-prev').disabled = (n <= 1);
-    document.getElementById('enc-next').disabled = (n >= encPages.length);
-    var jumpInput = document.getElementById('enc-jump-input');
-    if (jumpInput) jumpInput.value = '';
-
-    preloadEncPage_(n + 1);
-    preloadEncPage_(n - 1);
-  }
-
-  function encKeyHandler(e) {
-    if (document.getElementById('view-encyclopedia').style.display === 'none') return;
-    var tag = (document.activeElement && document.activeElement.tagName) || '';
-    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-    if (e.key === 'ArrowLeft') showEncPage(encPageNum - 1, 'prev');
-    else if (e.key === 'ArrowRight') showEncPage(encPageNum + 1, 'next');
-  }
-  document.addEventListener('keydown', encKeyHandler);
 
   function localGlobalSearch_(q) {
     q = String(q || '').toLowerCase().trim();
