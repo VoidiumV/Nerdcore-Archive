@@ -315,6 +315,14 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     cursor:pointer; letter-spacing:0.3px; white-space:nowrap;
   }
   .report-btn-corner:hover{ color:var(--magenta); border-color:var(--magenta); }
+  .hero-action-stack{ position:absolute; top:10px; right:10px; z-index:2; display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
+  .hero-action-btn{ font-family:'VT323', monospace; font-size:14px; color:var(--muted-dim); background:rgba(11,14,26,0.75); border:1px solid var(--border); padding:5px 9px; cursor:pointer; letter-spacing:0.3px; white-space:nowrap; }
+  .hero-action-btn:hover{ color:var(--magenta); border-color:var(--magenta); }
+  .hero-action-btn.links:hover{ color:var(--green); border-color:var(--green); }
+  .artist-aka{ font-family:'VT323', monospace; font-size:18px; color:var(--muted); margin-top:2px; }
+  .artist-roles-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .role-badge{ font-family:'VT323', monospace; font-size:14px; color:#c792ff; border:1px solid #c792ff; padding:2px 9px; text-transform:uppercase; letter-spacing:0.3px; }
+  .artist-card-aka{ font-family:'VT323', monospace; font-size:13px; color:var(--muted-dim); text-align:center; padding:0 10px 8px; letter-spacing:0.3px; }
   .detail-hero-img{ width:220px; height:220px; object-fit:cover; flex-shrink:0; border-right:3px solid var(--border); background:#0a0d1c; }
   .detail-hero-text{ flex:1; min-width:0; padding:26px 26px; display:flex; flex-direction:column; justify-content:center; }
   .detail-title{ font-family:'Press Start 2P', monospace; font-size:20px; color:var(--ink); text-shadow:2px 2px 0 var(--magenta); margin:0 0 10px; line-height:1.6; }
@@ -727,6 +735,52 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
   .modal-btn.primary{ color:var(--green); border-color:var(--green); }
   .modal-btn.primary:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
 
+  /* ---------- artist links & rates side drawer ---------- */
+  .side-drawer-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:10002; display:none; }
+  .side-drawer-overlay.open{ display:block; }
+  .side-drawer{
+    position:fixed; top:0; right:0; height:100%; width:360px; max-width:88vw;
+    background:var(--panel-2); border-left:3px solid var(--green);
+    box-shadow:-6px 0 20px rgba(0,0,0,0.5);
+    transform:translateX(100%); transition:transform .22s ease;
+    display:flex; flex-direction:column; z-index:10003;
+  }
+  .side-drawer-overlay.open .side-drawer{ transform:translateX(0); }
+  .side-drawer-header{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:16px 18px; border-bottom:2px solid var(--border); flex-shrink:0;
+  }
+  .side-drawer-title{ font-family:'Press Start 2P', monospace; font-size:12px; color:var(--ink); text-shadow:2px 2px 0 var(--magenta); line-height:1.6; }
+  .side-drawer-close{ font-family:'VT323', monospace; font-size:24px; color:var(--muted); cursor:pointer; padding:0 4px; line-height:1; }
+  .side-drawer-close:hover{ color:var(--magenta); }
+  .side-drawer-body{ flex:1; overflow-y:auto; padding:18px; }
+  .side-drawer-section{ margin-bottom:26px; }
+  .side-drawer-section:last-child{ margin-bottom:0; }
+  .side-drawer-section-label{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--amber); letter-spacing:1px; margin-bottom:12px; }
+  .side-drawer-empty{ font-family:'VT323',monospace; font-size:17px; color:var(--muted); text-align:center; padding:16px 10px; border:1px dashed var(--border); }
+  .social-link-row{
+    display:flex; align-items:center; gap:10px;
+    font-family:'VT323', monospace; font-size:19px; color:var(--ink);
+    text-decoration:none; padding:10px 12px; margin-bottom:8px;
+    background:var(--panel); border:2px solid var(--border);
+    transition:transform .12s ease, border-color .12s ease, color .12s ease;
+  }
+  .social-link-row:hover{ transform:translate(-2px,-2px); border-color:var(--green); color:var(--green); }
+  .social-link-icon{ font-size:16px; width:20px; text-align:center; flex-shrink:0; }
+  .artist-birthday-row{
+    font-family:'VT323', monospace; font-size:19px; color:var(--ink);
+    display:flex; align-items:center; gap:10px; padding:10px 12px;
+    background:var(--panel); border:2px solid var(--border);
+  }
+  .rate-row{
+    display:flex; justify-content:space-between; gap:12px; align-items:baseline;
+    font-family:'VT323', monospace; font-size:19px; color:var(--ink);
+    padding:9px 4px; border-bottom:1px dashed var(--border);
+  }
+  .rate-row:last-child{ border-bottom:none; }
+  .rate-price{ color:var(--green); font-weight:bold; white-space:nowrap; }
+  @media(max-width:480px){ .side-drawer{ width:100%; max-width:100%; } }
+
   /* ---------- initial-load overlay ---------- */
   #app-loading-overlay{
     position:fixed; inset:0; z-index:10001;
@@ -1007,6 +1061,17 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
   <div id="floating-player-resize-handle" title="Drag to resize"></div>
 </div>
 
+<!-- ARTIST LINKS & RATES DRAWER -->
+<div class="side-drawer-overlay" id="artist-links-overlay">
+  <div class="side-drawer" id="artist-links-drawer">
+    <div class="side-drawer-header">
+      <span class="side-drawer-title" id="artist-links-drawer-title">LINKS &amp; RATES</span>
+      <span class="side-drawer-close" id="artist-links-drawer-close">&#10005;</span>
+    </div>
+    <div class="side-drawer-body" id="artist-links-drawer-body"></div>
+  </div>
+</div>
+
 <!-- BUG / QUALITY REPORT -->
 <div class="modal-overlay" id="bug-report-overlay">
   <div class="modal-box">
@@ -1032,7 +1097,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxQt7WM_YvsKWQqw1DK673NQxLAsTcW1cAiQKj0wRRpUCCYU-jzkgvCNviUA7HvzJT4/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycby8Bo_pXuVt5ocwCh12FP_MhT4gIuv7rXvAmCxNG7VC9E5w7CvCx8ljt-f5R2NLQtsm/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1515,6 +1580,88 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       });
     }
   }
+
+  // ----------------------------------------------------------------------
+  // ARTIST LINKS & RATES SIDE DRAWER
+  // ----------------------------------------------------------------------
+  var SOCIAL_LINK_DEFS_ = [
+    { key: 'website', label: 'Official Website', icon: '&#127760;' },
+    { key: 'merch', label: 'Merchandise', icon: '&#128717;' },
+    { key: 'youtube', label: 'YouTube', icon: '&#9654;' },
+    { key: 'twitch', label: 'Twitch', icon: '&#128250;' },
+    { key: 'twitter', label: 'X / Twitter', icon: '&#128038;' },
+    { key: 'tiktok', label: 'TikTok', icon: '&#127925;' },
+    { key: 'instagram', label: 'Instagram', icon: '&#128248;' },
+    { key: 'facebook', label: 'Facebook', icon: '&#128101;' },
+    { key: 'discord', label: 'Discord Server', icon: '&#128172;' },
+    { key: 'patreon', label: 'Patreon', icon: '&#9829;' },
+    { key: 'linktree', label: 'Linktree', icon: '&#128279;' },
+    { key: 'carrd', label: 'Carrd.co', icon: '&#128196;' },
+    { key: 'spotify', label: 'Spotify', icon: '&#127911;' },
+    { key: 'appleMusic', label: 'Apple Music', icon: '&#127911;' },
+    { key: 'email', label: 'Email', icon: '&#9993;' }
+  ];
+
+  function openArtistLinksDrawer_(artistName, entry) {
+    var overlay = document.getElementById('artist-links-overlay');
+    var titleEl = document.getElementById('artist-links-drawer-title');
+    var body = document.getElementById('artist-links-drawer-body');
+    if (!overlay || !body) return;
+    titleEl.textContent = String(artistName || 'ARTIST').toUpperCase() + ' \u2014 LINKS & RATES';
+
+    var social = (entry && entry.social) || {};
+    var rates = (entry && entry.rates) || [];
+    var birthday = (entry && entry.birthday) || '';
+
+    var html = '';
+
+    if (birthday) {
+      html += '<div class="side-drawer-section"><div class="side-drawer-section-label">BIRTHDAY</div>' +
+        '<div class="artist-birthday-row"><span class="social-link-icon">&#127874;</span>' + escapeHtml(birthday) + '</div></div>';
+    }
+
+    var linkRows = SOCIAL_LINK_DEFS_.map(function (def) {
+      var val = social[def.key];
+      if (!val) return '';
+      if (def.key === 'email') {
+        return '<a class="social-link-row" href="mailto:' + escapeHtml(val) + '"><span class="social-link-icon">' + def.icon + '</span>' + escapeHtml(def.label) + '</a>';
+      }
+      return '<a class="social-link-row" href="' + escapeHtml(val) + '" target="_blank" rel="noopener"><span class="social-link-icon">' + def.icon + '</span>' + escapeHtml(def.label) + '</a>';
+    }).join('');
+
+    html += '<div class="side-drawer-section"><div class="side-drawer-section-label">LINKS</div>' +
+      (linkRows || '<div class="side-drawer-empty">No links added yet.</div>') + '</div>';
+
+    var rateRows = rates.map(function (r) {
+      return '<div class="rate-row"><span>' + escapeHtml(r.label) + '</span><span class="rate-price">' + escapeHtml(r.price || '\u2014') + '</span></div>';
+    }).join('');
+
+    html += '<div class="side-drawer-section"><div class="side-drawer-section-label">RATES</div>' +
+      (rateRows || '<div class="side-drawer-empty">No rates added yet.</div>') + '</div>';
+
+    body.innerHTML = html;
+    overlay.classList.add('open');
+  }
+
+  function closeArtistLinksDrawer_() {
+    var overlay = document.getElementById('artist-links-overlay');
+    if (overlay) overlay.classList.remove('open');
+  }
+
+  function wireArtistLinksButton_(artistName, entry) {
+    var btn = document.getElementById('artist-links-btn');
+    if (btn) {
+      btn.addEventListener('click', function () { openArtistLinksDrawer_(artistName, entry); });
+    }
+  }
+
+  (function wireArtistLinksDrawerChrome_() {
+    var closeBtn = document.getElementById('artist-links-drawer-close');
+    var overlay = document.getElementById('artist-links-overlay');
+    if (closeBtn) closeBtn.addEventListener('click', closeArtistLinksDrawer_);
+    if (overlay) overlay.addEventListener('click', function (e) { if (e.target === this) closeArtistLinksDrawer_(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeArtistLinksDrawer_(); });
+  })();
 
   document.getElementById('bug-report-cancel').addEventListener('click', closeBugReportModal);
   document.getElementById('bug-report-overlay').addEventListener('click', function (e) {
@@ -2188,6 +2335,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     var hiddenMap = {};
     var groupMap = {};
     var friendMap = {};
+    var akaMap = {};
     allArtists.forEach(function (a) {
       var key = normalizeArtistKey(a.artist);
       if (!key) return;
@@ -2195,6 +2343,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       if (a.hidden) hiddenMap[key] = true;
       if (!isNA(a.members)) groupMap[key] = true;
       if (a.friend) friendMap[key] = true;
+      if (!isNA(a.aka)) akaMap[key] = splitCsv_(a.aka);
     });
     var seen = {};
     var names = [];
@@ -2227,7 +2376,11 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     });
 
     var q = artistSearchQuery.trim().toLowerCase();
-    if (q) names = names.filter(function (n) { return n.toLowerCase().indexOf(q) !== -1; });
+    if (q) names = names.filter(function (n) {
+      if (n.toLowerCase().indexOf(q) !== -1) return true;
+      var akaList = akaMap[normalizeArtistKey(n)] || [];
+      return akaList.some(function (a) { return a.toLowerCase().indexOf(q) !== -1; });
+    });
     names.sort(function (a, b) {
       return artistSortDir === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
     });
@@ -2238,7 +2391,8 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
         pfp: imageMeta.pfp || '',
         pfpCached: imageMeta.pfpCached || '',
         alternatePfps: imageMeta.alternatePfps || [],
-        isGroup: !!groupMap[normalizeArtistKey(n)]
+        isGroup: !!groupMap[normalizeArtistKey(n)],
+        aka: akaMap[normalizeArtistKey(n)] || []
       };
     });
   }
@@ -2256,12 +2410,14 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     container.innerHTML = '<div class="artist-grid">' + list.map(function (a, idx) {
       var img = artistImageUrl_(a, 300);
       var groupTagHtml = a.isGroup ? '<div class="group-tag">GROUP</div>' : '';
+      var akaHtml = (a.aka && a.aka.length) ? '<div class="artist-card-aka">AKA ' + escapeHtml(a.aka.join(', ')) + '</div>' : '';
       var loadingMode = idx < 12 ? 'eager' : 'lazy';
       var priority = idx < 8 ? ' high' : '';
       return (
         '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
           '<img data-artist-image="1" data-alt-images="' + encodeImageListAttr_(a.alternatePfps) + '" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
+          akaHtml +
           groupTagHtml +
           '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + '</div>' +
         '</div>'
@@ -3233,13 +3389,22 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       return artistDetailSortDir === 'asc' ? cmp : -cmp;
     });
 
+    var akaList = (pfpEntry && !isNA(pfpEntry.aka)) ? splitCsv_(pfpEntry.aka) : [];
+    var rolesList = (pfpEntry && !isNA(pfpEntry.roles)) ? splitCsv_(pfpEntry.roles) : [];
+    var birthdayStr = (pfpEntry && pfpEntry.birthday) ? String(pfpEntry.birthday).trim() : '';
+
     var header =
       '<div class="detail-hero">' +
-        '<span class="report-btn-corner" id="artist-report-missing-btn">&#9873; REQUEST MISSING SONG</span>' +
+        '<div class="hero-action-stack">' +
+          '<span class="hero-action-btn" id="artist-report-missing-btn">&#9873; REQUEST MISSING SONG</span>' +
+          '<span class="hero-action-btn links" id="artist-links-btn">&#128279; LINKS &amp; RATES</span>' +
+        '</div>' +
         '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(pfpEntry && pfpEntry.alternatePfps) + '" src="' + escapeHtml(optimizeArtUrl(pfp, 440)) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(name) + '</h1>' +
-          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span></div>' +
+          (akaList.length ? '<div class="artist-aka">AKA ' + escapeHtml(akaList.join(', ')) + '</div>' : '') +
+          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span>&#127874; ' + escapeHtml(birthdayStr) + '</span>' : '') + '</div>' +
+          (rolesList.length ? '<div class="artist-roles-row">' + rolesList.map(function (r) { return '<span class="role-badge">' + escapeHtml(r) + '</span>'; }).join('') + '</div>' : '') +
         '</div>' +
       '</div>';
 
@@ -3288,6 +3453,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + '<div id="artist-albums-pane"><div class="loading">Loading albums&hellip;</div></div>';
       wireArtistViewTabs_(name);
       wireArtistMissingSongButton_(name);
+      wireArtistLinksButton_(name, pfpEntry);
       wireGroupUi_();
       if (!albumsLoaded) {
         api('albums').then(function (list) {
@@ -3327,6 +3493,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     if (!allSongs.length) {
       container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + producedTile + '<div class="empty">' + maybeEasterEggEmpty_('No songs posted for this artist yet.') + '</div>';
       wireArtistMissingSongButton_(name);
+      wireArtistLinksButton_(name, pfpEntry);
       wireArtistViewTabs_(name);
       wireGroupUi_();
       var featuredTileElEmpty = document.getElementById('artist-featured-tile');
@@ -3377,6 +3544,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
 
     container.innerHTML = header + groupMembersHtml + groupToggleHtml + viewTabs + featuredTile + producedTile + toolbarRow + cardsHtml;
     wireArtistMissingSongButton_(name);
+    wireArtistLinksButton_(name, pfpEntry);
     wireArtistViewTabs_(name);
     wireGroupUi_();
     var featuredTileEl = document.getElementById('artist-featured-tile');
@@ -4470,7 +4638,9 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     });
     (allArtists || []).forEach(function(x){
       var name=String(x.artist||x.name||x.title||'');
-      if(name && name.toLowerCase().indexOf(q)!==-1) add({route:'artist-'+encodeURIComponent(name),title:name,type:'artist',subtitle:''});
+      var akaList=splitCsv_(x.aka||'');
+      var hay=(name+' '+akaList.join(' ')).toLowerCase();
+      if(name && hay.indexOf(q)!==-1) add({route:'artist-'+encodeURIComponent(name),title:name,type:'artist',subtitle:akaList.length?('AKA '+akaList.join(', ')):''});
     });
     return out.slice(0,12);
   }
