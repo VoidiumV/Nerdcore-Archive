@@ -1097,7 +1097,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxBuvzT1V6rEao-bZftyRFUFnWXPx_Uz5KZ20eS_mJwdEfiuWi1gvLiHwLXjzgiymwz/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxFxLwgGFzHWe2fPau8iAkOFrTlvQAWB8eYZ8B9yIjiJnQ08EV0cjaJSKttfPFpEgpZ/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1602,6 +1602,17 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     { key: 'email', label: 'Email', icon: '&#9993;' }
   ];
 
+  // Returns true only if this artist actually has at least one social
+  // link or at least one rate entry -- used to decide whether the
+  // "LINKS & RATES" button should even be shown on the artist page.
+  function artistHasLinksOrRates_(entry) {
+    if (!entry) return false;
+    var social = entry.social || {};
+    var hasSocial = SOCIAL_LINK_DEFS_.some(function (def) { return !!social[def.key]; });
+    var hasRates = !!(entry.rates && entry.rates.length);
+    return hasSocial || hasRates;
+  }
+
   function openArtistLinksDrawer_(artistName, entry) {
     var overlay = document.getElementById('artist-links-overlay');
     var titleEl = document.getElementById('artist-links-drawer-title');
@@ -1611,14 +1622,8 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
 
     var social = (entry && entry.social) || {};
     var rates = (entry && entry.rates) || [];
-    var birthday = (entry && entry.birthday) || '';
 
     var html = '';
-
-    if (birthday) {
-      html += '<div class="side-drawer-section"><div class="side-drawer-section-label">BIRTHDAY</div>' +
-        '<div class="artist-birthday-row"><span class="social-link-icon">&#127874;</span>' + escapeHtml(birthday) + '</div></div>';
-    }
 
     var linkRows = SOCIAL_LINK_DEFS_.map(function (def) {
       var val = social[def.key];
@@ -2407,17 +2412,18 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       return;
     }
     var fallback = getFallbackImage();
+    // NOTE: AKA is intentionally NOT shown on the list/grid card -- it only
+    // shows on the artist's own profile page (see renderArtistDetail).
+    // aka is still used above for search matching.
     container.innerHTML = '<div class="artist-grid">' + list.map(function (a, idx) {
       var img = artistImageUrl_(a, 300);
       var groupTagHtml = a.isGroup ? '<div class="group-tag">GROUP</div>' : '';
-      var akaHtml = (a.aka && a.aka.length) ? '<div class="artist-card-aka">AKA ' + escapeHtml(a.aka.join(', ')) + '</div>' : '';
       var loadingMode = idx < 12 ? 'eager' : 'lazy';
       var priority = idx < 8 ? ' high' : '';
       return (
         '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
           '<img data-artist-image="1" data-alt-images="' + encodeImageListAttr_(a.alternatePfps) + '" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
-          akaHtml +
           groupTagHtml +
           '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + '</div>' +
         '</div>'
@@ -3392,18 +3398,21 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     var akaList = (pfpEntry && !isNA(pfpEntry.aka)) ? splitCsv_(pfpEntry.aka) : [];
     var rolesList = (pfpEntry && !isNA(pfpEntry.roles)) ? splitCsv_(pfpEntry.roles) : [];
     var birthdayStr = (pfpEntry && pfpEntry.birthday) ? String(pfpEntry.birthday).trim() : '';
+    // Only show a "LINKS & RATES" action if this artist actually has at
+    // least one social link or one rate entry (see #2).
+    var showLinksBtn = artistHasLinksOrRates_(pfpEntry);
 
     var header =
       '<div class="detail-hero">' +
         '<div class="hero-action-stack">' +
           '<span class="hero-action-btn" id="artist-report-missing-btn">&#9873; REQUEST MISSING SONG</span>' +
-          '<span class="hero-action-btn links" id="artist-links-btn">&#128279; LINKS &amp; RATES</span>' +
+          (showLinksBtn ? '<span class="hero-action-btn links" id="artist-links-btn">&#128279; LINKS &amp; RATES</span>' : '') +
         '</div>' +
         '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(pfpEntry && pfpEntry.alternatePfps) + '" src="' + escapeHtml(optimizeArtUrl(pfp, 440)) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(name) + '</h1>' +
           (akaList.length ? '<div class="artist-aka">AKA ' + escapeHtml(akaList.join(', ')) + '</div>' : '') +
-          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span>&#127874; ' + escapeHtml(birthdayStr) + '</span>' : '') + '</div>' +
+          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span><b>' + (groupMembers.length ? 'Formed' : 'Born') + ':</b> ' + escapeHtml(birthdayStr) + '</span>' : '') + '</div>' +
           (rolesList.length ? '<div class="artist-roles-row">' + rolesList.map(function (r) { return '<span class="role-badge">' + escapeHtml(r) + '</span>'; }).join('') + '</div>' : '') +
         '</div>' +
       '</div>';
