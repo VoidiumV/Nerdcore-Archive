@@ -54,29 +54,15 @@
   }
   .brand{ display:flex; align-items:center; gap:10px; cursor:default; }
   .brand-title{ cursor:default; }
-  .cover-switcher{ position:relative; flex-shrink:0; }
+  .cover-switcher{ position:relative; flex-shrink:0; display:flex; flex-direction:column; }
   .cover-switcher .detail-hero-img{ display:block; }
-  .alt-art-hint{ position:absolute; left:8px; bottom:8px; z-index:2; font-family:'Press Start 2P',monospace; font-size:8px; line-height:1.4; color:var(--ink); background:rgba(11,14,26,.88); border:2px solid var(--green); padding:6px 7px; pointer-events:none; box-shadow:3px 3px 0 rgba(0,0,0,.45); }
-  .alt-art-controls{ position:absolute; right:8px; bottom:8px; z-index:3; display:flex; gap:4px; }
-  .alt-art-controls button{ font-family:'VT323',monospace; font-size:16px; color:var(--ink); background:rgba(11,14,26,.92); border:1px solid var(--green); padding:3px 7px; cursor:pointer; }
-  .alt-art-controls button:hover{ color:var(--green); }
-  .alt-art-count{ font-family:'VT323',monospace; font-size:15px; color:var(--green); background:rgba(11,14,26,.92); border:1px solid var(--border); padding:3px 7px; }
-  /* Subtle alternate-art cue: keeps the artwork completely unobstructed. */
-.alt-art-multi-indicator{ display:flex; justify-content:center; align-items:center; gap:4px; margin-top:7px; min-height:8px; pointer-events:none; }
-.alt-art-multi-indicator span{ width:5px; height:5px; border:1px solid var(--muted); border-radius:50%; display:block; opacity:.62; }
-.alt-art-multi-indicator span:first-child{ background:var(--muted); opacity:.9; }
-.lyrics-updated{ margin:28px 0 8px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); text-align:center; font-family:'VT323',monospace; font-size:15px; letter-spacing:.04em; color:var(--muted); text-transform:none; }
-.alt-art-card-hint{ position:absolute; left:7px; bottom:7px; z-index:2; font-family:'VT323',monospace; font-size:14px; color:var(--ink); background:rgba(11,14,26,.88); border:1px solid var(--green); padding:2px 5px; pointer-events:none; }
-.alt-stack-badge{ position:absolute; z-index:3; top:7px; left:7px; display:inline-flex; align-items:center; gap:4px; font-family:'VT323',monospace; font-size:15px; letter-spacing:.3px; color:var(--amber); background:rgba(11,14,26,.9); border:1px solid var(--amber); padding:3px 8px; pointer-events:none; white-space:nowrap; }
-.alt-stack-badge .arrow{ font-size:13px; line-height:1; }
-img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gradient(135deg, transparent 0 44%, var(--border) 44% 49%, var(--panel-2) 49% 58%, var(--border) 58% 63%, transparent 63% 100%) 0 0 / 100% 100% no-repeat; }
-.detail-hero-img.alt-stack{ padding:0 0 13px 13px; }
+  .lyrics-updated{ margin:28px 0 8px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); text-align:center; font-family:'VT323',monospace; font-size:15px; letter-spacing:.04em; color:var(--muted); text-transform:none; }
   .archive-updated{ font-family:'VT323',monospace; font-size:15px; color:var(--muted-dim); margin-top:8px; }
   .changelog-entry{ background:var(--panel); border:2px solid var(--border); padding:16px 18px; margin-bottom:10px; }
   .changelog-date{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--amber); margin-bottom:9px; }
   .changelog-summary{ font-family:'VT323',monospace; font-size:19px; color:var(--ink); line-height:1.5; white-space:pre-line; }
   .not-found-glitch{ font-family:'VT323',monospace; font-size:22px; color:var(--muted); line-height:1.5; }
-  @media(max-width:620px){ .cover-switcher{ width:100%; } .cover-switcher .detail-hero-img{ width:100%; } .alt-art-hint{ left:10px; bottom:10px; } }
+  @media(max-width:620px){ .cover-switcher{ width:100%; } .cover-switcher .detail-hero-img{ width:100%; } }
   .brand-title{
     font-size:16px; color:var(--ink);
     text-shadow:2px 2px 0 var(--magenta);
@@ -200,6 +186,8 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
   .badge.new{ color:var(--green); border-color:var(--green); }
   .badge.updated{ color:var(--amber); border-color:var(--amber); }
   .badge.synced{ color:#5fc9ff; border-color:#5fc9ff; }
+  .badge.covers{ color:#c792ff; border-color:#c792ff; cursor:pointer; }
+  .badge.covers:hover{ background:#c792ff; color:#0b0e1a; }
   .related-section{ margin-top:28px; }
   .section-kicker{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--amber); letter-spacing:1px; margin-bottom:12px; }
   .related-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
@@ -735,6 +723,14 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
   .modal-btn.primary{ color:var(--green); border-color:var(--green); }
   .modal-btn.primary:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
 
+  /* ---------- cover art gallery ---------- */
+  .cover-art-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(110px,1fr)); gap:10px; max-height:56vh; overflow-y:auto; margin-bottom:6px; }
+  .cover-art-thumb{ position:relative; cursor:pointer; border:2px solid var(--border); overflow:hidden; aspect-ratio:1/1; background:#0a0d1c; transition:border-color .12s ease, transform .12s ease; }
+  .cover-art-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .cover-art-thumb:hover{ border-color:var(--green); transform:translateY(-2px); }
+  .cover-art-thumb.selected{ border-color:var(--green); box-shadow:0 0 0 2px var(--green); }
+  .cover-art-thumb.selected::after{ content:'\2713'; position:absolute; top:4px; right:4px; width:18px; height:18px; border-radius:50%; background:var(--green); color:#0b0e1a; font-size:12px; display:flex; align-items:center; justify-content:center; font-family:'VT323',monospace; }
+
   /* ---------- artist links & rates side drawer ---------- */
   .side-drawer-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:10002; display:none; }
   .side-drawer-overlay.open{ display:block; }
@@ -1096,8 +1092,20 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
   </div>
 </div>
 
+<!-- COVER ART GALLERY -->
+<div class="modal-overlay" id="cover-art-overlay">
+  <div class="modal-box">
+    <h3>ALL COVER ART</h3>
+    <p>Tap a cover below to view it here &mdash; this only changes what you see, not the site's saved artwork.</p>
+    <div class="cover-art-grid" id="cover-art-grid"></div>
+    <div class="modal-actions">
+      <div class="modal-btn" id="cover-art-close">CLOSE</div>
+    </div>
+  </div>
+</div>
+
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxFxLwgGFzHWe2fPau8iAkOFrTlvQAWB8eYZ8B9yIjiJnQ08EV0cjaJSKttfPFpEgpZ/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbyOwjn6wKQuioqsh-ih7xHygrgc10GZl8Xl1E9iW_etDmPrkqczJ_KYl0dNVa1tiSPz/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1259,21 +1267,25 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     return String(value||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
   }
   function encodeImageListAttr_(list){ return escapeHtml(encodeURIComponent(JSON.stringify(parseImageList_(list)))); }
+  // Cover art with alternates is left completely unobstructed -- no badge
+  // or border sits on top of it. Instead a "N COVERS" badge is rendered in
+  // the card's existing meta/badge row (never overlapping the artwork), and
+  // clicking either that badge or the artwork itself opens a gallery modal
+  // where the user can browse every cover and pick one to view (locally
+  // only -- it doesn't change anything saved on the sheet).
   function wireAlternateImageControls_(root){
     if(!root)return;
     root.querySelectorAll('img[data-alt-images]').forEach(function(img){
       if(img.getAttribute('data-alt-wired')==='1')return;
       var raw=img.getAttribute('data-alt-images'), list=[]; try{list=JSON.parse(decodeURIComponent(raw||''));}catch(e){return;} if(!list.length)return;
-      var urls=[img.getAttribute('src')].concat(list).filter(Boolean), index=0;
       img.setAttribute('data-alt-wired','1');
-      img.setAttribute('data-alt-index','0');
-      img.title='Alternate artwork available';
-      img.classList.add('alt-stack');
-      var parent=img.parentElement;
-      if(parent && !parent.querySelector('.alt-stack-badge') && !parent.classList.contains('cover-switcher')){
-        var badge=document.createElement('span'); badge.className='alt-stack-badge'; badge.innerHTML='<span class="arrow">&#10530;</span> '+urls.length; parent.appendChild(badge);
-      }
-      img.addEventListener('click',function(ev){ ev.stopPropagation(); index=(index+1)%urls.length; img.setAttribute('data-alt-index',String(index)); img.classList.add('image-switching'); img.src=urls[index]; setTimeout(function(){img.classList.remove('image-switching');},180); });
+      img.style.cursor='pointer';
+      img.title='Tap to view all cover art (' + (list.length+1) + ')';
+      img.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        var urls=[img.getAttribute('src')].concat(list).filter(Boolean);
+        openCoverArtModal_(urls, img.getAttribute('src'), function(chosen){ img.src=chosen; });
+      });
     });
   }
   function wireCoverSwitcher_(root){
@@ -1283,15 +1295,60 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       var img=wrap.querySelector('img[data-cover-image]'); if(!img)return;
       var list=[]; try{list=JSON.parse(decodeURIComponent(wrap.getAttribute('data-alt-list')||''));}catch(e){return;}
       var urls=[img.getAttribute('src')].concat(list).filter(Boolean); if(urls.length<2)return;
-      var index=0; wrap.setAttribute('data-alt-wired','1');
-      img.classList.add('alt-stack');
-      if(!wrap.querySelector('.alt-stack-badge')){
-        var badge=document.createElement('span'); badge.className='alt-stack-badge'; badge.innerHTML='<span class="arrow">&#10530;</span> '+urls.length+' COVERS'; wrap.appendChild(badge);
-      }
-      function update(){ img.classList.add('image-switching'); img.src=urls[index]; setTimeout(function(){img.classList.remove('image-switching');},180); }
-      img.addEventListener('click',function(e){e.stopPropagation();index=(index+1)%urls.length;update();});
+      wrap.setAttribute('data-alt-wired','1');
+      img.style.cursor='pointer';
+      img.title='Tap to view all cover art (' + urls.length + ')';
+      img.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        openCoverArtModal_(urls, img.getAttribute('src'), function(chosen){ img.src=chosen; });
+      });
     });
   }
+
+  // Renders a small clickable "N COVERS" badge for use inside a card's
+  // existing badge/meta row. Clicking it forwards to the nearby cover
+  // image's own click handler (wired above) so there's only one modal
+  // implementation to maintain.
+  function coversBadgeHtml_(alternateList){
+    var list=parseImageList_(alternateList);
+    if(!list.length)return '';
+    return '<span class="badge covers" onclick="event.stopPropagation(); openCoverArtModalFromTrigger_(this);">' + (list.length+1) + ' COVERS</span>';
+  }
+  function openCoverArtModalFromTrigger_(el){
+    var card = el.closest('.lyric-card, .track-card, .artist-card, .album-card, .im-card, .detail-hero, .cover-switcher');
+    var img = card ? (card.querySelector('img[data-cover-image]') || card.querySelector('img[data-alt-images]')) : null;
+    if (img) img.click();
+  }
+
+  function openCoverArtModal_(urls, currentUrl, onSelect){
+    var overlay=document.getElementById('cover-art-overlay');
+    var grid=document.getElementById('cover-art-grid');
+    if(!overlay||!grid)return;
+    var fallback=getFallbackImage();
+    grid.innerHTML=urls.map(function(u,i){
+      var isSelected = u===currentUrl;
+      return '<div class="cover-art-thumb' + (isSelected?' selected':'') + '" data-cover-idx="' + i + '"><img src="' + escapeHtml(optimizeArtUrl(u,220)) + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'"></div>';
+    }).join('');
+    grid.querySelectorAll('[data-cover-idx]').forEach(function(el){
+      el.addEventListener('click',function(){
+        var idx=parseInt(el.getAttribute('data-cover-idx'),10);
+        if(onSelect) onSelect(urls[idx]);
+        closeCoverArtModal_();
+      });
+    });
+    overlay.classList.add('open');
+  }
+  function closeCoverArtModal_(){
+    var overlay=document.getElementById('cover-art-overlay');
+    if(overlay) overlay.classList.remove('open');
+  }
+  (function wireCoverArtModalChrome_(){
+    var closeBtn=document.getElementById('cover-art-close');
+    var overlay=document.getElementById('cover-art-overlay');
+    if(closeBtn) closeBtn.addEventListener('click', closeCoverArtModal_);
+    if(overlay) overlay.addEventListener('click', function(e){ if(e.target===this) closeCoverArtModal_(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeCoverArtModal_(); });
+  })();
 
   function setArtistImageWithFallback_(img, primaryUrl, fallbackUrl) {
     if (!img) return;
@@ -2425,7 +2482,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
           '<img data-artist-image="1" data-alt-images="' + encodeImageListAttr_(a.alternatePfps) + '" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
           groupTagHtml +
-          '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + '</div>' +
+          '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + coversBadgeHtml_(a.alternatePfps) + '</div>' +
         '</div>'
       );
     }).join('') + '</div>';
@@ -3052,15 +3109,16 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       var badgeClass = a.type === 'EP' ? 'badge ep' : 'badge album';
       return (
         '<div class="artist-card" data-album-id="' + escapeHtml(a.id) + '">' +
-          '<img src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img data-alt-images="' + encodeImageListAttr_(a.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="name">' + escapeHtml(a.title) + '</div>' +
-          '<div class="album-card-badge"><span class="' + badgeClass + '">' + escapeHtml(a.type) + '</span>' + badgeHtmlFor_(a.title, a.artist) +
+          '<div class="album-card-badge"><span class="' + badgeClass + '">' + escapeHtml(a.type) + '</span>' + badgeHtmlFor_(a.title, a.artist) + coversBadgeHtml_(a.alternateCovers) +
             (a.dateStr ? '<span class="date-str">' + escapeHtml(a.dateStr) + '</span>' : '') +
           '</div>' +
         '</div>'
       );
     }).join('') + '</div>';
 
+    wireAlternateImageControls_(pane);
     pane.querySelectorAll('[data-album-id]').forEach(function (card) {
       card.addEventListener('click', function () {
         showAlbumDetail(card.getAttribute('data-album-id'), backArtistName);
@@ -3165,6 +3223,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
             '<span class="' + badgeClass + '">' + escapeHtml(album.type) + '</span>' +
             (album.dateStr ? '<span>' + escapeHtml(album.dateStr) + '</span>' : '') +
             badgeHtmlFor_(album.title, album.artist, 'album') +
+            coversBadgeHtml_(album.alternateCovers) +
             '<span>' + tracks.length + (tracks.length === 1 ? ' track' : ' tracks') + '</span>' +
           '</div>' +
         '</div>' +
@@ -3198,13 +3257,14 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
                 '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
                 '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
                 (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-                '<div class="lyric-meta-row">' + variantBadge + (item.isLocked ? '<span class="badge locked">Locked</span>' : '') + '</div>' +
+                '<div class="lyric-meta-row">' + variantBadge + (item.isLocked ? '<span class="badge locked">Locked</span>' : '') + coversBadgeHtml_(item.alternateCovers) + '</div>' +
               '</div>' +
             '</div>'
           );
         }).join('');
 
     container.innerHTML = header + (streamBtns ? '<div class="stream-row">' + streamBtns + '</div>' : '') + completionHtml + tracksHtml;
+    wireAlternateImageControls_(container);
 
     container.querySelectorAll('.track-card[data-id]').forEach(function (card) {
       card.addEventListener('click', function () {
@@ -3297,7 +3357,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
               (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + '</div>' +
+              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + coversBadgeHtml_(item.alternateCovers) + '</div>' +
             '<span class="date-str">' + escapeHtml(item.dateStr) + '</span>' +
           '</div>' +
         '</div>'
@@ -3305,6 +3365,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     }).join('');
 
     container.innerHTML = header + toolbarRow + cardsHtml;
+    wireAlternateImageControls_(container);
 
     var sortFieldToggle = document.getElementById('franchise-songs-sortfield-toggle');
     if (sortFieldToggle) {
@@ -3412,7 +3473,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(name) + '</h1>' +
           (akaList.length ? '<div class="artist-aka">AKA ' + escapeHtml(akaList.join(', ')) + '</div>' : '') +
-          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span><b>' + (groupMembers.length ? 'Formed' : 'Born') + ':</b> ' + escapeHtml(birthdayStr) + '</span>' : '') + '</div>' +
+          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span><b>' + (groupMembers.length ? 'Formed' : 'Born') + ':</b> ' + escapeHtml(birthdayStr) + '</span>' : '') + coversBadgeHtml_(pfpEntry && pfpEntry.alternatePfps) + '</div>' +
           (rolesList.length ? '<div class="artist-roles-row">' + rolesList.map(function (r) { return '<span class="role-badge">' + escapeHtml(r) + '</span>'; }).join('') + '</div>' : '') +
         '</div>' +
       '</div>';
@@ -3464,6 +3525,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       wireArtistMissingSongButton_(name);
       wireArtistLinksButton_(name, pfpEntry);
       wireGroupUi_();
+      wireAlternateImageControls_(container);
       if (!albumsLoaded) {
         api('albums').then(function (list) {
           allAlbums = list || [];
@@ -3505,6 +3567,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
       wireArtistLinksButton_(name, pfpEntry);
       wireArtistViewTabs_(name);
       wireGroupUi_();
+      wireAlternateImageControls_(container);
       var featuredTileElEmpty = document.getElementById('artist-featured-tile');
       if (featuredTileElEmpty) featuredTileElEmpty.addEventListener('click', function () { showArtistFeaturedSongs(name); });
       var producedTileElEmpty = document.getElementById('artist-produced-tile');
@@ -3543,7 +3606,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
               (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + '</div>' +
+              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + coversBadgeHtml_(item.alternateCovers) + '</div>' +
               '<span class="date-str">' + escapeHtml(item.dateStr) + '</span>' +
             '</div>' +
           '</div>'
@@ -3556,6 +3619,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
     wireArtistLinksButton_(name, pfpEntry);
     wireArtistViewTabs_(name);
     wireGroupUi_();
+    wireAlternateImageControls_(container);
     var featuredTileEl = document.getElementById('artist-featured-tile');
     if (featuredTileEl) featuredTileEl.addEventListener('click', function () { showArtistFeaturedSongs(name); });
     var producedTileEl = document.getElementById('artist-produced-tile');
@@ -3775,7 +3839,7 @@ img.alt-stack{ box-sizing:border-box; padding:0 0 9px 9px; background:linear-gra
         (function(){ var altList=parseImageList_(src.alternateCovers || post.alternateCovers); return '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(altList) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'"></div>'; })() +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
-          '<div class="detail-meta"><span>by <b>' + linkedArtistNamesHtml_(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + '</div>' +
+          '<div class="detail-meta"><span>by <b>' + linkedArtistNamesHtml_(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + coversBadgeHtml_(src.alternateCovers || post.alternateCovers) + '</div>' +
           (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + linkedArtistNamesHtml_(post.featured) + '</span></div>' : '') +
           (post.producer && !isNA(post.producer) ? '<div class="detail-producer">Produced by ' + escapeHtml(post.producer) + '</div>' : '') +
           tagsHtml +
