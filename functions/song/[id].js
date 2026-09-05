@@ -11,7 +11,7 @@ export async function onRequest(context) {
   const shareUrl = SITE_URL + '/song/' + encodeURIComponent(id);
 
   let title = 'Nerdcore Archive';
-  let description = "BritishJuggernaut's Unofficial Nerdcore Site";
+  let description = "BritishJuggernaut's Nerdcore Archive";
   let image = '';
 
   try {
