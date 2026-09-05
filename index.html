@@ -3350,7 +3350,7 @@
 
     var header =
       '<div class="detail-hero">' +
-        '<div class="hero-action-stack"><span class="hero-action-btn links" id="album-share-btn">&#128279; COPY SHARE LINK</span></div>' +
+        '<div class="hero-action-stack"><span class="hero-action-btn links" id="album-share-btn">COPY SHARE LINK</span></div>' +
         '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(album.alternateCovers) + '" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(album.title) + '</h1>' +
@@ -3610,7 +3610,7 @@
         '<div class="hero-action-stack">' +
           '<span class="hero-action-btn" id="artist-report-missing-btn">&#9873; REQUEST MISSING SONG</span>' +
           (showLinksBtn ? '<span class="hero-action-btn links" id="artist-links-btn">&#128279; LINKS &amp; RATES</span>' : '') +
-          '<span class="hero-action-btn links" id="artist-share-btn">&#128279; COPY SHARE LINK</span>' +
+          '<span class="hero-action-btn links" id="artist-share-btn">COPY SHARE LINK</span>' +
         '</div>' +
         '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(pfpEntry && pfpEntry.alternatePfps) + '" src="' + escapeHtml(optimizeArtUrl(pfp, 440)) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
@@ -3984,7 +3984,7 @@
       '<div class="detail-hero">' +
         '<div class="hero-action-stack">' +
           '<span class="hero-action-btn" id="lyric-report-btn">&#9873; REPORT ISSUE</span>' +
-          '<span class="hero-action-btn links" id="lyric-share-btn">&#128279; COPY SHARE LINK</span>' +
+          '<span class="hero-action-btn links" id="lyric-share-btn">COPY SHARE LINK</span>' +
         '</div>' +
         (function(){ var altList=parseImageList_(src.alternateCovers || post.alternateCovers); return '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(altList) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'"></div>'; })() +
         '<div class="detail-hero-text">' +
