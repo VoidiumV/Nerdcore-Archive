@@ -2,8 +2,7 @@
 //
 // Handles requests to  /song/:id
 
-const SITE_URL = 'https://nerdcore-archive.pages.dev';
-const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwCQAbSTBwiHTJCyDRZlSd0e4DGUGK4gG-3seRRHPjjyYjRTLj2Lbb4pVTl2-WdsLPe/exec';
+import { SITE_URL, API_BASE_URL } from '../_shared/config.js';
 
 export async function onRequest(context) {
   const id = context.params.id;
@@ -11,7 +10,7 @@ export async function onRequest(context) {
   const shareUrl = SITE_URL + '/song/' + encodeURIComponent(id);
 
   let title = 'Nerdcore Archive';
-  let description = "BritishJuggernaut's Nerdcore Archive";
+  let description = "BritishJuggernaut's Unofficial Nerdcore Site";
   let image = '';
 
   try {
