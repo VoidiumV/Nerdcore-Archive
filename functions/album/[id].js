@@ -1,19 +1,13 @@
 // functions/album/[id].js
 //
 // Handles requests to  /album/:id
-//
-// Same idea as functions/song/[id].js -- see the comment block there for
-// why this needs to be a real, crawlable path rather than a "#/album-..."
-// hash link. This one looks the album up by id and embeds its cover art,
-// title, and artist, then redirects real visitors into the SPA.
-//
-// Share THIS link ( /album/12 ), not #/album-12.
 
 const SITE_URL = 'https://nerdcore-archive.pages.dev';
 const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwCQAbSTBwiHTJCyDRZlSd0e4DGUGK4gG-3seRRHPjjyYjRTLj2Lbb4pVTl2-WdsLPe/exec';
 
 export async function onRequest(context) {
-  const id = context.params.id;
+  const rawId = context.params.id;
+  const id = safeDecode_(rawId);
   const hashUrl = SITE_URL + '/#/album-' + encodeURIComponent(id);
   const shareUrl = SITE_URL + '/album/' + encodeURIComponent(id);
 
@@ -22,10 +16,14 @@ export async function onRequest(context) {
   let image = '';
 
   try {
-    const resp = await fetch(API_BASE_URL + '?action=albums');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const resp = await fetch(API_BASE_URL + '?action=albums', { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (resp.ok) {
       const list = await resp.json();
-      const match = Array.isArray(list) ? list.find(function (a) { return String(a.id) === String(id); }) : null;
+      const key = normKey_(id);
+      const match = Array.isArray(list) ? list.find(function (a) { return normKey_(a.id) === key; }) : null;
       if (match) {
         title = match.artist ? (match.title + ' — ' + match.artist) : match.title;
         description = match.artist
@@ -44,6 +42,14 @@ export async function onRequest(context) {
       'cache-control': 'public, max-age=300'
     }
   });
+}
+
+function safeDecode_(s) {
+  try { return decodeURIComponent(s); } catch (e) { return s; }
+}
+
+function normKey_(s) {
+  return String(s || '').trim().toLowerCase();
 }
 
 function optimizeArt_(url) {
