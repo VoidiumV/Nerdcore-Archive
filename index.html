@@ -669,6 +669,16 @@
     flex-shrink:0;
   }
   #floating-player-close{ cursor:pointer; color:var(--magenta); font-size:14px; }
+  #floating-player-reopen{
+    display:none; position:fixed; bottom:20px; right:20px; z-index:9999;
+    font-family:'Press Start 2P', monospace; font-size:11px;
+    background:var(--panel-2); color:var(--green); border:2px solid var(--green);
+    padding:12px 16px; cursor:pointer; letter-spacing:0.5px;
+    box-shadow:3px 3px 0 rgba(0,0,0,0.4);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  #floating-player-reopen:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 rgba(0,0,0,0.4); }
+  @media(max-width:600px){ #floating-player-reopen{ left:12px; right:12px; text-align:center; } }
   #floating-player-body{ width:100%; flex:1; min-height:0; background:#000; position:relative; pointer-events:auto; }
   #floating-player-body iframe{ width:100%; height:100%; border:none; display:block; pointer-events:auto; }
   .floating-custom-audio{ width:100%; height:100%; padding:16px; display:flex; flex-direction:column; justify-content:center; gap:12px; background:var(--panel-2); }
@@ -1057,6 +1067,11 @@
   <div id="floating-player-resize-handle" title="Drag to resize"></div>
 </div>
 
+<!-- Shown after the floating player is closed while something is still
+     loaded (e.g. a synced-lyrics song), so it can be brought back without
+     losing playback/sync progress. -->
+<div id="floating-player-reopen">&#9654; REOPEN PLAYER</div>
+
 <!-- ARTIST LINKS & RATES DRAWER -->
 <div class="side-drawer-overlay" id="artist-links-overlay">
   <div class="side-drawer" id="artist-links-drawer">
@@ -1105,7 +1120,7 @@
 </div>
 
 <script>
-  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbzfxqePRZV-qAgTdg_J3GrGXZhotoMC-Ew_u6Y34D_O-_FL_u7TJuaDLE41EFLP60sp/exec';
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwCQAbSTBwiHTJCyDRZlSd0e4DGUGK4gG-3seRRHPjjyYjRTLj2Lbb4pVTl2-WdsLPe/exec';
 
   var jsonpCounter = 0;
   var API_TIMEOUT_MS = 20000;
@@ -1522,6 +1537,7 @@
     var iframe = document.getElementById('floating-player-iframe');
     var custom = document.getElementById('floating-custom-audio');
     if (!player || !iframe) return;
+    hideFloatingReopenPill_();
     stopYoutubeListening_();
     var floatingAudio = document.getElementById('floating-audio-el');
     if (floatingAudio) { try { floatingAudio.pause(); } catch (e) {} }
@@ -1589,14 +1605,40 @@
     try { return new URL(url).hostname; } catch (e) { return ''; }
   }
 
+  // ----------------------------------------------------------------------
+  // REOPEN PLAYER -- closing the floating player (the X button) used to
+  // fully tear it down (clear the iframe, stop YouTube listening, stop any
+  // running sync clock), which meant a closed player for a synced song
+  // could never be gotten back without restarting the sync from scratch.
+  // Closing now just hides the widget and leaves any audio/video/sync
+  // clock running in the background; a small "REOPEN PLAYER" pill appears
+  // so it can be brought back into view with everything still in sync.
+  // ----------------------------------------------------------------------
+  function floatingPlayerHasActiveMedia_() {
+    var iframe = document.getElementById('floating-player-iframe');
+    var custom = document.getElementById('floating-custom-audio');
+    if (custom && custom.style.display !== 'none' && syncedAudioEl) return true;
+    if (iframe && iframe.src) return true;
+    return false;
+  }
+  function showFloatingReopenPill_() {
+    var pill = document.getElementById('floating-player-reopen');
+    if (pill) pill.style.display = '';
+  }
+  function hideFloatingReopenPill_() {
+    var pill = document.getElementById('floating-player-reopen');
+    if (pill) pill.style.display = 'none';
+  }
+
   document.getElementById('floating-player-close').addEventListener('click', function() {
     var player = document.getElementById('floating-player');
-    var iframe = document.getElementById('floating-player-iframe');
-    iframe.src = '';
     player.style.display = 'none';
-    stopYoutubeListening_();
-    if (syncUsingYoutube) stopManualSync_();
-    updateSyncControlsVisibility_();
+    if (floatingPlayerHasActiveMedia_()) showFloatingReopenPill_();
+  });
+
+  document.getElementById('floating-player-reopen').addEventListener('click', function() {
+    document.getElementById('floating-player').style.display = 'flex';
+    hideFloatingReopenPill_();
   });
 
   var bugReportContext = null;
@@ -2479,10 +2521,10 @@
       var priority = idx < 8 ? ' high' : '';
       return (
         '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
-          '<img data-artist-image="1" data-alt-images="' + encodeImageListAttr_(a.alternatePfps) + '" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
+          '<img data-artist-image="1" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
           groupTagHtml +
-          '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + coversBadgeHtml_(a.alternatePfps) + '</div>' +
+          '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + '</div>' +
         '</div>'
       );
     }).join('') + '</div>';
@@ -2604,7 +2646,7 @@
       var catHtml = f.category ? '<div class="franchise-cat">' + escapeHtml(f.category.toUpperCase()) + '</div>' : '';
       return (
         '<div class="artist-card" data-franchise="' + escapeHtml(f.franchise) + '">' +
-          '<img data-alt-images="' + encodeImageListAttr_(f.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="name">' + escapeHtml(f.franchise) + '</div>' +
           catHtml +
         '</div>'
@@ -3109,9 +3151,9 @@
       var badgeClass = a.type === 'EP' ? 'badge ep' : 'badge album';
       return (
         '<div class="artist-card" data-album-id="' + escapeHtml(a.id) + '">' +
-          '<img data-alt-images="' + encodeImageListAttr_(a.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="name">' + escapeHtml(a.title) + '</div>' +
-          '<div class="album-card-badge"><span class="' + badgeClass + '">' + escapeHtml(a.type) + '</span>' + badgeHtmlFor_(a.title, a.artist) + coversBadgeHtml_(a.alternateCovers) +
+          '<div class="album-card-badge"><span class="' + badgeClass + '">' + escapeHtml(a.type) + '</span>' + badgeHtmlFor_(a.title, a.artist) +
             (a.dateStr ? '<span class="date-str">' + escapeHtml(a.dateStr) + '</span>' : '') +
           '</div>' +
         '</div>'
@@ -3252,12 +3294,12 @@
           return (
             '<div class="track-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '"' + mainAttrs + '>' +
               '<div class="track-num">' + escapeHtml(String(numLabel)) + '</div>' +
-              '<img class="lyric-cover" data-alt-images="' + encodeImageListAttr_(item.alternateCovers) + '" src="' + tImg + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+              '<img class="lyric-cover" src="' + tImg + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
               '<div class="lyric-body">' +
                 '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
                 '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
                 (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-                '<div class="lyric-meta-row">' + variantBadge + (item.isLocked ? '<span class="badge locked">Locked</span>' : '') + coversBadgeHtml_(item.alternateCovers) + '</div>' +
+                '<div class="lyric-meta-row">' + variantBadge + (item.isLocked ? '<span class="badge locked">Locked</span>' : '') + '</div>' +
               '</div>' +
             '</div>'
           );
@@ -3352,12 +3394,12 @@
       var badge = item.isLocked ? '<span class="badge locked">Locked</span>' : (item.isUpcoming ? '<span class="badge upcoming">Upcoming</span>' : '');
       return (
         '<div class="lyric-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '">' +
-          '<img class="lyric-cover" data-alt-images="' + encodeImageListAttr_(item.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+          '<img class="lyric-cover" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
           '<div class="lyric-body">' +
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
               (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + coversBadgeHtml_(item.alternateCovers) + '</div>' +
+              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + '</div>' +
             '<span class="date-str">' + escapeHtml(item.dateStr) + '</span>' +
           '</div>' +
         '</div>'
@@ -3459,6 +3501,7 @@
     var akaList = (pfpEntry && !isNA(pfpEntry.aka)) ? splitCsv_(pfpEntry.aka) : [];
     var rolesList = (pfpEntry && !isNA(pfpEntry.roles)) ? splitCsv_(pfpEntry.roles) : [];
     var birthdayStr = (pfpEntry && pfpEntry.birthday) ? String(pfpEntry.birthday).trim() : '';
+    var fromStr = (pfpEntry && !isNA(pfpEntry.from)) ? String(pfpEntry.from).trim() : '';
     // Only show a "LINKS & RATES" action if this artist actually has at
     // least one social link or one rate entry (see #2).
     var showLinksBtn = artistHasLinksOrRates_(pfpEntry);
@@ -3473,7 +3516,7 @@
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(name) + '</h1>' +
           (akaList.length ? '<div class="artist-aka">AKA ' + escapeHtml(akaList.join(', ')) + '</div>' : '') +
-          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span><b>' + (groupMembers.length ? 'Formed' : 'Born') + ':</b> ' + escapeHtml(birthdayStr) + '</span>' : '') + coversBadgeHtml_(pfpEntry && pfpEntry.alternatePfps) + '</div>' +
+          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span><b>' + (groupMembers.length ? 'Formed' : 'Born') + ':</b> ' + escapeHtml(birthdayStr) + '</span>' : '') + (fromStr ? '<span><b>From:</b> ' + escapeHtml(fromStr) + '</span>' : '') + coversBadgeHtml_(pfpEntry && pfpEntry.alternatePfps) + '</div>' +
           (rolesList.length ? '<div class="artist-roles-row">' + rolesList.map(function (r) { return '<span class="role-badge">' + escapeHtml(r) + '</span>'; }).join('') + '</div>' : '') +
         '</div>' +
       '</div>';
@@ -3601,12 +3644,12 @@
           (item.isUpcoming ? '<span class="badge upcoming">Upcoming</span>' : '');
         return (
           '<div class="lyric-card' + lockedClass + '" data-id="' + escapeHtml(item.id) + '" data-locked="' + item.isLocked + '">' +
-            '<img class="lyric-cover" data-alt-images="' + encodeImageListAttr_(item.alternateCovers) + '" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
+            '<img class="lyric-cover" src="' + img + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
             '<div class="lyric-body">' +
               '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
               '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
               (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
-              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + coversBadgeHtml_(item.alternateCovers) + '</div>' +
+              '<div class="lyric-meta-row">' + badge + badgeHtmlFor_(item.title, item.artist) + '</div>' +
               '<span class="date-str">' + escapeHtml(item.dateStr) + '</span>' +
             '</div>' +
           '</div>'
@@ -3714,6 +3757,7 @@
       } catch (e) {}
     }
     syncedAudioEl = null;
+    hideFloatingReopenPill_();
     if (syncedAudioBlobUrl) {
       try { URL.revokeObjectURL(syncedAudioBlobUrl); } catch (e) {}
       syncedAudioBlobUrl = '';
@@ -4047,6 +4091,7 @@
     var iframe = document.getElementById('floating-player-iframe');
     var custom = document.getElementById('floating-custom-audio');
     if (!player || !iframe || !custom) return;
+    hideFloatingReopenPill_();
     stopYoutubeListening_();
     iframe.src = ''; iframe.style.display = 'none';
     custom.style.display = 'flex';
@@ -4285,6 +4330,7 @@
       try { syncedAudioEl.pause(); } catch (e) { }
       syncedAudioEl = null;
     }
+    hideFloatingReopenPill_();
   }
 
   function getSyncedElapsedSeconds_() {
