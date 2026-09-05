@@ -4,6 +4,22 @@
 
 import { SITE_URL, API_BASE_URL } from '../_shared/config.js';
 
+async function fetchLyricsList_() {
+  var attempts = [15000, 20000]; // ms — try once, then again with more headroom
+  for (var i = 0; i < attempts.length; i++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), attempts[i]);
+      const resp = await fetch(API_BASE_URL + '?action=lyrics', { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (resp.ok) return await resp.json();
+    } catch (err) {
+      // fall through and retry (or give up after the last attempt)
+    }
+  }
+  return null;
+}
+
 export async function onRequest(context) {
   const rawId = context.params.id;
   const id = safeDecode_(rawId);
@@ -11,22 +27,14 @@ export async function onRequest(context) {
   const shareUrl = SITE_URL + '/song/' + encodeURIComponent(id);
 
   let title = 'Nerdcore Archive';
-  let description = "BritishJuggernaut's Nerdcore Archive";
+  let description = "BritishJuggernaut's Unofficial Nerdcore Site";
   let image = '';
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-    const resp = await fetch(API_BASE_URL + '?action=lyrics', { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (resp.ok) {
-      const list = await resp.json();
-      let post = Array.isArray(list) ? list.find(function (p) { return String(p.id) === String(id); }) : null;
+    const list = await fetchLyricsList_();
+    if (Array.isArray(list)) {
+      let post = list.find(function (p) { return String(p.id) === String(id); });
 
-      // Alternate-version rows ("(Sped Up)", "[Remix]", etc.) redirect to
-      // their main song for lyrics content -- use the main song's data
-      // for the embed too, so a variant's share link doesn't show a blank
-      // card just because the variant row itself is thin on data.
       if (post && post.isVariant && post.mainId) {
         const main = list.find(function (p) { return String(p.id) === String(post.mainId); });
         if (main) post = main;
