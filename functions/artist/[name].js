@@ -13,7 +13,7 @@ export async function onRequest(context) {
   let title = name || 'Nerdcore Archive';
   let description = name
     ? ('Songs, releases, and info for ' + name + ' on Nerdcore Archive.')
-    : "BritishJuggernaut's Unofficial Nerdcore Site";
+    : "BritishJuggernaut's Nerdcore Archive";
   let image = '';
 
   try {
