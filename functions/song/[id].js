@@ -4,25 +4,8 @@
 
 import { SITE_URL, API_BASE_URL } from '../_shared/config.js';
 
-async function fetchLyricsList_() {
-  var attempts = [15000, 20000]; // ms — try once, then again with more headroom
-  for (var i = 0; i < attempts.length; i++) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), attempts[i]);
-      const resp = await fetch(API_BASE_URL + '?action=lyrics', { signal: controller.signal });
-      clearTimeout(timeoutId);
-      if (resp.ok) return await resp.json();
-    } catch (err) {
-      // fall through and retry (or give up after the last attempt)
-    }
-  }
-  return null;
-}
-
 export async function onRequest(context) {
-  const rawId = context.params.id;
-  const id = safeDecode_(rawId);
+  const id = context.params.id;
   const hashUrl = SITE_URL + '/#/lyric-' + encodeURIComponent(id);
   const shareUrl = SITE_URL + '/song/' + encodeURIComponent(id);
 
@@ -31,23 +14,22 @@ export async function onRequest(context) {
   let image = '';
 
   try {
-    const list = await fetchLyricsList_();
-    if (Array.isArray(list)) {
-      let post = list.find(function (p) { return String(p.id) === String(id); });
-
-      if (post && post.isVariant && post.mainId) {
-        const main = list.find(function (p) { return String(p.id) === String(post.mainId); });
-        if (main) post = main;
-      }
-
-      if (post && !post.isLocked && post.title) {
-        title = post.artist ? (post.title + ' — ' + post.artist) : post.title;
-        description = post.artist
-          ? ('Lyrics for "' + post.title + '" by ' + post.artist + ' on Nerdcore Archive.')
-          : ('Lyrics for "' + post.title + '" on Nerdcore Archive.');
-        if (post.featured && !isBlankish_(post.featured)) description += ' Feat. ' + post.featured + '.';
-        if (post.franchise && !isBlankish_(post.franchise)) description += ' Franchise: ' + post.franchise + '.';
-        image = optimizeArt_(post.cover || '');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const resp = await fetch(API_BASE_URL + '?action=lyricMeta&id=' + encodeURIComponent(id), {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data && !data.error && !data.isLocked && data.title) {
+        title = data.artist ? (data.title + ' — ' + data.artist) : data.title;
+        description = data.artist
+          ? ('Lyrics for "' + data.title + '" by ' + data.artist + ' on Nerdcore Archive.')
+          : ('Lyrics for "' + data.title + '" on Nerdcore Archive.');
+        if (data.featured && !isBlankish_(data.featured)) description += ' Feat. ' + data.featured + '.';
+        if (data.franchise && !isBlankish_(data.franchise)) description += ' Franchise: ' + data.franchise + '.';
+        image = optimizeArt_(data.cover || '');
       }
     }
   } catch (err) {
@@ -61,10 +43,6 @@ export async function onRequest(context) {
       'cache-control': found ? 'public, max-age=300' : 'no-store'
     }
   });
-}
-
-function safeDecode_(s) {
-  try { return decodeURIComponent(s); } catch (e) { return s; }
 }
 
 function isBlankish_(val) {
