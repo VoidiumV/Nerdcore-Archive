@@ -1,16 +1,8 @@
 // functions/artist/[name].js
 //
 // Handles requests to  /artist/:name
-//
-// Same idea as functions/song/[id].js -- see the comment block there for
-// why this needs to be a real, crawlable path rather than a "#/artist-..."
-// hash link. This one looks the artist up by name and embeds their photo,
-// name, and a short blurb, then redirects real visitors into the SPA.
-//
-// Share THIS link ( /artist/Some%20Artist ), not #/artist-Some%20Artist.
 
-const SITE_URL = 'https://nerdcore-archive.pages.dev';
-const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwCQAbSTBwiHTJCyDRZlSd0e4DGUGK4gG-3seRRHPjjyYjRTLj2Lbb4pVTl2-WdsLPe/exec';
+import { SITE_URL, API_BASE_URL } from '../_shared/config.js';
 
 export async function onRequest(context) {
   const rawName = context.params.name;
@@ -21,11 +13,14 @@ export async function onRequest(context) {
   let title = name || 'Nerdcore Archive';
   let description = name
     ? ('Songs, releases, and info for ' + name + ' on Nerdcore Archive.')
-    : "BritishJuggernaut's Nerdcore Archive";
+    : "BritishJuggernaut's Unofficial Nerdcore Site";
   let image = '';
 
   try {
-    const resp = await fetch(API_BASE_URL + '?action=artists');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const resp = await fetch(API_BASE_URL + '?action=artists', { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (resp.ok) {
       const list = await resp.json();
       const key = normKey_(name);
