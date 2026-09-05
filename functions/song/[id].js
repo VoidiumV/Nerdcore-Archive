@@ -5,37 +5,47 @@
 import { SITE_URL, API_BASE_URL } from '../_shared/config.js';
 
 export async function onRequest(context) {
-  const id = context.params.id;
+  const rawId = context.params.id;
+  const id = safeDecode_(rawId);
   const hashUrl = SITE_URL + '/#/lyric-' + encodeURIComponent(id);
   const shareUrl = SITE_URL + '/song/' + encodeURIComponent(id);
 
   let title = 'Nerdcore Archive';
-  let description = "BritishJuggernaut's Unofficial Nerdcore Site";
+  let description = "BritishJuggernaut's Nerdcore Archive";
   let image = '';
 
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
-    const resp = await fetch(API_BASE_URL + '?action=lyricMeta&id=' + encodeURIComponent(id), {
-      signal: controller.signal
-    });
+    const resp = await fetch(API_BASE_URL + '?action=lyrics', { signal: controller.signal });
     clearTimeout(timeoutId);
     if (resp.ok) {
-      const data = await resp.json();
-      if (data && !data.error && !data.isLocked && data.title) {
-        title = data.artist ? (data.title + ' — ' + data.artist) : data.title;
-        description = data.artist
-          ? ('Lyrics for "' + data.title + '" by ' + data.artist + ' on Nerdcore Archive.')
-          : ('Lyrics for "' + data.title + '" on Nerdcore Archive.');
-        if (data.featured && !isBlankish_(data.featured)) description += ' Feat. ' + data.featured + '.';
-        if (data.franchise && !isBlankish_(data.franchise)) description += ' Franchise: ' + data.franchise + '.';
-        image = optimizeArt_(data.cover || '');
+      const list = await resp.json();
+      let post = Array.isArray(list) ? list.find(function (p) { return String(p.id) === String(id); }) : null;
+
+      // Alternate-version rows ("(Sped Up)", "[Remix]", etc.) redirect to
+      // their main song for lyrics content -- use the main song's data
+      // for the embed too, so a variant's share link doesn't show a blank
+      // card just because the variant row itself is thin on data.
+      if (post && post.isVariant && post.mainId) {
+        const main = list.find(function (p) { return String(p.id) === String(post.mainId); });
+        if (main) post = main;
+      }
+
+      if (post && !post.isLocked && post.title) {
+        title = post.artist ? (post.title + ' — ' + post.artist) : post.title;
+        description = post.artist
+          ? ('Lyrics for "' + post.title + '" by ' + post.artist + ' on Nerdcore Archive.')
+          : ('Lyrics for "' + post.title + '" on Nerdcore Archive.');
+        if (post.featured && !isBlankish_(post.featured)) description += ' Feat. ' + post.featured + '.';
+        if (post.franchise && !isBlankish_(post.franchise)) description += ' Franchise: ' + post.franchise + '.';
+        image = optimizeArt_(post.cover || '');
       }
     }
   } catch (err) {
     // Fall back to the generic site card below rather than failing the request.
   }
-  
+
   const found = title !== 'Nerdcore Archive';
   return new Response(buildEmbedHtml_(title, description, image, shareUrl, hashUrl, 'music.song'), {
     headers: {
@@ -43,6 +53,10 @@ export async function onRequest(context) {
       'cache-control': found ? 'public, max-age=300' : 'no-store'
     }
   });
+}
+
+function safeDecode_(s) {
+  try { return decodeURIComponent(s); } catch (e) { return s; }
 }
 
 function isBlankish_(val) {
