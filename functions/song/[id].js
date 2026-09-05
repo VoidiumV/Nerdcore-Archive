@@ -1,26 +1,6 @@
 // functions/song/[id].js
 //
 // Handles requests to  /song/:id
-//
-// Link-preview bots (Discord, Twitter/X, Slack, iMessage, etc.) fetch a
-// URL's raw HTML and read its <meta property="og:..."> tags. They do NOT
-// run JavaScript, and they never see anything after a "#" in a URL
-// (fragments are never sent to the server). That's why the site's normal
-// "https://nerdcore-archive.pages.dev/#/lyric-10267" links can never embed
-// -- the crawler only ever sees "/", with no idea which song it was.
-//
-// This function gives each song a real, crawlable path. It:
-//   1. Looks the song up via the existing Apps Script API.
-//   2. Returns a small HTML page stamped with that song's title, artist,
-//      and cover art as Open Graph / Twitter Card meta tags.
-//   3. Instantly redirects real visitors (via JS, with a <meta
-//      http-equiv="refresh"> fallback for anything without JS) into the
-//      actual single-page app at "/#/lyric-<id>".
-//
-// Bots read step 2 and stop there (no JS = no redirect), so they see the
-// song-specific embed. Humans get redirected before they'd ever notice.
-//
-// Share THIS link ( /song/10267 ), not the old #/lyric-10267 one.
 
 const SITE_URL = 'https://nerdcore-archive.pages.dev';
 const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbwCQAbSTBwiHTJCyDRZlSd0e4DGUGK4gG-3seRRHPjjyYjRTLj2Lbb4pVTl2-WdsLPe/exec';
@@ -35,7 +15,12 @@ export async function onRequest(context) {
   let image = '';
 
   try {
-    const resp = await fetch(API_BASE_URL + '?action=lyric&id=' + encodeURIComponent(id));
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    const resp = await fetch(API_BASE_URL + '?action=lyricMeta&id=' + encodeURIComponent(id), {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
     if (resp.ok) {
       const data = await resp.json();
       if (data && !data.error && !data.isLocked && data.title) {
