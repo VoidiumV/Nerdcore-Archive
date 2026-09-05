@@ -35,10 +35,11 @@ export async function onRequest(context) {
     // Fall back to the generic card below.
   }
 
+  const found = title !== 'Nerdcore Archive';
   return new Response(buildEmbedHtml_(title, description, image, shareUrl, hashUrl, 'music.album'), {
     headers: {
       'content-type': 'text/html; charset=UTF-8',
-      'cache-control': 'public, max-age=300'
+      'cache-control': found ? 'public, max-age=300' : 'no-store'
     }
   });
 }
