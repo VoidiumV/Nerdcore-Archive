@@ -35,11 +35,12 @@ export async function onRequest(context) {
   } catch (err) {
     // Fall back to the generic site card below rather than failing the request.
   }
-
+  
+  const found = title !== 'Nerdcore Archive';
   return new Response(buildEmbedHtml_(title, description, image, shareUrl, hashUrl, 'music.song'), {
     headers: {
       'content-type': 'text/html; charset=UTF-8',
-      'cache-control': 'public, max-age=300'
+      'cache-control': found ? 'public, max-age=300' : 'no-store'
     }
   });
 }
