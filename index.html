@@ -925,15 +925,78 @@
   .notfound-body p{ margin:0 0 14px; }
   .notfound-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px); }
 
-  /* ---------- PRINT / EXPORT LYRICS SHEET ---------- */
+  /* ---------- EASTER EGG: #/staffonly ---------- */
+  .staffonly-page{ background:#0a0000; border:3px solid #ff2b2b; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:44px 26px; text-align:center; position:relative; overflow:hidden; transition:background .6s ease, border-color .6s ease; }
+  .staffonly-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,43,43,0.05) 0 1px, transparent 1px 3px); }
+  .staffonly-badge{ font-family:'Press Start 2P',monospace; font-size:26px; color:#ff2b2b; text-shadow:0 0 16px rgba(255,43,43,0.7); margin-bottom:18px; animation:staffonlyBlink 1s steps(1,end) infinite; transition:color .6s ease, text-shadow .6s ease, font-size .6s ease; }
+  @keyframes staffonlyBlink{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
+  .staffonly-code{ font-family:'VT323',monospace; font-size:20px; color:#ff8080; letter-spacing:1px; margin-bottom:22px; transition:color .6s ease; }
+  .staffonly-detail{ font-family:'VT323',monospace; font-size:19px; color:#c7c7c7; max-width:520px; margin:0 auto; line-height:1.6; }
+  .staffonly-page.staffonly-revealed{ background:var(--panel); border-color:var(--green); }
+  .staffonly-page.staffonly-revealed .staffonly-badge{ color:var(--green); text-shadow:2px 2px 0 var(--magenta); animation:none; font-size:20px; }
+  .staffonly-page.staffonly-revealed .staffonly-code{ color:var(--muted); }
+  @media(prefers-reduced-motion:reduce){ .staffonly-badge{ animation:none!important; } }
+
+  /* ---------- EASTER EGG: #/echo ---------- */
+  .echo-page{ background:#05050a; border:3px solid #5fc9ff; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:40px 26px; text-align:center; }
+  .echo-title{ font-family:'Press Start 2P',monospace; font-size:16px; color:#5fc9ff; letter-spacing:1px; margin-bottom:22px; }
+  .echo-input{ width:100%; max-width:440px; font-family:'JetBrains Mono',monospace; font-size:18px; background:#0a0d1c; border:2px solid #5fc9ff; color:#eef0e6; padding:12px 16px; outline:none; text-align:center; }
+  .echo-input:focus{ box-shadow:0 0 12px rgba(95,201,255,0.4); }
+  .echo-output{ margin-top:26px; display:flex; flex-direction:column; align-items:center; gap:4px; min-height:220px; }
+  .echo-line{ font-family:'VT323',monospace; color:#5fc9ff; letter-spacing:0.5px; opacity:0; animation:echoFadeIn .25s ease forwards; word-break:break-word; max-width:90%; }
+  @keyframes echoFadeIn{ from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:none;} }
+  @media(prefers-reduced-motion:reduce){ .echo-line{ animation:none!important; opacity:1!important; } }
+
+  /* ---------- EASTER EGG: #/users ---------- */
+  .users-page{ background:#000; border:3px solid #3dff8f; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:26px; font-family:'JetBrains Mono',monospace; }
+  .users-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:8px; }
+  .users-title{ color:#3dff8f; font-size:14px; letter-spacing:0.5px; }
+  .users-live{ color:#ff2b2b; font-size:12px; animation:staffonlyBlink 1.2s steps(1,end) infinite; }
+  .users-sub{ color:#5c6b70; font-size:13px; margin-bottom:16px; line-height:1.5; }
+  .users-table-wrap{ overflow-x:auto; }
+  .users-table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .users-table th{ text-align:left; color:#3dff8f; border-bottom:1px solid #1a3a28; padding:6px 10px; white-space:nowrap; }
+  .users-table td{ color:#8fd9ab; border-bottom:1px solid #0f2018; padding:6px 10px; white-space:nowrap; }
+  .users-table tr:hover td{ background:#031a0e; }
+
+  /* ---------- EASTER EGG: #/void ---------- */
+  #view-void{ padding:0 !important; max-width:none !important; margin:0 !important; }
+  .void-page{ position:relative; width:100%; height:100vh; background:#000; overflow:hidden; }
+  .void-hello{ position:absolute; top:37%; left:63%; font-family:'VT323',monospace; font-size:6px; color:#0a0a0a; cursor:pointer; user-select:none; transition:color .3s ease; }
+  .void-hello:hover{ color:#050505; }
+  .void-found{ display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; font-family:'VT323',monospace; font-size:24px; color:var(--green); text-shadow:0 0 10px rgba(61,255,143,0.5); }
+  .void-found.show{ display:block; }
+  .void-found .retry-link{ color:var(--green); font-size:18px; }
+
+  /* ---------- EASTER EGG: #/vault111 ---------- */
+  .vault111-page{ background:#001505; border:3px solid #2ee66b; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:30px 26px; position:relative; overflow:hidden; font-family:'JetBrains Mono',monospace; color:#2ee66b; }
+  .vault111-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(46,230,107,0.06) 0 1px, transparent 1px 3px); }
+  .vault111-header{ font-family:'Press Start 2P',monospace; font-size:12px; letter-spacing:1px; margin-bottom:20px; text-shadow:0 0 8px rgba(46,230,107,0.6); }
+  .vault111-boot p{ margin:0 0 10px; font-size:15px; letter-spacing:0.3px; }
+  .vault111-ok{ color:#8fff9a; }
+  .vault111-doc{ margin-top:10px; border-top:1px dashed #1a5c33; padding-top:16px; }
+  .vault111-doc-title{ font-family:'Press Start 2P',monospace; font-size:11px; margin-bottom:14px; }
+  .vault111-doc p{ font-size:15px; margin:0 0 8px; color:#8fff9a; }
+  .vault111-footer{ margin-top:14px; color:#2ee66b; font-style:italic; }
+
+  /* ---------- EASTER EGG: #/portal ---------- */
+  .portal-page{ background:#eef2f5; border:3px solid #7fb8cc; box-shadow:6px 6px 0 rgba(0,0,0,0.25); padding:36px 30px; color:#33424a; font-family:'Space Mono',monospace; text-align:center; }
+  .portal-topline{ font-family:'Press Start 2P',monospace; font-size:10px; letter-spacing:2px; color:#5a8fa3; margin-bottom:18px; }
+  .portal-title{ font-family:'Press Start 2P',monospace; font-size:16px; color:#2c5568; margin:0 0 22px; line-height:1.6; }
+  .portal-body{ font-size:18px; line-height:1.6; max-width:560px; margin:0 auto; color:#41535c; }
+  .portal-body p{ margin:0 0 14px; }
+  .portal-note{ font-style:italic; color:#7d8f97; font-size:15px; }
+  .portal-cake{ font-size:44px; margin-top:20px; filter:grayscale(0.3); }
+
+  /* ---------- PRINT / EXPORT LYRICS SHEET (populated just before window.print(), see printCurrentLyrics_) ---------- */
   #print-lyrics-sheet{ display:none; }
   .print-sheet-inner{ font-family:'Space Mono', monospace; border:2px solid #000; padding:20px 24px; width:820px; max-width:820px; box-sizing:border-box; background:#fff; }
   .print-sheet-header{ display:flex; align-items:center; gap:14px; margin-bottom:12px; padding-bottom:10px; border-bottom:2px solid #000; }
   .print-sheet-cover{ width:80px; height:80px; object-fit:cover; border:2px solid #000; flex-shrink:0; }
-  .print-sheet-title{ font-family:'Press Start 2P', monospace; font-size:14px; margin:0 0 6px; line-height:1.4; }
-  .print-sheet-meta{ font-family:'VT323', monospace; font-size:15px; color:#333; }
+  .print-sheet-title{ font-family:'Press Start 2P', monospace; font-size:14px; margin:0 0 6px; line-height:1.4; color:#000 !important; }
+  .print-sheet-meta{ font-family:'VT323', monospace; font-size:15px; color:#333 !important; }
   .print-sheet-tags{ margin-top:6px; }
-  .print-sheet-tag{ display:inline-block; font-family:'VT323',monospace; font-size:11px; border:1px solid #000; padding:1px 6px; margin:2px 3px 2px 0; text-transform:uppercase; letter-spacing:0.3px; }
+  .print-sheet-tag{ display:inline-block; font-family:'VT323',monospace; font-size:11px; border:1px solid #000; padding:1px 6px; margin:2px 3px 2px 0; text-transform:uppercase; letter-spacing:0.3px; color:#000 !important; }
   .print-sheet-lyrics{ font-family:'JetBrains Mono','Space Mono',monospace; font-size:11px; line-height:1.45; columns:2; column-gap:24px; column-rule:1px dashed #999; }
   .print-sheet-lyrics p{ margin:0 0 3px; break-inside:avoid; }
   .print-sheet-lyrics .lyrics-header{ font-family:'Press Start 2P',monospace; font-size:7.5px; margin:9px 0 3px; letter-spacing:0.3px; }
@@ -1301,6 +1364,91 @@
     </div>
   </div>
   <p style="margin-top:22px;"><span class="retry-link" id="anomaly-home">File this under "fine, actually."</span></p>
+</div>
+
+<!-- EASTER EGG: STAFF ONLY -->
+<div class="page" id="view-staffonly" style="display:none">
+  <div class="staffonly-page" id="staffonly-page">
+    <div class="staffonly-scanlines"></div>
+    <div class="staffonly-badge" id="staffonly-badge">ACCESS DENIED</div>
+    <div class="staffonly-code" id="staffonly-code">ERROR 0x1987-A &middot; INSUFFICIENT PERMISSIONS</div>
+    <div class="staffonly-detail" id="staffonly-detail">
+      <p>Credential check failed. This route is restricted to Archive Staff, Senior Archive Staff, and one guy named Kevin who nobody has ever met.</p>
+      <p id="staffonly-verifying">Verifying identity<span class="staffonly-dots">...</span></p>
+    </div>
+  </div>
+  <p style="margin-top:22px;"><span class="retry-link" id="staffonly-home">Back to the public area.</span></p>
+</div>
+
+<!-- EASTER EGG: ECHO -->
+<div class="page" id="view-echo" style="display:none">
+  <div class="echo-page">
+    <div class="echo-title">SAY SOMETHING.</div>
+    <input type="text" class="echo-input" id="echo-input" autocomplete="off" placeholder="type here&hellip;">
+    <div class="echo-output" id="echo-output"></div>
+  </div>
+  <p style="margin-top:22px;"><span class="retry-link" id="echo-home">Stop shouting into the void.</span></p>
+</div>
+
+<!-- EASTER EGG: USERS -->
+<div class="page" id="view-users" style="display:none">
+  <div class="users-page">
+    <div class="users-header">
+      <span class="users-title">VISITOR LOG &mdash; /#/users</span>
+      <span class="users-live">&#9679; LIVE</span>
+    </div>
+    <div class="users-sub">Every single person who has ever loaded this exact route, allegedly. This data is entirely fake. We are not tracking you. Probably.</div>
+    <div class="users-table-wrap" id="users-table-wrap"></div>
+  </div>
+  <p style="margin-top:22px;"><span class="retry-link" id="users-home">Log yourself out.</span></p>
+</div>
+
+<!-- EASTER EGG: VOID -->
+<div class="page" id="view-void" style="display:none">
+  <div class="void-page" id="void-page">
+    <span class="void-hello" id="void-hello">hello</span>
+    <div class="void-found" id="void-found">you found it.<br><span class="retry-link" id="void-home-inner">leave the void.</span></div>
+  </div>
+</div>
+
+<!-- EASTER EGG: VAULT 111 -->
+<div class="page" id="view-vault111" style="display:none">
+  <div class="vault111-page">
+    <div class="vault111-scanlines"></div>
+    <div class="vault111-header">VAULT-TEC TERMINAL &middot; CRYO BAY 111</div>
+    <div class="vault111-boot" id="vault111-boot">
+      <p>&gt; INITIATING THAW SEQUENCE&hellip;</p>
+      <p>&gt; POD STATUS: <span class="vault111-ok">STABLE</span></p>
+      <p>&gt; RESIDENT: "LYRICS.DOC"</p>
+      <p>&gt; TIME IN CRYO-STASIS: <span id="vault111-years">CALCULATING&hellip;</span></p>
+      <p>&gt; DEFROSTING&hellip;</p>
+    </div>
+    <div class="vault111-doc" id="vault111-doc" style="display:none;">
+      <div class="vault111-doc-title">RECOVERED DOCUMENT: "lyrics_final_FINAL_v2.doc"</div>
+      <p>Line 1: illegible (freezer burn)</p>
+      <p>Line 2: illegible (freezer burn)</p>
+      <p>Line 3: something about a chorus, possibly</p>
+      <p>Line 4: "[Verse 2]" &mdash; the rest did not survive the thaw</p>
+      <p class="vault111-footer">War. War never changes. Neither does an unfinished lyrics doc.</p>
+    </div>
+  </div>
+  <p style="margin-top:22px;"><span class="retry-link" id="vault111-home">Seal the vault door.</span></p>
+</div>
+
+<!-- EASTER EGG: PORTAL -->
+<div class="page" id="view-portal" style="display:none">
+  <div class="portal-page">
+    <div class="portal-topline">APERTURE SCIENCE &mdash; ENRICHMENT CENTER</div>
+    <h1 class="portal-title">TEST CHAMBER 19: "NERDCORE ARCHIVE"</h1>
+    <div class="portal-body">
+      <p>Congratulations. You are now the first person to fail a test that does not exist.</p>
+      <p>The Enrichment Center is required to remind you that the playlist featured at the end of this test is a lie. There is no playlist. There has never been a playlist. Please enjoy this cake-flavored substitute instead.</p>
+      <p>For your safety and the safety of other archive visitors, remain calm. This changelog entry will be added to your permanent record.</p>
+      <p class="portal-note">Note: this easter egg was not part of the test.</p>
+    </div>
+    <div class="portal-cake">&#127856;</div>
+  </div>
+  <p style="margin-top:22px;"><span class="retry-link" id="portal-home">Proceed to the next test chamber.</span></p>
 </div>
 
 <!-- FLOATING PLAYER CONTAINER -->
@@ -2272,8 +2420,11 @@
 
   function hideAllViews(isNavigatingToLyricDetail) {
     clearInterval(gameoverTimer_);
+    clearTimeout(staffonlyTimer_);
+    clearTimeout(vault111Timer_);
+    clearInterval(vault111CounterInterval_);
     var lyricsDetailWasVisible = document.getElementById('view-lyrics-detail').style.display !== 'none';
-    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','releases','top5','indiemonday','changelog','about','404','1987','gameover','backrooms','credits','juggernaut','hollowknight','anomaly'].forEach(function (v) {
+    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','releases','top5','indiemonday','changelog','about','404','1987','gameover','backrooms','credits','juggernaut','hollowknight','anomaly','staffonly','echo','users','void','vault111','portal'].forEach(function (v) {
       var el=document.getElementById('view-' + v);
       if (el) { el.style.display = 'none'; el.classList.remove('page-enter'); }
     });
@@ -2583,6 +2734,12 @@
     if (path === 'juggernaut') { hideAllViews(); document.getElementById('view-juggernaut').style.display = ''; setPath('juggernaut'); return; }
     if (path === 'hollowknight') { hideAllViews(); document.getElementById('view-hollowknight').style.display = ''; setPath('hollowknight'); return; }
     if (path === 'anomaly') { hideAllViews(); document.getElementById('view-anomaly').style.display = ''; setPath('anomaly'); return; }
+    if (path === 'staffonly') { hideAllViews(); document.getElementById('view-staffonly').style.display = ''; setPath('staffonly'); startStaffOnlySequence_(); return; }
+    if (path === 'echo') { hideAllViews(); document.getElementById('view-echo').style.display = ''; setPath('echo'); resetEchoPage_(); return; }
+    if (path === 'users') { hideAllViews(); document.getElementById('view-users').style.display = ''; setPath('users'); renderUsersTable_(); return; }
+    if (path === 'void') { hideAllViews(); document.getElementById('view-void').style.display = ''; setPath('void'); resetVoidPage_(); return; }
+    if (path === 'vault111') { hideAllViews(); document.getElementById('view-vault111').style.display = ''; setPath('vault111'); startVault111Sequence_(); return; }
+    if (path === 'portal') { hideAllViews(); document.getElementById('view-portal').style.display = ''; setPath('portal'); return; }
 
     var isLyricsFamily = path === 'lyrics' ||
       path.indexOf('artist-featured-') === 0 ||
@@ -5387,6 +5544,11 @@
     input.addEventListener('input',function(){
       var q=input.value.trim(); clearTimeout(globalSearchTimer_); var req=++globalSearchRequest_;
       if(!q){box.style.display='none';return;}
+      if(/^who\s+(made|built|created|runs|owns)\s+this\??$/i.test(q)){
+        box.style.display='none'; input.value=''; input.blur();
+        showAbout();
+        return;
+      }
       var local=localGlobalSearch_(q);
       if(local.length){renderGlobalSearchResults_({results:local});return;}
       box.style.display=''; box.innerHTML='<div class="global-search-result"><div class="global-search-result-meta">Searching the archive...</div></div>';
@@ -5489,6 +5651,118 @@
       setTimeout(function () { page.classList.remove('smashing'); }, 1400);
     });
   })();
+
+  // ---- #/staffonly ----
+  var staffonlyTimer_ = null;
+  function startStaffOnlySequence_(){
+    clearTimeout(staffonlyTimer_);
+    var page=document.getElementById('staffonly-page');
+    var badge=document.getElementById('staffonly-badge');
+    var code=document.getElementById('staffonly-code');
+    var detail=document.getElementById('staffonly-detail');
+    if(page) page.classList.remove('staffonly-revealed');
+    if(badge) badge.textContent='ACCESS DENIED';
+    if(code) code.innerHTML='ERROR 0x1987-A &middot; INSUFFICIENT PERMISSIONS';
+    if(detail) detail.innerHTML='<p>Credential check failed. This route is restricted to Archive Staff, Senior Archive Staff, and one guy named Kevin who nobody has ever met.</p><p>Verifying identity<span class="staffonly-dots">...</span></p>';
+    staffonlyTimer_=setTimeout(function(){
+      if(page) page.classList.add('staffonly-revealed');
+      if(badge) badge.textContent='OH. NEVER MIND.';
+      if(code) code.textContent='ACTUALLY: NO PERMISSIONS EXIST';
+      if(detail) detail.innerHTML='<p>There was never a login system, a staff role, or a Kevin. This page was just a stall tactic while it typed dramatically at you.</p><p>You may now proceed, having gained nothing.</p>';
+    }, 3600);
+  }
+
+  // ---- #/echo ----
+  function renderEchoLines_(value){
+    var wrap=document.getElementById('echo-output'); if(!wrap)return;
+    var v=String(value||'').trim();
+    if(!v){ wrap.innerHTML=''; return; }
+    var lines=[], maxLines=7;
+    for(var i=0;i<maxLines;i++){
+      var size=Math.max(10, 26 - i*2.5);
+      var opacity=Math.max(0.15, 1 - i*0.13);
+      var suffix = i===0 ? '' : Array(i+1).join('...echo');
+      lines.push('<div class="echo-line" style="font-size:'+size+'px; opacity:'+opacity+';">'+escapeHtml(v)+suffix+'</div>');
+    }
+    wrap.innerHTML=lines.join('');
+  }
+  function resetEchoPage_(){
+    var input=document.getElementById('echo-input'), out=document.getElementById('echo-output');
+    if(out) out.innerHTML='';
+    if(input){ input.value=''; setTimeout(function(){ input.focus(); },50); }
+  }
+  (function wireEchoInput_(){
+    var input=document.getElementById('echo-input');
+    if(!input) return;
+    input.addEventListener('input', function(){ renderEchoLines_(input.value); });
+  })();
+
+  // ---- #/users ----
+  var USERS_FAKE_LOG_ = [
+    {name:'xX_NerdcoreFan420_Xx', ip:'8.8.4.4', status:'Vibing'},
+    {name:'definitely_not_a_bot', ip:'0.0.0.0', status:'Refreshing tab 40x'},
+    {name:'BritishJuggernaut', ip:'127.0.0.1', status:'Debugging at 3am'},
+    {name:'lurker_supreme', ip:'404.404.404.404', status:'Still here'},
+    {name:'anon', ip:'???', status:'Watching'},
+    {name:'CTRL_F_enjoyer', ip:'192.168.1.???', status:'Searching for one song'},
+    {name:'ghost_in_the_sheet', ip:'???.???.???.???', status:'Editing a cell somewhere'},
+    {name:'YourMomsFavoriteRapper', ip:'69.42.0.1', status:'Skeptical'},
+    {name:'i_forgot_my_password', ip:'localhost', status:'Trying again'},
+    {name:'the_algorithm', ip:'1.1.1.1', status:'Taking notes'},
+    {name:'nice_try_hacker', ip:'6.6.6.6', status:'Blocked (jk)'},
+    {name:'user#0000001', ip:'0001', status:'First ever visitor, apparently'},
+    {name:'placeholder_person', ip:'x.x.x.x', status:"Doesn't exist"},
+    {name:'YOU', ip:'right now', status:'Reading this table'}
+  ];
+  function renderUsersTable_(){
+    var wrap=document.getElementById('users-table-wrap'); if(!wrap)return;
+    var rows=USERS_FAKE_LOG_.map(function(u,i){
+      var t=new Date(Date.now()-Math.floor(Math.random()*90)*60000);
+      var ts=t.toTimeString().split(' ')[0];
+      return '<tr><td>'+(i+1)+'</td><td>'+escapeHtml(u.name)+'</td><td>'+escapeHtml(u.ip)+'</td><td>'+ts+'</td><td>'+escapeHtml(u.status)+'</td></tr>';
+    }).join('');
+    wrap.innerHTML='<table class="users-table"><thead><tr><th>#</th><th>Visitor</th><th>IP (fake)</th><th>Time</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+
+  // ---- #/void ----
+  function resetVoidPage_(){
+    var hello=document.getElementById('void-hello'), found=document.getElementById('void-found');
+    if(hello) hello.style.display='';
+    if(found) found.classList.remove('show');
+  }
+  (function wireVoidEgg_(){
+    var hello=document.getElementById('void-hello'), found=document.getElementById('void-found');
+    if(!hello) return;
+    hello.addEventListener('click', function(){
+      hello.style.display='none';
+      if(found) found.classList.add('show');
+    });
+  })();
+  var voidHomeInner=document.getElementById('void-home-inner'); if(voidHomeInner) voidHomeInner.addEventListener('click', showHome);
+
+  // ---- #/vault111 ----
+  var vault111Timer_ = null;
+  var vault111CounterInterval_ = null;
+  function startVault111Sequence_(){
+    clearTimeout(vault111Timer_); clearInterval(vault111CounterInterval_);
+    var yearsEl=document.getElementById('vault111-years');
+    var docEl=document.getElementById('vault111-doc');
+    if(docEl) docEl.style.display='none';
+    var n=0;
+    vault111CounterInterval_=setInterval(function(){
+      n+=Math.floor(Math.random()*40)+5;
+      if(yearsEl) yearsEl.textContent=n+' YEARS';
+      if(n>210){ clearInterval(vault111CounterInterval_); if(yearsEl) yearsEl.textContent='210 YEARS (GIVE OR TAKE)'; }
+    },60);
+    vault111Timer_=setTimeout(function(){ if(docEl) docEl.style.display='block'; },2600);
+  }
+
+  // ---- home-link wiring for the six new easter eggs ----
+  var staffonlyHome=document.getElementById('staffonly-home'); if(staffonlyHome) staffonlyHome.addEventListener('click',showHome);
+  var echoHome=document.getElementById('echo-home'); if(echoHome) echoHome.addEventListener('click',showHome);
+  var usersHome=document.getElementById('users-home'); if(usersHome) usersHome.addEventListener('click',showHome);
+  var vault111Home=document.getElementById('vault111-home'); if(vault111Home) vault111Home.addEventListener('click',showHome);
+  var portalHome=document.getElementById('portal-home'); if(portalHome) portalHome.addEventListener('click',showHome);
 
   var gameoverHome = document.getElementById('gameover-home'); if (gameoverHome) gameoverHome.addEventListener('click', showHome);
   var backroomsHome = document.getElementById('backrooms-home'); if (backroomsHome) backroomsHome.addEventListener('click', showHome);
