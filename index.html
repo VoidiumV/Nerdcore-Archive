@@ -872,6 +872,7 @@
   .print-sheet-lyrics{ font-family:'JetBrains Mono','Space Mono',monospace; font-size:11px; line-height:1.45; columns:2; column-gap:24px; column-rule:1px dashed #999; }
   .print-sheet-lyrics p{ margin:0 0 3px; break-inside:avoid; }
   .print-sheet-lyrics .lyrics-header{ font-family:'Press Start 2P',monospace; font-size:7.5px; margin:9px 0 3px; letter-spacing:0.3px; }
+  .print-sheet-lyrics, .print-sheet-lyrics *{color:#000 !important; text-shadow:none !important; background:transparent !important; }
   @media print{
     *{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
     html, body{ background:#fff !important; }
@@ -1136,9 +1137,9 @@
     <div class="classified-stamp">CLASSIFIED</div>
     <h1 class="classified-title">INCIDENT REPORT: FREDDY FAZBEAR'S PIZZA, 1987</h1>
     <div class="classified-body">
-      <p>Location: a family pizzeria that, in hindsight, should have closed several red flags ago. Four animatronic performers &mdash; a bear, a bunny, a chicken, and a fox pulled from the show floor for reasons the paperwork lists only as <span class="redacted">"biting incident, unrelated to the other biting incident"</span> &mdash; were left powered on and unsupervised overnight, for reasons no manager has ever explained with a straight face.</p>
+      <p>Location: a family pizzeria that, in hindsight, should have closed several red flags ago. Four animatronic performers, a bear, a bunny, a chicken, and a fox, pulled from the show floor for reasons the paperwork lists only as <span class="redacted">"biting incident, unrelated to the other biting incident"</span>, were left powered on and unsupervised overnight, for reasons no manager has ever explained with a straight face.</p>
       <p>Missing persons: five, by the official count. The company's statement blamed <span class="redacted">"a malfunction"</span> and reopened the restaurant a week later as if nothing had happened, which everyone found very reassuring.</p>
-      <p>Suspect: a man in a purple uniform, present on no surviving camera footage, described by no two witnesses the same way, and eventually located &mdash; much later, wearing a very different suit than he started in &mdash; fused to some springlocks that were never rated for that kind of pressure.</p>
+      <p>Suspect: a man in a purple uniform, present on no surviving camera footage, described by no two witnesses the same way, and eventually located, much later, wearing a very different suit than he started in, fused to some springlocks that were never rated for that kind of pressure.</p>
       <p>Night guard employment records: extensive. Turnover: also extensive. Exit interviews mostly consist of the word <span class="redacted">"no"</span> repeated at increasing volume into a tape recorder.</p>
       <p>Current status of the animatronics: several. All technically accounted for. None of them anywhere they're supposed to be. The archivist would like it on record that she did not sign up for this when she agreed to run a nerdcore lyrics site.</p>
     </div>
@@ -4203,7 +4204,7 @@
         (function(){ var altList=parseImageList_(src.alternateCovers || post.alternateCovers); return '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(altList) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'"></div>'; })() +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
-          '<div class="detail-meta"><span>by <b>' + linkedArtistNamesHtml_(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + coversBadgeHtml_(src.alternateCovers || post.alternateCovers) + '</div>' +
+          '<div class="detail-meta"><span style="color:var(--ink);">by <b>' + linkedArtistNamesHtml_(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + coversBadgeHtml_(src.alternateCovers || post.alternateCovers) + '</div>' +
           (post.featured && !isNA(post.featured) ? '<div class="detail-featured">feat. <span class="feat-name">' + linkedArtistNamesHtml_(post.featured) + '</span></div>' : '') +
           (post.producer && !isNA(post.producer) ? '<div class="detail-producer">Produced by ' + escapeHtml(post.producer) + '</div>' : '') +
           tagsHtml +
@@ -4372,11 +4373,39 @@
       var inner = sheet.querySelector('.print-sheet-inner');
       if (!inner) { fallbackToPrint(); return; }
 
-      html2canvas(inner, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(function (canvas) {
+     html2canvas(inner, { scale: 2, backgroundColor: '#ffffff', useCORS: true }).then(function (canvas) {
         try {
           var jsPDF = window.jspdf.jsPDF;
-          var pdf = new jsPDF({ unit: 'px', format: [canvas.width, canvas.height] });
-          pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, canvas.width, canvas.height);
+          var pdf = new jsPDF({ unit: 'pt', format: 'letter' });
+          var pageWidth = pdf.internal.pageSize.getWidth();
+          var pageHeight = pdf.internal.pageSize.getHeight();
+          var margin = 24;
+          var usableWidth = pageWidth - margin * 2;
+          var usableHeight = pageHeight - margin * 2;
+          var imgWidth = usableWidth;
+          var imgHeight = (canvas.height * imgWidth) / canvas.width;
+          var pxPerPt = canvas.width / imgWidth;
+
+          if (imgHeight <= usableHeight) {
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, imgWidth, imgHeight);
+          } else {
+            var pageHeightPx = usableHeight * pxPerPt;
+            var remainingPx = canvas.height;
+            var yOffsetPx = 0, pageIndex = 0;
+            while (remainingPx > 0) {
+              var sliceHeightPx = Math.min(pageHeightPx, remainingPx);
+              var pageCanvas = document.createElement('canvas');
+              pageCanvas.width = canvas.width;
+              pageCanvas.height = sliceHeightPx;
+              pageCanvas.getContext('2d').drawImage(canvas, 0, yOffsetPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+              if (pageIndex > 0) pdf.addPage();
+              pdf.addImage(pageCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, imgWidth, sliceHeightPx / pxPerPt);
+              yOffsetPx += sliceHeightPx;
+              remainingPx -= sliceHeightPx;
+              pageIndex++;
+            }
+          }
+
           var safeName = String(displayTitle || post.title || 'lyrics')
             .replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '') || 'lyrics';
           pdf.save(safeName + '.pdf');
