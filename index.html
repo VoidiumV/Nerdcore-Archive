@@ -926,29 +926,43 @@
   .notfound-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px); }
 
   /* ---------- EASTER EGG: #/staffonly ---------- */
-  .staffonly-page{ background:#0a0000; border:3px solid #ff2b2b; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:44px 26px; text-align:center; position:relative; overflow:hidden; transition:background .6s ease, border-color .6s ease; }
+  #view-staffonly{ padding:0 !important; max-width:none !important; margin:0 !important; }
+  .staffonly-page{ position:relative; width:100%; height:100vh; background:#0a0000; overflow:hidden; display:flex; align-items:center; justify-content:center; transition:background .6s ease, filter .5s ease; }
   .staffonly-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,43,43,0.05) 0 1px, transparent 1px 3px); }
-  .staffonly-badge{ font-family:'Press Start 2P',monospace; font-size:26px; color:#ff2b2b; text-shadow:0 0 16px rgba(255,43,43,0.7); margin-bottom:18px; animation:staffonlyBlink 1s steps(1,end) infinite; transition:color .6s ease, text-shadow .6s ease, font-size .6s ease; }
+  .staffonly-siren{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at 50% 30%, rgba(255,43,43,0.28), transparent 60%); animation:staffonlySiren 1.4s ease-in-out infinite; }
+  @keyframes staffonlySiren{ 0%,100%{opacity:.35;} 50%{opacity:1;} }
+  .staffonly-center{ position:relative; z-index:1; text-align:center; padding:26px; }
+  .staffonly-badge{ font-family:'Press Start 2P',monospace; font-size:30px; color:#ff2b2b; text-shadow:0 0 16px rgba(255,43,43,0.7); margin-bottom:18px; animation:staffonlyBlink 1s steps(1,end) infinite; transition:color .6s ease, text-shadow .6s ease, font-size .6s ease; }
   @keyframes staffonlyBlink{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
   .staffonly-code{ font-family:'VT323',monospace; font-size:20px; color:#ff8080; letter-spacing:1px; margin-bottom:22px; transition:color .6s ease; }
   .staffonly-detail{ font-family:'VT323',monospace; font-size:19px; color:#c7c7c7; max-width:520px; margin:0 auto; line-height:1.6; }
-  .staffonly-page.staffonly-revealed{ background:var(--panel); border-color:var(--green); }
-  .staffonly-page.staffonly-revealed .staffonly-badge{ color:var(--green); text-shadow:2px 2px 0 var(--magenta); animation:none; font-size:20px; }
+  .staffonly-keycard-wrap{ margin-top:30px; cursor:pointer; }
+  .staffonly-keycard{ font-size:56px; display:inline-block; animation:staffonlyFloat 1.8s ease-in-out infinite; }
+  @keyframes staffonlyFloat{ 0%,100%{transform:translateY(0) rotate(-2deg);} 50%{transform:translateY(-8px) rotate(2deg);} }
+  .staffonly-keycard-label{ font-family:'VT323',monospace; font-size:16px; color:var(--green); margin-top:10px; letter-spacing:1px; }
+  .staffonly-page.staffonly-revealed{ background:#050a05; }
+  .staffonly-page.staffonly-revealed .staffonly-siren{ display:none; }
+  .staffonly-page.staffonly-revealed .staffonly-badge{ color:var(--green); text-shadow:2px 2px 0 var(--magenta); animation:none; font-size:22px; }
   .staffonly-page.staffonly-revealed .staffonly-code{ color:var(--muted); }
-  @media(prefers-reduced-motion:reduce){ .staffonly-badge{ animation:none!important; } }
+  .staffonly-page.staffonly-swiping{ filter:brightness(3) saturate(0); opacity:0; }
+  @media(prefers-reduced-motion:reduce){ .staffonly-badge,.staffonly-siren,.staffonly-keycard{ animation:none!important; } }
 
   /* ---------- EASTER EGG: #/echo ---------- */
-  .echo-page{ background:#05050a; border:3px solid #5fc9ff; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:40px 26px; text-align:center; }
+  #view-echo{ padding:0 !important; max-width:none !important; margin:0 !important; }
+  .echo-page{ width:100%; height:100vh; background:#05050a; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:26px; text-align:center; transition:opacity .5s ease; }
   .echo-title{ font-family:'Press Start 2P',monospace; font-size:16px; color:#5fc9ff; letter-spacing:1px; margin-bottom:22px; }
   .echo-input{ width:100%; max-width:440px; font-family:'JetBrains Mono',monospace; font-size:18px; background:#0a0d1c; border:2px solid #5fc9ff; color:#eef0e6; padding:12px 16px; outline:none; text-align:center; }
   .echo-input:focus{ box-shadow:0 0 12px rgba(95,201,255,0.4); }
   .echo-output{ margin-top:26px; display:flex; flex-direction:column; align-items:center; gap:4px; min-height:220px; }
   .echo-line{ font-family:'VT323',monospace; color:#5fc9ff; letter-spacing:0.5px; opacity:0; animation:echoFadeIn .25s ease forwards; word-break:break-word; max-width:90%; }
   @keyframes echoFadeIn{ from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:none;} }
+  .echo-hint{ margin-top:20px; font-family:'VT323',monospace; font-size:14px; color:#3a5568; letter-spacing:0.3px; }
+  .echo-page.echo-leaving{ opacity:0; }
   @media(prefers-reduced-motion:reduce){ .echo-line{ animation:none!important; opacity:1!important; } }
 
   /* ---------- EASTER EGG: #/users ---------- */
-  .users-page{ background:#000; border:3px solid #3dff8f; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:26px; font-family:'JetBrains Mono',monospace; }
+  #view-users{ padding:0 !important; max-width:none !important; margin:0 !important; }
+  .users-page{ width:100%; min-height:100vh; background:#000; padding:26px; font-family:'JetBrains Mono',monospace; box-sizing:border-box; transition:opacity .5s ease; }
   .users-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:8px; }
   .users-title{ color:#3dff8f; font-size:14px; letter-spacing:0.5px; }
   .users-live{ color:#ff2b2b; font-size:12px; animation:staffonlyBlink 1.2s steps(1,end) infinite; }
@@ -958,6 +972,12 @@
   .users-table th{ text-align:left; color:#3dff8f; border-bottom:1px solid #1a3a28; padding:6px 10px; white-space:nowrap; }
   .users-table td{ color:#8fd9ab; border-bottom:1px solid #0f2018; padding:6px 10px; white-space:nowrap; }
   .users-table tr:hover td{ background:#031a0e; }
+  .users-terminal-line{ display:flex; align-items:center; gap:8px; margin-top:22px; }
+  .users-prompt{ color:#3dff8f; font-size:14px; white-space:nowrap; }
+  .users-terminal-input{ flex:1; background:transparent; border:none; outline:none; color:#8fd9ab; font-family:'JetBrains Mono',monospace; font-size:14px; caret-color:#3dff8f; }
+  .users-cursor{ color:#3dff8f; animation:staffonlyBlink .9s steps(1,end) infinite; }
+  .users-terminal-hint{ margin-top:8px; color:#3a5c48; font-size:12px; letter-spacing:0.3px; }
+  .users-page.users-leaving{ opacity:0; }
 
   /* ---------- EASTER EGG: #/void ---------- */
   #view-void{ padding:0 !important; max-width:none !important; margin:0 !important; }
@@ -969,7 +989,8 @@
   .void-found .retry-link{ color:var(--green); font-size:18px; }
 
   /* ---------- EASTER EGG: #/vault111 ---------- */
-  .vault111-page{ background:#001505; border:3px solid #2ee66b; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:30px 26px; position:relative; overflow:hidden; font-family:'JetBrains Mono',monospace; color:#2ee66b; }
+  #view-vault111{ padding:0 !important; max-width:none !important; margin:0 !important; }
+  .vault111-page{ width:100%; min-height:100vh; background:#001505; position:relative; overflow:hidden; font-family:'JetBrains Mono',monospace; color:#2ee66b; padding:30px 26px; box-sizing:border-box; transition:opacity .6s ease; }
   .vault111-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(46,230,107,0.06) 0 1px, transparent 1px 3px); }
   .vault111-header{ font-family:'Press Start 2P',monospace; font-size:12px; letter-spacing:1px; margin-bottom:20px; text-shadow:0 0 8px rgba(46,230,107,0.6); }
   .vault111-boot p{ margin:0 0 10px; font-size:15px; letter-spacing:0.3px; }
@@ -978,17 +999,27 @@
   .vault111-doc-title{ font-family:'Press Start 2P',monospace; font-size:11px; margin-bottom:14px; }
   .vault111-doc p{ font-size:15px; margin:0 0 8px; color:#8fff9a; }
   .vault111-footer{ margin-top:14px; color:#2ee66b; font-style:italic; }
+  .vault111-door-wrap{ margin-top:28px; text-align:center; cursor:pointer; }
+  .vault111-door{ font-size:60px; display:inline-block; color:#2ee66b; transition:transform .6s ease; }
+  .vault111-door-label{ font-family:'VT323',monospace; font-size:15px; color:#8fff9a; margin-top:8px; letter-spacing:0.5px; }
+  .vault111-page.vault111-sealing .vault111-door{ transform:rotate(540deg) scale(0); }
+  .vault111-page.vault111-sealing{ opacity:0; }
 
   /* ---------- EASTER EGG: #/portal ---------- */
-  .portal-page{ background:#eef2f5; border:3px solid #7fb8cc; box-shadow:6px 6px 0 rgba(0,0,0,0.25); padding:36px 30px; color:#33424a; font-family:'Space Mono',monospace; text-align:center; }
+  #view-portal{ padding:0 !important; max-width:none !important; margin:0 !important; }
+  .portal-page{ width:100%; min-height:100vh; background:#eef2f5; color:#33424a; font-family:'Space Mono',monospace; text-align:center; padding:50px 30px; box-sizing:border-box; transition:opacity .6s ease; }
   .portal-topline{ font-family:'Press Start 2P',monospace; font-size:10px; letter-spacing:2px; color:#5a8fa3; margin-bottom:18px; }
   .portal-title{ font-family:'Press Start 2P',monospace; font-size:16px; color:#2c5568; margin:0 0 22px; line-height:1.6; }
   .portal-body{ font-size:18px; line-height:1.6; max-width:560px; margin:0 auto; color:#41535c; }
   .portal-body p{ margin:0 0 14px; }
   .portal-note{ font-style:italic; color:#7d8f97; font-size:15px; }
-  .portal-cake{ font-size:44px; margin-top:20px; filter:grayscale(0.3); }
+  .portal-cake-wrap{ margin-top:22px; cursor:pointer; }
+  .portal-cake{ font-size:48px; filter:grayscale(0.3); transition:transform .4s ease, filter .4s ease, opacity .4s ease; display:inline-block; }
+  .portal-cake-label{ font-family:'VT323',monospace; font-size:14px; color:#7d8f97; margin-top:6px; }
+  .portal-cake.portal-cake-poof{ transform:scale(1.6) rotate(20deg); filter:grayscale(1) blur(3px); opacity:0; }
+  .portal-page.portal-leaving{ opacity:0; }
 
-  /* ---------- PRINT / EXPORT LYRICS SHEET (populated just before window.print(), see printCurrentLyrics_) ---------- */
+  /* ---------- PRINT / EXPORT LYRICS SHEET ---------- */
   #print-lyrics-sheet{ display:none; }
   .print-sheet-inner{ font-family:'Space Mono', monospace; border:2px solid #000; padding:20px 24px; width:820px; max-width:820px; box-sizing:border-box; background:#fff; }
   .print-sheet-header{ display:flex; align-items:center; gap:14px; margin-bottom:12px; padding-bottom:10px; border-bottom:2px solid #000; }
@@ -1370,37 +1401,48 @@
 <div class="page" id="view-staffonly" style="display:none">
   <div class="staffonly-page" id="staffonly-page">
     <div class="staffonly-scanlines"></div>
-    <div class="staffonly-badge" id="staffonly-badge">ACCESS DENIED</div>
-    <div class="staffonly-code" id="staffonly-code">ERROR 0x1987-A &middot; INSUFFICIENT PERMISSIONS</div>
-    <div class="staffonly-detail" id="staffonly-detail">
-      <p>Credential check failed. This route is restricted to Archive Staff, Senior Archive Staff, and one guy named Kevin who nobody has ever met.</p>
-      <p id="staffonly-verifying">Verifying identity<span class="staffonly-dots">...</span></p>
+    <div class="staffonly-siren" id="staffonly-siren"></div>
+    <div class="staffonly-center">
+      <div class="staffonly-badge" id="staffonly-badge">ACCESS DENIED</div>
+      <div class="staffonly-code" id="staffonly-code">ERROR 0x1987-A &middot; INSUFFICIENT PERMISSIONS</div>
+      <div class="staffonly-detail" id="staffonly-detail">
+        <p>Credential check failed. This route is restricted to Archive Staff, Senior Archive Staff, and one guy named Kevin who nobody has ever met.</p>
+        <p id="staffonly-verifying">Verifying identity<span class="staffonly-dots">...</span></p>
+      </div>
+      <div class="staffonly-keycard-wrap" id="staffonly-keycard-wrap" style="display:none;">
+        <div class="staffonly-keycard" id="staffonly-keycard">&#128179;</div>
+        <div class="staffonly-keycard-label">TAP THE KEYCARD TO SWIPE OUT</div>
+      </div>
     </div>
   </div>
-  <p style="margin-top:22px;"><span class="retry-link" id="staffonly-home">Back to the public area.</span></p>
 </div>
 
 <!-- EASTER EGG: ECHO -->
 <div class="page" id="view-echo" style="display:none">
-  <div class="echo-page">
-    <div class="echo-title">SAY SOMETHING.</div>
+  <div class="echo-page" id="echo-page">
+    <div class="echo-title">SAY SOMETHING INTO THE CHAMBER.</div>
     <input type="text" class="echo-input" id="echo-input" autocomplete="off" placeholder="type here&hellip;">
     <div class="echo-output" id="echo-output"></div>
+    <div class="echo-hint">(say <b>"stop"</b> to leave the echo chamber)</div>
   </div>
-  <p style="margin-top:22px;"><span class="retry-link" id="echo-home">Stop shouting into the void.</span></p>
 </div>
 
 <!-- EASTER EGG: USERS -->
 <div class="page" id="view-users" style="display:none">
-  <div class="users-page">
+  <div class="users-page" id="users-page">
     <div class="users-header">
       <span class="users-title">VISITOR LOG &mdash; /#/users</span>
       <span class="users-live">&#9679; LIVE</span>
     </div>
     <div class="users-sub">Every single person who has ever loaded this exact route, allegedly. This data is entirely fake. We are not tracking you. Probably.</div>
     <div class="users-table-wrap" id="users-table-wrap"></div>
+    <div class="users-terminal-line">
+      <span class="users-prompt">guest@nerdcore-archive:~$</span>
+      <input type="text" class="users-terminal-input" id="users-terminal-input" autocomplete="off" spellcheck="false">
+      <span class="users-cursor">&#9608;</span>
+    </div>
+    <div class="users-terminal-hint">(type <b>logout</b> or <b>exit</b> and press Enter)</div>
   </div>
-  <p style="margin-top:22px;"><span class="retry-link" id="users-home">Log yourself out.</span></p>
 </div>
 
 <!-- EASTER EGG: VOID -->
@@ -1413,7 +1455,7 @@
 
 <!-- EASTER EGG: VAULT 111 -->
 <div class="page" id="view-vault111" style="display:none">
-  <div class="vault111-page">
+  <div class="vault111-page" id="vault111-page">
     <div class="vault111-scanlines"></div>
     <div class="vault111-header">VAULT-TEC TERMINAL &middot; CRYO BAY 111</div>
     <div class="vault111-boot" id="vault111-boot">
@@ -1430,14 +1472,17 @@
       <p>Line 3: something about a chorus, possibly</p>
       <p>Line 4: "[Verse 2]" &mdash; the rest did not survive the thaw</p>
       <p class="vault111-footer">War. War never changes. Neither does an unfinished lyrics doc.</p>
+      <div class="vault111-door-wrap" id="vault111-door-wrap">
+        <div class="vault111-door" id="vault111-door">&#9678;</div>
+        <div class="vault111-door-label">TAP THE DOOR TO RE-SEAL THE VAULT</div>
+      </div>
     </div>
   </div>
-  <p style="margin-top:22px;"><span class="retry-link" id="vault111-home">Seal the vault door.</span></p>
 </div>
 
 <!-- EASTER EGG: PORTAL -->
 <div class="page" id="view-portal" style="display:none">
-  <div class="portal-page">
+  <div class="portal-page" id="portal-page">
     <div class="portal-topline">APERTURE SCIENCE &mdash; ENRICHMENT CENTER</div>
     <h1 class="portal-title">TEST CHAMBER 19: "NERDCORE ARCHIVE"</h1>
     <div class="portal-body">
@@ -1446,9 +1491,11 @@
       <p>For your safety and the safety of other archive visitors, remain calm. This changelog entry will be added to your permanent record.</p>
       <p class="portal-note">Note: this easter egg was not part of the test.</p>
     </div>
-    <div class="portal-cake">&#127856;</div>
+    <div class="portal-cake-wrap" id="portal-cake-wrap">
+      <div class="portal-cake" id="portal-cake">&#127856;</div>
+      <div class="portal-cake-label">(tap the cake)</div>
+    </div>
   </div>
-  <p style="margin-top:22px;"><span class="retry-link" id="portal-home">Proceed to the next test chamber.</span></p>
 </div>
 
 <!-- FLOATING PLAYER CONTAINER -->
@@ -5652,7 +5699,7 @@
     });
   })();
 
-  // ---- #/staffonly ----
+  // ---- #/staffonly ---- (exit: tap the floating keycard to "swipe out")
   var staffonlyTimer_ = null;
   function startStaffOnlySequence_(){
     clearTimeout(staffonlyTimer_);
@@ -5660,19 +5707,32 @@
     var badge=document.getElementById('staffonly-badge');
     var code=document.getElementById('staffonly-code');
     var detail=document.getElementById('staffonly-detail');
-    if(page) page.classList.remove('staffonly-revealed');
+    var keycardWrap=document.getElementById('staffonly-keycard-wrap');
+    if(page) page.classList.remove('staffonly-revealed','staffonly-swiping');
     if(badge) badge.textContent='ACCESS DENIED';
     if(code) code.innerHTML='ERROR 0x1987-A &middot; INSUFFICIENT PERMISSIONS';
     if(detail) detail.innerHTML='<p>Credential check failed. This route is restricted to Archive Staff, Senior Archive Staff, and one guy named Kevin who nobody has ever met.</p><p>Verifying identity<span class="staffonly-dots">...</span></p>';
+    if(keycardWrap) keycardWrap.style.display='none';
     staffonlyTimer_=setTimeout(function(){
       if(page) page.classList.add('staffonly-revealed');
       if(badge) badge.textContent='OH. NEVER MIND.';
       if(code) code.textContent='ACTUALLY: NO PERMISSIONS EXIST';
-      if(detail) detail.innerHTML='<p>There was never a login system, a staff role, or a Kevin. This page was just a stall tactic while it typed dramatically at you.</p><p>You may now proceed, having gained nothing.</p>';
+      if(detail) detail.innerHTML='<p>There was never a login system, a staff role, or a Kevin. This page was just a stall tactic while it typed dramatically at you.</p>';
+      if(keycardWrap) keycardWrap.style.display='';
     }, 3600);
   }
+  (function wireStaffOnlyKeycard_(){
+    var keycardWrap=document.getElementById('staffonly-keycard-wrap');
+    var page=document.getElementById('staffonly-page');
+    if(!keycardWrap) return;
+    keycardWrap.addEventListener('click', function(){
+      if(page) page.classList.add('staffonly-swiping');
+      setTimeout(showHome, 480);
+    });
+  })();
 
-  // ---- #/echo ----
+  // ---- #/echo ---- (exit: type "stop" into the chamber)
+  var ECHO_EXIT_WORDS_ = ['stop','quiet','shh','shhh'];
   function renderEchoLines_(value){
     var wrap=document.getElementById('echo-output'); if(!wrap)return;
     var v=String(value||'').trim();
@@ -5687,17 +5747,27 @@
     wrap.innerHTML=lines.join('');
   }
   function resetEchoPage_(){
-    var input=document.getElementById('echo-input'), out=document.getElementById('echo-output');
+    var input=document.getElementById('echo-input'), out=document.getElementById('echo-output'), page=document.getElementById('echo-page');
     if(out) out.innerHTML='';
+    if(page) page.classList.remove('echo-leaving');
     if(input){ input.value=''; setTimeout(function(){ input.focus(); },50); }
   }
   (function wireEchoInput_(){
     var input=document.getElementById('echo-input');
+    var page=document.getElementById('echo-page');
     if(!input) return;
-    input.addEventListener('input', function(){ renderEchoLines_(input.value); });
+    input.addEventListener('input', function(){
+      var v=String(input.value||'').trim().toLowerCase();
+      if(ECHO_EXIT_WORDS_.indexOf(v)!==-1){
+        if(page) page.classList.add('echo-leaving');
+        setTimeout(showHome, 450);
+        return;
+      }
+      renderEchoLines_(input.value);
+    });
   })();
 
-  // ---- #/users ----
+  // ---- #/users ---- (exit: type "logout" or "exit" into the terminal prompt)
   var USERS_FAKE_LOG_ = [
     {name:'xX_NerdcoreFan420_Xx', ip:'8.8.4.4', status:'Vibing'},
     {name:'definitely_not_a_bot', ip:'0.0.0.0', status:'Refreshing tab 40x'},
@@ -5722,7 +5792,29 @@
       return '<tr><td>'+(i+1)+'</td><td>'+escapeHtml(u.name)+'</td><td>'+escapeHtml(u.ip)+'</td><td>'+ts+'</td><td>'+escapeHtml(u.status)+'</td></tr>';
     }).join('');
     wrap.innerHTML='<table class="users-table"><thead><tr><th>#</th><th>Visitor</th><th>IP (fake)</th><th>Time</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    var input=document.getElementById('users-terminal-input');
+    var page=document.getElementById('users-page');
+    if(input){
+      input.value='';
+      setTimeout(function(){ input.focus(); },50);
+    }
   }
+  (function wireUsersTerminal_(){
+    var input=document.getElementById('users-terminal-input');
+    var page=document.getElementById('users-page');
+    if(!input) return;
+    input.addEventListener('keydown', function(e){
+      if(e.key!=='Enter') return;
+      var v=String(input.value||'').trim().toLowerCase();
+      if(v==='logout' || v==='exit'){
+        input.disabled=true;
+        if(page) page.classList.add('users-leaving');
+        setTimeout(showHome, 500);
+      } else {
+        input.value='';
+      }
+    });
+  })();
 
   // ---- #/void ----
   function resetVoidPage_(){
@@ -5740,13 +5832,15 @@
   })();
   var voidHomeInner=document.getElementById('void-home-inner'); if(voidHomeInner) voidHomeInner.addEventListener('click', showHome);
 
-  // ---- #/vault111 ----
+  // ---- #/vault111 ---- (exit: tap the vault door to re-seal it)
   var vault111Timer_ = null;
   var vault111CounterInterval_ = null;
   function startVault111Sequence_(){
     clearTimeout(vault111Timer_); clearInterval(vault111CounterInterval_);
     var yearsEl=document.getElementById('vault111-years');
     var docEl=document.getElementById('vault111-doc');
+    var page=document.getElementById('vault111-page');
+    if(page) page.classList.remove('vault111-sealing');
     if(docEl) docEl.style.display='none';
     var n=0;
     vault111CounterInterval_=setInterval(function(){
@@ -5756,13 +5850,30 @@
     },60);
     vault111Timer_=setTimeout(function(){ if(docEl) docEl.style.display='block'; },2600);
   }
+  (function wireVault111Door_(){
+    var doorWrap=document.getElementById('vault111-door-wrap');
+    var page=document.getElementById('vault111-page');
+    if(!doorWrap) return;
+    doorWrap.addEventListener('click', function(){
+      if(page) page.classList.add('vault111-sealing');
+      setTimeout(showHome, 650);
+    });
+  })();
 
-  // ---- home-link wiring for the six new easter eggs ----
-  var staffonlyHome=document.getElementById('staffonly-home'); if(staffonlyHome) staffonlyHome.addEventListener('click',showHome);
-  var echoHome=document.getElementById('echo-home'); if(echoHome) echoHome.addEventListener('click',showHome);
-  var usersHome=document.getElementById('users-home'); if(usersHome) usersHome.addEventListener('click',showHome);
-  var vault111Home=document.getElementById('vault111-home'); if(vault111Home) vault111Home.addEventListener('click',showHome);
-  var portalHome=document.getElementById('portal-home'); if(portalHome) portalHome.addEventListener('click',showHome);
+  // ---- #/portal ---- (exit: tap the cake, watch it vanish, auto-exit the chamber)
+  (function wirePortalCake_(){
+    var cakeWrap=document.getElementById('portal-cake-wrap');
+    var cake=document.getElementById('portal-cake');
+    var page=document.getElementById('portal-page');
+    if(!cakeWrap) return;
+    cakeWrap.addEventListener('click', function(){
+      if(cake) cake.classList.add('portal-cake-poof');
+      setTimeout(function(){
+        if(page) page.classList.add('portal-leaving');
+        setTimeout(showHome, 600);
+      }, 450);
+    });
+  })();
 
   var gameoverHome = document.getElementById('gameover-home'); if (gameoverHome) gameoverHome.addEventListener('click', showHome);
   var backroomsHome = document.getElementById('backrooms-home'); if (backroomsHome) backroomsHome.addEventListener('click', showHome);
