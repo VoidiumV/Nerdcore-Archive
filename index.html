@@ -866,6 +866,28 @@
   .juggernaut-btn:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
   @media(prefers-reduced-motion:reduce){ .juggernaut-page.smashing{ animation:none!important; } }
 
+  /* ---------- EASTER EGG: #/hollowknight ---------- */
+  .hollow-page{ background:#050608; border:3px solid #3a4a52; box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:50px 26px; text-align:center; position:relative; overflow:hidden; }
+  .hollow-title{ font-family:'Press Start 2P',monospace; font-size:18px; color:#8fa8ac; letter-spacing:2px; line-height:1.8; margin:0 0 30px; text-shadow:0 0 12px rgba(143,168,172,0.4); }
+  .hollow-body{ font-family:'VT323',monospace; font-size:21px; color:#5c6b70; line-height:1.9; max-width:560px; margin:0 auto; }
+  .hollow-body p{ margin:0 0 16px; }
+  .hollow-glow{ color:#c9f0e8; text-shadow:0 0 10px rgba(201,240,232,0.55); }
+  .hollow-vessel{ font-size:44px; margin-bottom:22px; opacity:0.7; animation:hollowFlicker 6s steps(1,end) infinite; }
+  @keyframes hollowFlicker{ 0%,94%,100%{opacity:0.7;} 95%{opacity:0.15;} 96%{opacity:0.7;} }
+  .hollow-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0 1px, transparent 1px 3px); }
+  @media(prefers-reduced-motion:reduce){ .hollow-vessel{ animation:none!important; } }
+
+  /* ---------- EASTER EGG: #/anomaly ---------- */
+  .anomaly-page{ background:#0a0a0a; border:3px solid var(--amber); box-shadow:6px 6px 0 rgba(0,0,0,0.6); padding:30px 26px; position:relative; overflow:hidden; }
+  .anomaly-stamp{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--amber); border:3px solid var(--amber); display:inline-block; padding:8px 14px; margin-bottom:18px; letter-spacing:2px; }
+  .anomaly-title{ font-family:'Press Start 2P',monospace; font-size:18px; color:#eee; line-height:1.7; margin:0 0 16px; }
+  .anomaly-body{ font-family:'VT323',monospace; font-size:19px; color:#c7c7c7; line-height:1.7; max-width:640px; }
+  .anomaly-body p{ margin:0 0 14px; }
+  .anomaly-table{ width:100%; max-width:640px; border-collapse:collapse; margin:16px 0 20px; font-family:'JetBrains Mono',monospace; font-size:14px; }
+  .anomaly-table td{ border:1px solid #333; padding:8px 10px; color:#aaa; vertical-align:top; }
+  .anomaly-table td:first-child{ color:var(--amber); width:150px; }
+  .anomaly-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0 1px, transparent 1px 3px); }
+
   /* ---------- EASTER EGG: long-press logo glitch ---------- */
   @keyframes bodyGlitchShift{
     0%,100%{ transform:translate(0,0); filter:none; }
@@ -1245,6 +1267,40 @@
     <button type="button" class="juggernaut-btn" id="juggernaut-smash-btn">TRY TO STOP ME</button>
   </div>
   <p style="margin-top:22px;"><span class="retry-link" id="juggernaut-home">Get out of the way.</span></p>
+</div>
+
+<!-- EASTER EGG: HOLLOW KNIGHT -->
+<div class="page" id="view-hollowknight" style="display:none">
+  <div class="hollow-page">
+    <div class="hollow-scanlines"></div>
+    <div class="hollow-vessel">&#9675;</div>
+    <h1 class="hollow-title">A LONG WAY DOWN,<br>A LONG WAY BACK UP</h1>
+    <div class="hollow-body">
+      <p>Every archive has a place like this. Not linked from anywhere, not mentioned in the changelog, reachable only if you already knew to look.</p>
+      <p>Somewhere below the lyrics sheet and the release calendar, past the cache keys and the cover art, something small and quiet is still <span class="hollow-glow">listening</span>.</p>
+      <p>It doesn't want anything from you. It just wanted you to know it was here.</p>
+    </div>
+  </div>
+  <p style="margin-top:22px;"><span class="retry-link" id="hollowknight-home">Climb back to the surface.</span></p>
+</div>
+
+<!-- EASTER EGG: ANOMALY -->
+<div class="page" id="view-anomaly" style="display:none">
+  <div class="anomaly-page">
+    <div class="anomaly-scanlines"></div>
+    <div class="anomaly-stamp">CONTAINMENT NOTICE</div>
+    <h1 class="anomaly-title">ANOMALY: THE CHANGELOG</h1>
+    <div class="anomaly-body">
+      <table class="anomaly-table">
+        <tr><td>Designation</td><td>The page at #/changelog</td></tr>
+        <tr><td>Containment</td><td>None currently in effect. Anomaly is permitted to update itself.</td></tr>
+        <tr><td>Description</td><td>Entries appear on the changelog page with no corresponding edit ever made by site staff. When asked, the archivist insists she wrote every one of them herself, at times she cannot recall, in a tone she does not use.</td></tr>
+      </table>
+      <p>Personnel are reminded not to read more than three entries back to back. No official reason has been given for this guideline. The guideline predates the changelog itself.</p>
+      <p>This notice was not authored by anyone currently on staff.</p>
+    </div>
+  </div>
+  <p style="margin-top:22px;"><span class="retry-link" id="anomaly-home">File this under "fine, actually."</span></p>
 </div>
 
 <!-- FLOATING PLAYER CONTAINER -->
@@ -2217,7 +2273,7 @@
   function hideAllViews(isNavigatingToLyricDetail) {
     clearInterval(gameoverTimer_);
     var lyricsDetailWasVisible = document.getElementById('view-lyrics-detail').style.display !== 'none';
-    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','releases','top5','indiemonday','changelog','about','404','1987','gameover','backrooms','credits','juggernaut'].forEach(function (v) {
+    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','releases','top5','indiemonday','changelog','about','404','1987','gameover','backrooms','credits','juggernaut','hollowknight','anomaly'].forEach(function (v) {
       var el=document.getElementById('view-' + v);
       if (el) { el.style.display = 'none'; el.classList.remove('page-enter'); }
     });
@@ -2525,6 +2581,8 @@
     if (path === 'backrooms') { hideAllViews(); document.getElementById('view-backrooms').style.display = ''; setPath('backrooms'); return; }
     if (path === 'credits') { hideAllViews(); document.getElementById('view-credits').style.display = ''; setPath('credits'); renderCredits_(); return; }
     if (path === 'juggernaut') { hideAllViews(); document.getElementById('view-juggernaut').style.display = ''; setPath('juggernaut'); return; }
+    if (path === 'hollowknight') { hideAllViews(); document.getElementById('view-hollowknight').style.display = ''; setPath('hollowknight'); return; }
+    if (path === 'anomaly') { hideAllViews(); document.getElementById('view-anomaly').style.display = ''; setPath('anomaly'); return; }
 
     var isLyricsFamily = path === 'lyrics' ||
       path.indexOf('artist-featured-') === 0 ||
@@ -5436,6 +5494,8 @@
   var backroomsHome = document.getElementById('backrooms-home'); if (backroomsHome) backroomsHome.addEventListener('click', showHome);
   var creditsHome = document.getElementById('credits-home'); if (creditsHome) creditsHome.addEventListener('click', showHome);
   var juggernautHome = document.getElementById('juggernaut-home'); if (juggernautHome) juggernautHome.addEventListener('click', showHome);
+  var hollowknightHome = document.getElementById('hollowknight-home'); if (hollowknightHome) hollowknightHome.addEventListener('click', showHome);
+  var anomalyHome = document.getElementById('anomaly-home'); if (anomalyHome) anomalyHome.addEventListener('click', showHome);
 
   // ----------------------------------------------------------------------
   // EASTER EGG: long-press (or click-and-hold) the logo to glitch the site
