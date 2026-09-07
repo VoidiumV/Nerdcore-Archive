@@ -846,22 +846,6 @@
 
   .sync-btn.retry{margin-left:10px;}
 
-  #view-gameover{ padding:0 !important; max-width:none !important; margin:0 !important; }
-  .gameover-page{ position:relative; width:100%; min-height:100vh; background:#000; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; box-sizing:border-box; }
-  .gameover-bezel{ position:absolute; inset:0; pointer-events:none; border:18px solid #150000; box-shadow:inset 0 0 70px rgba(255,0,0,0.18); }
-  .gameover-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,0,0,0.05) 0 2px, transparent 2px 4px); }
-  .gameover-inner{ position:relative; z-index:1; padding:40px 26px; }
-  .gameover-title{ font-family:'Press Start 2P',monospace; font-size:50px; color:#ff2b2b; text-shadow:0 0 20px rgba(255,43,43,0.8), 0 0 70px rgba(255,43,43,0.35); margin:0 0 34px; animation:gameoverPulse 1.1s ease-in-out infinite; }
-  @keyframes gameoverPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.04); } }
-  .gameover-continue{ font-family:'VT323',monospace; font-size:30px; color:#eee; margin-bottom:18px; letter-spacing:2px; animation:staffonlyBlink 1s steps(1,end) infinite; }
-  .gameover-countdown{ font-family:'Press Start 2P',monospace; font-size:64px; color:var(--amber); margin-bottom:30px; text-shadow:0 0 20px rgba(255,182,39,0.5); }
-  .gameover-buttons{ display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
-  .gameover-btn{ font-family:'Press Start 2P',monospace; font-size:13px; padding:16px 24px; cursor:pointer; border:2px solid var(--green); color:var(--green); background:#0a0a0a; }
-  .gameover-btn:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
-  .gameover-terminated{ display:none; }
-  .gameover-terminated.show{ display:block; }
-  .gameover-exit-link{ position:absolute; left:0; right:0; bottom:26px; z-index:2; text-align:center; }
-  @media(max-width:600px){ .gameover-title{ font-size:32px; } .gameover-countdown{ font-size:44px; } }
 
   #view-backrooms{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .backrooms-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box;
@@ -892,18 +876,6 @@
   .credits-exit{ position:absolute; left:0; right:0; bottom:20px; z-index:2; text-align:center; }
   @media(prefers-reduced-motion:reduce){ .credits-scroll{ animation:none; position:static; padding-top:20px; } }
 
-  #view-juggernaut{ padding:0 !important; max-width:none !important; margin:0 !important; }
-  .juggernaut-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box;
-    background: radial-gradient(circle, #3a0000 1.5px, transparent 1.8px) 0 0/16px 16px, #1a0000;
-    display:flex; align-items:center; justify-content:center; text-align:center; padding:40px 22px; overflow:hidden; }
-  .juggernaut-slab{ position:relative; z-index:1; max-width:640px; width:100%; background:#0a0a0a; border:4px solid #ff2b2b; box-shadow:10px 10px 0 rgba(0,0,0,0.6); padding:40px 30px; }
-  .juggernaut-title{ font-family:'Press Start 2P',monospace; font-size:26px; color:#ff2b2b; text-shadow:0 0 18px rgba(255,43,43,0.7); margin:0 0 22px; line-height:1.6; }
-  .juggernaut-quote{ font-family:'VT323',monospace; font-size:32px; color:#eee; margin-bottom:26px; line-height:1.4; }
-  .juggernaut-page.smashing .juggernaut-slab{ animation:juggernautSmash .3s steps(2,end) infinite; }
-  @keyframes juggernautSmash{ 0%,100%{ transform:translate(0,0) rotate(0); } 25%{ transform:translate(-9px,4px) rotate(-1deg); } 50%{ transform:translate(8px,-6px) rotate(1deg); } 75%{ transform:translate(-6px,-3px); } }
-  .juggernaut-btn{ font-family:'Press Start 2P',monospace; font-size:12px; padding:14px 20px; cursor:pointer; border:2px solid #ff2b2b; color:#ff2b2b; background:#0a0a0a; margin-top:10px; }
-  .juggernaut-btn:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
-  @media(prefers-reduced-motion:reduce){ .juggernaut-page.smashing .juggernaut-slab{ animation:none!important; } }
 
   #view-hollowknight{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .hollow-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box;
@@ -1085,14 +1057,6 @@
   .redacted.revealed{ color:#ff8c8c; background:transparent; }
   .classified-footer{ letter-spacing:.4px; }
 
-  .gameover-page{ background:#07080d; }
-  .gameover-bezel{ border:12px solid #11131a; box-shadow:inset 0 0 0 1px #2c3040; }
-  .gameover-scanlines{ opacity:.45; }
-  .gameover-inner{ max-width:620px; width:100%; border:1px solid #303442; background:#0c0e15; padding:34px 28px; box-shadow:8px 8px 0 rgba(0,0,0,.45); }
-  .gameover-title{ text-shadow:4px 4px 0 #32131a; animation:none; }
-  .gameover-countdown{ margin-bottom:24px; }
-  .gameover-btn{ min-width:120px; transition:transform .12s ease,background .12s ease; }
-  .gameover-btn:hover{ transform:translate(-2px,-2px); background:#11151c; }
 
   .backrooms-page{ background:#b5a044; align-items:flex-start; padding-top:10vh; }
   .backrooms-buzz{ background:repeating-linear-gradient(90deg,rgba(255,255,220,.06) 0 1px,transparent 1px 9px); animation:none; }
@@ -1110,11 +1074,6 @@
   .credits-exit{ bottom:18px; }
   .credits-heading{ letter-spacing:1px; }
 
-  .juggernaut-page{ background:#18100f; }
-  .juggernaut-page::before{ content:''; position:absolute; inset:0; background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 5px); pointer-events:none; }
-  .juggernaut-slab{ max-width:700px; background:#0f0d0d; border:2px solid #ff2b2b; border-radius:2px; box-shadow:12px 12px 0 rgba(0,0,0,.4); transform:rotate(-.6deg); }
-  .juggernaut-title{ text-shadow:3px 3px 0 #3b0909; }
-  .juggernaut-quote{ font-size:29px; }
 
   .hollow-page{ background:#070b0d; align-items:flex-end; justify-content:flex-start; text-align:left; padding:12vh 10vw; }
   .hollow-sheet{ max-width:620px; border-left:1px solid #394a4e; padding-left:28px; }
@@ -1152,7 +1111,7 @@
   .void-found{ border:1px solid #203c2c; padding:22px 28px; background:#050906; box-shadow:8px 8px 0 rgba(0,0,0,.4); }
 
   .vault111-page{ background:#061008; }
-  .vault111-doc{ max-width:760px; }
+  .vault111-doc{ max-width:760px; width:min(760px,100%); margin-left:auto; margin-right:auto; text-align:center; }
   .vault111-door-wrap{ border-top:1px dashed #1a5c33; padding-top:18px; }
   .vault111-door{ font-size:52px; }
 
@@ -1163,9 +1122,8 @@
 
   /* Secret routes: keep the main composition centered and intentional. */
   body.secret-route #view-1987 > .classified-page,
-  body.secret-route #view-gameover > .gameover-page,
+
   body.secret-route #view-backrooms > .backrooms-page,
-  body.secret-route #view-juggernaut > .juggernaut-page,
   body.secret-route #view-hollowknight > .hollow-page,
   body.secret-route #view-anomaly > .anomaly-page,
   body.secret-route #view-staffonly > .staffonly-page,
@@ -1181,7 +1139,6 @@
   body.secret-route #view-backrooms .backrooms-sheet,
   body.secret-route #view-anomaly .anomaly-sheet,
   body.secret-route #view-staffonly .staffonly-center,
-  body.secret-route #view-juggernaut .juggernaut-slab,
   body.secret-route #view-hollowknight .hollow-sheet,
   body.secret-route #view-echo .echo-output{
     margin-left:auto; margin-right:auto;
@@ -1203,37 +1160,27 @@
   .portal-cake{ font-size:56px; line-height:1; filter:none; transition:transform .35s ease,opacity .35s ease; }
   .portal-cake.portal-cake-poof{ transform:scale(1.5) rotate(25deg); opacity:0; }
 
+  /* Secret scenes: environmental interaction rather than button menus. */
+  .backrooms-page{ --room-brightness:1; filter:brightness(var(--room-brightness)); transition:filter .12s ease; animation:backroomsRoomFlicker 4.8s steps(1,end) infinite; }
+  .backrooms-page.dark{ animation:none; }
+  @keyframes backroomsRoomFlicker{ 0%,11%,13%,56%,58%,100%{ --room-brightness:1; } 12%,57%{ --room-brightness:.62; } }
+  .backrooms-page.dark{ --room-brightness:.34; }
+  .backrooms-ceiling-light{ position:absolute; z-index:2; top:7vh; left:50%; width:180px; height:34px; transform:translateX(-50%); cursor:pointer; }
+  .backrooms-ceiling-light::before{ content:''; position:absolute; left:12px; right:12px; top:0; height:5px; background:#4a4327; box-shadow:0 7px 0 #292514; }
+  .backrooms-ceiling-light span{ position:absolute; left:24px; right:24px; top:9px; height:20px; background:rgba(255,244,177,.82); box-shadow:0 0 28px 12px rgba(255,238,151,.28); clip-path:polygon(7% 0,93% 0,100% 100%,0 100%); animation:backroomsTubeFlicker 4.8s steps(1,end) infinite; }
+  .backrooms-page.dark .backrooms-ceiling-light span{ opacity:.05; box-shadow:none; }
+  .backrooms-ceiling-light::after{ content:'BUZZ'; position:absolute; top:34px; left:0; right:0; text-align:center; font:10px 'VT323',monospace; color:#6d6234; opacity:.45; }
+  @keyframes backroomsTubeFlicker{ 0%,11%,13%,56%,58%,100%{opacity:1;} 12%,57%{opacity:.18;} }
+  .backrooms-page.dark .backrooms-sheet{ box-shadow:10px 10px 0 rgba(0,0,0,.5); }
+
+  .anomaly-jumpscare{ position:fixed; inset:0; z-index:10050; display:grid; place-items:center; background:#070707; opacity:0; visibility:hidden; pointer-events:none; }
+  .anomaly-jumpscare.show{ visibility:visible; animation:anomalyJump .62s steps(3,end) both; }
+  .anomaly-jumpscare-face{ font:clamp(40px,10vw,110px) 'Press Start 2P',monospace; color:#f4f0e5; letter-spacing:.08em; text-shadow:8px 0 #a8261e,-7px 0 #5c1010,0 0 24px rgba(255,255,255,.45); transform:scaleY(1.25); }
+  @keyframes anomalyJump{ 0%{opacity:0;} 8%{opacity:1;} 12%{opacity:0;} 18%{opacity:1;} 25%{opacity:.15;} 34%{opacity:1;} 100%{opacity:0;visibility:hidden;} }
+  .anomaly-stamp{ cursor:crosshair; user-select:none; }
+  .anomaly-stamp:hover{ filter:contrast(1.4); }
+
   /* Interactive secret-page pass */
-  .juggernaut-page{ background:#090b10; min-height:100vh; padding:28px 18px; text-align:left; overflow:hidden; }
-  .juggernaut-grid{ position:absolute; inset:0; opacity:.28; background:linear-gradient(rgba(61,255,143,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(61,255,143,.07) 1px,transparent 1px); background-size:42px 42px; mask-image:radial-gradient(circle at center,#000 20%,transparent 78%); }
-  .juggernaut-arena{ position:relative; z-index:1; width:min(760px,100%); margin:auto; padding:22px; border:1px solid #2a303d; background:rgba(8,10,15,.94); box-shadow:12px 12px 0 rgba(0,0,0,.35); }
-  .juggernaut-topline{ display:flex; justify-content:space-between; gap:15px; color:#697487; font:12px 'JetBrains Mono',monospace; border-bottom:1px solid #222936; padding-bottom:11px; letter-spacing:.8px; }
-  .juggernaut-topline span:last-child{ color:#ffb627; }
-  .juggernaut-heading{ padding:30px 10px 22px; text-align:center; }
-  .juggernaut-kicker{ color:#ff3fa0; font:10px 'Press Start 2P',monospace; letter-spacing:1px; margin-bottom:13px; }
-  .juggernaut-title{ color:#eef0e6; font-size:25px; text-shadow:3px 3px 0 #ff3fa0; margin:0 0 12px; }
-  .juggernaut-copy{ color:#8b91b8; font:22px 'VT323',monospace; margin:0 auto; max-width:560px; line-height:1.35; }
-  .juggernaut-boss{ width:min(560px,100%); margin:0 auto 22px; }
-  .juggernaut-boss-label{ color:#697487; font:10px 'Press Start 2P',monospace; margin-bottom:8px; }
-  .juggernaut-health{ height:18px; border:2px solid #303744; background:#11151d; padding:2px; }
-  .juggernaut-health span{ display:block; height:100%; width:100%; background:#ff3f56; transition:width .18s steps(4,end); }
-  .juggernaut-health-text{ text-align:right; margin-top:5px; color:#ff7a88; font:14px 'VT323',monospace; }
-  .juggernaut-target{ position:relative; display:block; width:170px; height:170px; margin:10px auto 18px; border:2px solid #ff3f56; border-radius:50%; background:#11151d; color:#ff3f56; cursor:pointer; box-shadow:0 0 0 10px #0b0e14,0 0 0 11px #2c3340,0 0 32px rgba(255,63,86,.15); }
-  .juggernaut-target:hover{ transform:scale(1.025); }
-  .juggernaut-target:active{ transform:scale(.94); }
-  .juggernaut-target-core{ position:relative; z-index:3; font:15px 'Press Start 2P',monospace; }
-  .juggernaut-target-ring{ position:absolute; inset:20px; border:1px dashed #7b3340; border-radius:50%; }
-  .juggernaut-target-ring.r2{ inset:42px; border-style:solid; border-color:#ff3f56; opacity:.5; }
-  .juggernaut-page.juggernaut-hit .juggernaut-target{ animation:jugImpact .18s steps(2,end); }
-  @keyframes jugImpact{ 50%{ transform:scale(.88); filter:brightness(1.8); } }
-  .juggernaut-page.juggernaut-broken .juggernaut-target{ border-color:#3dff8f; color:#3dff8f; box-shadow:0 0 0 10px #0b0e14,0 0 0 11px #3dff8f,0 0 35px rgba(61,255,143,.2); }
-  .juggernaut-page.juggernaut-broken .juggernaut-health span{ background:#3dff8f; }
-  .juggernaut-controls{ display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
-  .juggernaut-control,.juggernaut-exit{ font:10px 'Press Start 2P',monospace; color:#8b91b8; background:#11151d; border:1px solid #303744; padding:10px 13px; cursor:pointer; }
-  .juggernaut-control:hover,.juggernaut-exit:hover{ color:#3dff8f; border-color:#3dff8f; }
-  .juggernaut-log{ margin:20px auto 16px; width:min(560px,100%); min-height:70px; max-height:100px; overflow:hidden; padding:10px 12px; background:#07090d; border:1px solid #202631; color:#687487; font:13px/1.6 'JetBrains Mono',monospace; text-align:left; }
-  .juggernaut-log div:first-child{ color:#ff7a88; }
-  .juggernaut-exit{ display:block; margin:0 auto; color:#555c8a; }
 
   .backrooms-sheet,.anomaly-sheet,.staffonly-center,.users-page,.vault111-page,.portal-page{ transition:box-shadow .2s ease,transform .2s ease; }
   .backrooms-audio-fake{ cursor:pointer; }
@@ -1249,14 +1196,13 @@
   .vault111-choice.show{ display:block; }
   .portal-test-result{ min-height:28px; margin-top:16px; color:#5a8fa3; font:18px 'VT323',monospace; }
   .credits-page{ cursor:pointer; }
-  .credits-scroll{ padding-top:7vh; }
+  .credits-scroll{ padding-top:5vh; }
   .credits-page.paused .credits-scroll{ filter:brightness(1.15); }
   @media(prefers-reduced-motion:reduce){ .juggernaut-target,.juggernaut-page.juggernaut-hit .juggernaut-target{ animation:none!important; } }
 
   @media(max-width:620px){
     .classified-sheet,.backrooms-sheet,.anomaly-sheet,.staffonly-center{ padding:24px 20px; }
     .hollow-page{ padding:12vh 8vw; }
-    .gameover-inner{ padding:28px 18px; }
   }
 
   /* ---------- PRINT / EXPORT LYRICS SHEET ---------- */
@@ -1562,28 +1508,9 @@
     </div>
   </div>
 </div>
-<div class="page" id="view-gameover" style="display:none">
-  <div class="gameover-page">
-    <div class="gameover-scanlines"></div>
-    <div class="gameover-bezel"></div>
-    <div class="gameover-inner" id="gameover-main">
-      <div class="gameover-title">GAME OVER</div>
-      <div class="gameover-continue">CONTINUE?</div>
-      <div class="gameover-countdown" id="gameover-countdown">10</div>
-      <div class="gameover-buttons">
-        <button type="button" class="gameover-btn" id="gameover-yes">YES</button>
-        <button type="button" class="gameover-btn" id="gameover-no">NO</button>
-      </div>
-    </div>
-    <div class="gameover-inner gameover-terminated" id="gameover-terminated">
-      <div class="gameover-title" style="font-size:26px;">ARCHIVE TERMINATED</div>
-      <p style="font-family:'VT323',monospace; font-size:22px; color:var(--muted);">Just kidding. Your data's fine.</p>
-    </div>
-    <p class="gameover-exit-link"><span class="retry-link" id="gameover-home">Back to safety.</span></p>
-  </div>
-</div>
 <div class="page" id="view-backrooms" style="display:none">
-  <div class="backrooms-page">
+  <div class="backrooms-page" id="backrooms-page">
+    <div class="backrooms-ceiling-light" id="backrooms-ceiling-light" aria-label="flickering ceiling light"><span></span></div>
     <div class="backrooms-scanlines"></div>
     <div class="backrooms-buzz"></div>
     <div class="backrooms-sheet">
@@ -1611,34 +1538,6 @@
     <p class="credits-exit"><span class="retry-link" id="credits-home">Skip credits.</span></p>
   </div>
 </div>
-<div class="page" id="view-juggernaut" style="display:none">
-  <div class="juggernaut-page" id="juggernaut-main">
-    <div class="juggernaut-grid"></div>
-    <div class="juggernaut-arena">
-      <div class="juggernaut-topline"><span>ARCHIVE // IMPACT TEST</span><span id="juggernaut-status">READY</span></div>
-      <div class="juggernaut-heading">
-        <div class="juggernaut-kicker">SUBJECT: JUGGERNAUT</div>
-        <h1 class="juggernaut-title">BREAK THE BARRIER</h1>
-        <p class="juggernaut-copy" id="juggernaut-copy">There is one rule: keep hitting it until it gives up.</p>
-      </div>
-      <div class="juggernaut-boss">
-        <div class="juggernaut-boss-label">BARRIER INTEGRITY</div>
-        <div class="juggernaut-health"><span id="juggernaut-health-fill"></span></div>
-        <div class="juggernaut-health-text" id="juggernaut-health-text">100%</div>
-      </div>
-      <button type="button" class="juggernaut-target" id="juggernaut-smash-btn" aria-label="Hit the barrier">
-        <span class="juggernaut-target-core">HIT</span>
-        <span class="juggernaut-target-ring r1"></span><span class="juggernaut-target-ring r2"></span>
-      </button>
-      <div class="juggernaut-controls">
-        <button type="button" class="juggernaut-control" id="juggernaut-taunt-btn">TAUNT IT</button>
-        <button type="button" class="juggernaut-control" id="juggernaut-reset-btn">RESET</button>
-      </div>
-      <div class="juggernaut-log" id="juggernaut-log"><span>&gt; impact test awaiting input...</span></div>
-      <button type="button" class="juggernaut-exit" id="juggernaut-home">LEAVE THE TEST</button>
-    </div>
-  </div>
-</div>
 <div class="page" id="view-hollowknight" style="display:none">
   <div class="hollow-page">
     <div class="hollow-motes" id="hollow-motes"></div>
@@ -1655,9 +1554,10 @@
   </div>
 </div>
 <div class="page" id="view-anomaly" style="display:none">
-  <div class="anomaly-page">
+  <div class="anomaly-page" id="anomaly-page">
+    <div class="anomaly-jumpscare" id="anomaly-jumpscare" aria-hidden="true"><div class="anomaly-jumpscare-face">NO.</div></div>
     <div class="anomaly-sheet">
-      <div class="anomaly-stamp">CONTAINMENT NOTICE</div>
+      <div class="anomaly-stamp" id="anomaly-stamp">CONTAINMENT NOTICE</div>
       <h1 class="anomaly-title">ANOMALY: THE CHANGELOG</h1>
       <div class="anomaly-body">
         <table class="anomaly-table">
@@ -2887,7 +2787,7 @@
     }
   })();
 
-  var SECRET_ROUTE_NAMES_=['1987','gameover','backrooms','credits','juggernaut','hollowknight','anomaly','staffonly','echo','users','void','vault111','portal'];
+  var SECRET_ROUTE_NAMES_=['1987','backrooms','credits','hollowknight','anomaly','staffonly','echo','users','void','vault111','portal'];
   function isSecretRoute_(path){
     return SECRET_ROUTE_NAMES_.indexOf(String(path||''))!==-1;
   }
@@ -2898,12 +2798,11 @@
 
   function hideAllViews(isNavigatingToLyricDetail) {
     syncSecretChrome_();
-    clearInterval(gameoverTimer_);
     clearTimeout(staffonlyTimer_);
     clearTimeout(vault111Timer_);
     clearInterval(vault111CounterInterval_);
     var lyricsDetailWasVisible = document.getElementById('view-lyrics-detail').style.display !== 'none';
-    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','releases','top5','indiemonday','changelog','about','404','1987','gameover','backrooms','credits','juggernaut','hollowknight','anomaly','staffonly','echo','users','void','vault111','portal'].forEach(function (v) {
+    ['home','lyrics-list','lyrics-detail','artist-detail','album-detail','franchise-detail','franchise-songs','releases','top5','indiemonday','changelog','about','404','1987','backrooms','credits','hollowknight','anomaly','staffonly','echo','users','void','vault111','portal'].forEach(function (v) {
       var el=document.getElementById('view-' + v);
       if (el) { el.style.display = 'none'; el.classList.remove('page-enter'); }
     });
@@ -3209,12 +3108,10 @@
     if (!path || path === 'home') { showHome(); return; }
     if (path === '404') { showNotFound(); return; }
     if (path === '1987') { hideAllViews(); document.getElementById('view-1987').style.display = ''; setPath('1987'); return; }
-    if (path === 'gameover') { hideAllViews(); document.getElementById('view-gameover').style.display = ''; setPath('gameover'); startGameoverCountdown_(); return; }
     if (path === 'backrooms') { hideAllViews(); document.getElementById('view-backrooms').style.display = ''; setPath('backrooms'); return; }
     if (path === 'credits') { hideAllViews(); document.getElementById('view-credits').style.display = ''; setPath('credits'); renderCredits_(); return; }
-    if (path === 'juggernaut') { hideAllViews(); document.getElementById('view-juggernaut').style.display = ''; setPath('juggernaut'); return; }
     if (path === 'hollowknight') { hideAllViews(); document.getElementById('view-hollowknight').style.display = ''; setPath('hollowknight'); renderHollowMotes_(); return; }
-    if (path === 'anomaly') { hideAllViews(); document.getElementById('view-anomaly').style.display = ''; setPath('anomaly'); return; }
+    if (path === 'anomaly') { hideAllViews(); document.getElementById('view-anomaly').style.display = ''; setPath('anomaly'); setTimeout(function(){ if(window.location.hash.replace(/^#\/?/,'').replace(/\/+$/,'')==='anomaly' && Math.random()<0.65 && window.__ncAnomalyJump) window.__ncAnomalyJump(); }, 6500); return; }
     if (path === 'staffonly') { hideAllViews(); document.getElementById('view-staffonly').style.display = ''; setPath('staffonly'); startStaffOnlySequence_(); return; }
     if (path === 'echo') { hideAllViews(); document.getElementById('view-echo').style.display = ''; setPath('echo'); resetEchoPage_(); return; }
     if (path === 'users') { hideAllViews(); document.getElementById('view-users').style.display = ''; setPath('users'); renderUsersTable_(); return; }
@@ -6106,17 +6003,39 @@
   (function enhanceSecretPages_(){
     function button(cls,id,text){ return '<button type="button" class="secret-action '+cls+'" id="'+id+'">'+text+'</button>'; }
     var b=document.querySelector('#view-backrooms .backrooms-sheet');
-    if(b && !document.getElementById('backrooms-explore-btn')){
-      var controls=document.createElement('div'); controls.className='backrooms-room-controls'; controls.innerHTML=button('','backrooms-explore-btn','CHECK THE DOOR')+button('','backrooms-light-btn','FLICK THE LIGHTS'); b.appendChild(controls);
+    var backroomsPage=document.getElementById('backrooms-page');
+    var light=document.getElementById('backrooms-ceiling-light');
+    if(light && backroomsPage && !light.getAttribute('data-wired')){
+      light.setAttribute('data-wired','1');
+      light.addEventListener('click',function(){
+        backroomsPage.classList.toggle('dark');
+        if(backroomsPage.classList.contains('dark')){
+          var s=document.getElementById('backrooms-room-status'); if(s)s.textContent='The light stays off. Somewhere behind the wall, something is moving.';
+        }else{
+          var s2=document.getElementById('backrooms-room-status'); if(s2)s2.textContent='The fluorescent tube comes back on. The room is not arranged quite the same way.';
+        }
+      });
+    }
+    if(b && !document.getElementById('backrooms-room-status')){
       var st=document.createElement('div'); st.id='backrooms-room-status'; st.className='backrooms-room-status'; b.appendChild(st);
-      document.getElementById('backrooms-explore-btn').onclick=function(){st.textContent='The door is painted on. You should probably not have touched it.';};
-      document.getElementById('backrooms-light-btn').onclick=function(){st.textContent='The lights go out for exactly one second. When they return, the room feels slightly different.';};
     }
     var a=document.querySelector('#view-anomaly .anomaly-sheet');
-    if(a && !document.getElementById('anomaly-inspect-btn')){
-      var c=document.createElement('div'); c.className='anomaly-controls'; c.innerHTML=button('','anomaly-inspect-btn','INSPECT FOCUSED ENTRY'); a.appendChild(c);
-      var d=document.createElement('div'); d.id='anomaly-detail-pop'; d.className='anomaly-detail-pop'; d.textContent='Select a row above, then inspect it.'; a.appendChild(d);
-      document.getElementById('anomaly-inspect-btn').onclick=function(){var r=document.querySelector('#view-anomaly .anomaly-table tr.anomaly-focus'); d.textContent=r ? 'The entry resists further inspection. That is probably for the best.' : 'Nothing is selected. The anomaly seems pleased.';};
+    var anomalyPage=document.getElementById('anomaly-page');
+    var anomalyStamp=document.getElementById('anomaly-stamp');
+    var jump=document.getElementById('anomaly-jumpscare');
+    function triggerAnomalyJumpscare_(){
+      if(!jump || !anomalyPage)return;
+      jump.classList.remove('show'); void jump.offsetWidth; jump.classList.add('show');
+      anomalyPage.classList.add('anomaly-was-seen');
+      setTimeout(function(){ jump.classList.remove('show'); },700);
+    }
+    window.__ncAnomalyJump = triggerAnomalyJumpscare_;
+    if(anomalyStamp && !anomalyStamp.getAttribute('data-wired')){
+      anomalyStamp.setAttribute('data-wired','1');
+      anomalyStamp.addEventListener('click',triggerAnomalyJumpscare_);
+    }
+    if(a && !document.getElementById('anomaly-detail-pop')){
+      var d=document.createElement('div'); d.id='anomaly-detail-pop'; d.className='anomaly-detail-pop'; d.textContent='The page keeps changing when nobody is looking.'; a.appendChild(d);
     }
     var h=document.querySelector('#view-hollowknight .hollow-sheet');
     if(h && !document.getElementById('hollow-listen-btn')){
@@ -6179,33 +6098,6 @@
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
-  var gameoverTimer_ = null;
-  function startGameoverCountdown_() {
-    clearInterval(gameoverTimer_);
-    var n = 10;
-    var countdownEl = document.getElementById('gameover-countdown');
-    document.getElementById('gameover-main').style.display = '';
-    document.getElementById('gameover-terminated').classList.remove('show');
-    if (countdownEl) countdownEl.textContent = n;
-    gameoverTimer_ = setInterval(function () {
-      n--;
-      if (countdownEl) countdownEl.textContent = n > 0 ? n : '0';
-      if (n <= 0) {
-        clearInterval(gameoverTimer_);
-        document.getElementById('gameover-main').style.display = 'none';
-        document.getElementById('gameover-terminated').classList.add('show');
-        setTimeout(function () {
-          if (window.location.hash.replace(/^#\/?/, '') === 'gameover') showHome();
-        }, 2200);
-      }
-    }, 1000);
-  }
-  (function wireGameoverButtons_() {
-    var yesBtn = document.getElementById('gameover-yes');
-    var noBtn = document.getElementById('gameover-no');
-    if (yesBtn) yesBtn.addEventListener('click', function () { clearInterval(gameoverTimer_); showHome(); });
-    if (noBtn) noBtn.addEventListener('click', function () { clearInterval(gameoverTimer_); showHome(); });
-  })();
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -6255,36 +6147,6 @@
     container.innerHTML = html;
   }
 
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  (function wireJuggernautButton_() {
-    var btn = document.getElementById('juggernaut-smash-btn');
-    var page = document.getElementById('juggernaut-main');
-    var fill = document.getElementById('juggernaut-health-fill');
-    var healthText = document.getElementById('juggernaut-health-text');
-    var status = document.getElementById('juggernaut-status');
-    var copy = document.getElementById('juggernaut-copy');
-    var log = document.getElementById('juggernaut-log');
-    var taunt = document.getElementById('juggernaut-taunt-btn');
-    var reset = document.getElementById('juggernaut-reset-btn');
-    if (!btn || !page) return;
-    var hp = 100;
-    var hitCount = 0;
-    var taunts = ["That all you've got?", 'It heard you. It is unimpressed.', 'You are making progress. Probably.', 'The barrier has filed a complaint.'];
-    function setHp(v){ hp=Math.max(0,v); if(fill) fill.style.width=hp+'%'; if(healthText) healthText.textContent=hp+'%'; }
-    function resetFight(){ hp=100; hitCount=0; setHp(100); page.classList.remove('juggernaut-hit','juggernaut-broken'); if(status)status.textContent='READY'; if(copy)copy.textContent='There is one rule: keep hitting it until it gives up.'; if(log)log.innerHTML='<span>&gt; impact test reset.</span>'; btn.disabled=false; btn.classList.remove('spent'); }
-    btn.addEventListener('click', function(){
-      if(hp<=0)return;
-      hitCount++; hp-=20; setHp(hp);
-      page.classList.remove('juggernaut-hit'); void page.offsetWidth; page.classList.add('juggernaut-hit');
-      if(log){ var line=document.createElement('div'); line.textContent='> IMPACT '+String(hitCount).padStart(2,'0')+' // FORCE REGISTERED'; log.prepend(line); while(log.children.length>4)log.removeChild(log.lastChild); }
-      if(hp<=0){ page.classList.add('juggernaut-broken'); if(status)status.textContent='BARRIER BROKEN'; if(copy)copy.textContent='Okay. You win. Please stop punching the archive.'; btn.disabled=true; btn.classList.add('spent'); }
-      else if(status)status.textContent='IMPACT DETECTED';
-    });
-    if(taunt)taunt.addEventListener('click',function(){ if(copy)copy.textContent=taunts[Math.floor(Math.random()*taunts.length)]; if(status)status.textContent='PROVOCATION'; });
-    if(reset)reset.addEventListener('click',resetFight);
-    resetFight();
-  })();
   function renderHollowMotes_() {
     var wrap = document.getElementById('hollow-motes');
     if (!wrap) return;
@@ -6461,10 +6323,8 @@
     });
   })();
 
-  var gameoverHome = document.getElementById('gameover-home'); if (gameoverHome) gameoverHome.addEventListener('click', showHome);
   var backroomsHome = document.getElementById('backrooms-home'); if (backroomsHome) backroomsHome.addEventListener('click', showHome);
   var creditsHome = document.getElementById('credits-home'); if (creditsHome) creditsHome.addEventListener('click', showHome);
-  var juggernautHome = document.getElementById('juggernaut-home'); if (juggernautHome) juggernautHome.addEventListener('click', showHome);
   var hollowknightHome = document.getElementById('hollowknight-home'); if (hollowknightHome) hollowknightHome.addEventListener('click', showHome);
   var anomalyHome = document.getElementById('anomaly-home'); if (anomalyHome) anomalyHome.addEventListener('click', showHome);
 
