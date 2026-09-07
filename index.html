@@ -1203,6 +1203,56 @@
   .portal-cake{ font-size:56px; line-height:1; filter:none; transition:transform .35s ease,opacity .35s ease; }
   .portal-cake.portal-cake-poof{ transform:scale(1.5) rotate(25deg); opacity:0; }
 
+  /* Interactive secret-page pass */
+  .juggernaut-page{ background:#090b10; min-height:100vh; padding:28px 18px; text-align:left; overflow:hidden; }
+  .juggernaut-grid{ position:absolute; inset:0; opacity:.28; background:linear-gradient(rgba(61,255,143,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(61,255,143,.07) 1px,transparent 1px); background-size:42px 42px; mask-image:radial-gradient(circle at center,#000 20%,transparent 78%); }
+  .juggernaut-arena{ position:relative; z-index:1; width:min(760px,100%); margin:auto; padding:22px; border:1px solid #2a303d; background:rgba(8,10,15,.94); box-shadow:12px 12px 0 rgba(0,0,0,.35); }
+  .juggernaut-topline{ display:flex; justify-content:space-between; gap:15px; color:#697487; font:12px 'JetBrains Mono',monospace; border-bottom:1px solid #222936; padding-bottom:11px; letter-spacing:.8px; }
+  .juggernaut-topline span:last-child{ color:#ffb627; }
+  .juggernaut-heading{ padding:30px 10px 22px; text-align:center; }
+  .juggernaut-kicker{ color:#ff3fa0; font:10px 'Press Start 2P',monospace; letter-spacing:1px; margin-bottom:13px; }
+  .juggernaut-title{ color:#eef0e6; font-size:25px; text-shadow:3px 3px 0 #ff3fa0; margin:0 0 12px; }
+  .juggernaut-copy{ color:#8b91b8; font:22px 'VT323',monospace; margin:0 auto; max-width:560px; line-height:1.35; }
+  .juggernaut-boss{ width:min(560px,100%); margin:0 auto 22px; }
+  .juggernaut-boss-label{ color:#697487; font:10px 'Press Start 2P',monospace; margin-bottom:8px; }
+  .juggernaut-health{ height:18px; border:2px solid #303744; background:#11151d; padding:2px; }
+  .juggernaut-health span{ display:block; height:100%; width:100%; background:#ff3f56; transition:width .18s steps(4,end); }
+  .juggernaut-health-text{ text-align:right; margin-top:5px; color:#ff7a88; font:14px 'VT323',monospace; }
+  .juggernaut-target{ position:relative; display:block; width:170px; height:170px; margin:10px auto 18px; border:2px solid #ff3f56; border-radius:50%; background:#11151d; color:#ff3f56; cursor:pointer; box-shadow:0 0 0 10px #0b0e14,0 0 0 11px #2c3340,0 0 32px rgba(255,63,86,.15); }
+  .juggernaut-target:hover{ transform:scale(1.025); }
+  .juggernaut-target:active{ transform:scale(.94); }
+  .juggernaut-target-core{ position:relative; z-index:3; font:15px 'Press Start 2P',monospace; }
+  .juggernaut-target-ring{ position:absolute; inset:20px; border:1px dashed #7b3340; border-radius:50%; }
+  .juggernaut-target-ring.r2{ inset:42px; border-style:solid; border-color:#ff3f56; opacity:.5; }
+  .juggernaut-page.juggernaut-hit .juggernaut-target{ animation:jugImpact .18s steps(2,end); }
+  @keyframes jugImpact{ 50%{ transform:scale(.88); filter:brightness(1.8); } }
+  .juggernaut-page.juggernaut-broken .juggernaut-target{ border-color:#3dff8f; color:#3dff8f; box-shadow:0 0 0 10px #0b0e14,0 0 0 11px #3dff8f,0 0 35px rgba(61,255,143,.2); }
+  .juggernaut-page.juggernaut-broken .juggernaut-health span{ background:#3dff8f; }
+  .juggernaut-controls{ display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+  .juggernaut-control,.juggernaut-exit{ font:10px 'Press Start 2P',monospace; color:#8b91b8; background:#11151d; border:1px solid #303744; padding:10px 13px; cursor:pointer; }
+  .juggernaut-control:hover,.juggernaut-exit:hover{ color:#3dff8f; border-color:#3dff8f; }
+  .juggernaut-log{ margin:20px auto 16px; width:min(560px,100%); min-height:70px; max-height:100px; overflow:hidden; padding:10px 12px; background:#07090d; border:1px solid #202631; color:#687487; font:13px/1.6 'JetBrains Mono',monospace; text-align:left; }
+  .juggernaut-log div:first-child{ color:#ff7a88; }
+  .juggernaut-exit{ display:block; margin:0 auto; color:#555c8a; }
+
+  .backrooms-sheet,.anomaly-sheet,.staffonly-center,.users-page,.vault111-page,.portal-page{ transition:box-shadow .2s ease,transform .2s ease; }
+  .backrooms-audio-fake{ cursor:pointer; }
+  .backrooms-audio-fake.playing{ transform:translateY(-2px); }
+  .backrooms-room-controls,.anomaly-controls,.hollow-controls,.staffonly-actions,.vault111-actions,.portal-tests{ display:flex; justify-content:center; flex-wrap:wrap; gap:8px; margin-top:18px; }
+  .secret-action{ font:10px 'Press Start 2P',monospace; padding:9px 12px; border:1px solid currentColor; background:transparent; cursor:pointer; }
+  .secret-action:hover{ background:rgba(255,255,255,.06); transform:translateY(-1px); }
+  .backrooms-room-status{ margin-top:12px; min-height:24px; font:18px 'VT323',monospace; color:#d3c269; }
+  .anomaly-detail-pop{ margin:12px 0 0; padding:12px; border:1px dashed #aaa594; background:#e7e2d3; font:15px/1.6 'JetBrains Mono',monospace; color:#38372f; }
+  .hollow-message{ min-height:28px; margin-top:10px; color:#8fa8ac; font:19px 'VT323',monospace; }
+  .staffonly-page.staffonly-fast .staffonly-center{ box-shadow:0 0 0 1px #3dff8f,8px 8px 0 rgba(0,0,0,.35); }
+  .vault111-choice{ display:none; margin-top:14px; padding:14px; border:1px dashed #1a5c33; color:#8fff9a; }
+  .vault111-choice.show{ display:block; }
+  .portal-test-result{ min-height:28px; margin-top:16px; color:#5a8fa3; font:18px 'VT323',monospace; }
+  .credits-page{ cursor:pointer; }
+  .credits-scroll{ padding-top:7vh; }
+  .credits-page.paused .credits-scroll{ filter:brightness(1.15); }
+  @media(prefers-reduced-motion:reduce){ .juggernaut-target,.juggernaut-page.juggernaut-hit .juggernaut-target{ animation:none!important; } }
+
   @media(max-width:620px){
     .classified-sheet,.backrooms-sheet,.anomaly-sheet,.staffonly-center{ padding:24px 20px; }
     .hollow-page{ padding:12vh 8vw; }
@@ -1563,11 +1613,29 @@
 </div>
 <div class="page" id="view-juggernaut" style="display:none">
   <div class="juggernaut-page" id="juggernaut-main">
-    <div class="juggernaut-slab">
-      <h1 class="juggernaut-title">WHO SENT YOU IN HERE?</h1>
-      <p class="juggernaut-quote">"Don't you know who I am?<br>I'm the Juggernaut, bitch!"</p>
-      <button type="button" class="juggernaut-btn" id="juggernaut-smash-btn">TRY TO STOP ME</button>
-      <p style="margin-top:18px;"><span class="retry-link" id="juggernaut-home">Get out of the way.</span></p>
+    <div class="juggernaut-grid"></div>
+    <div class="juggernaut-arena">
+      <div class="juggernaut-topline"><span>ARCHIVE // IMPACT TEST</span><span id="juggernaut-status">READY</span></div>
+      <div class="juggernaut-heading">
+        <div class="juggernaut-kicker">SUBJECT: JUGGERNAUT</div>
+        <h1 class="juggernaut-title">BREAK THE BARRIER</h1>
+        <p class="juggernaut-copy" id="juggernaut-copy">There is one rule: keep hitting it until it gives up.</p>
+      </div>
+      <div class="juggernaut-boss">
+        <div class="juggernaut-boss-label">BARRIER INTEGRITY</div>
+        <div class="juggernaut-health"><span id="juggernaut-health-fill"></span></div>
+        <div class="juggernaut-health-text" id="juggernaut-health-text">100%</div>
+      </div>
+      <button type="button" class="juggernaut-target" id="juggernaut-smash-btn" aria-label="Hit the barrier">
+        <span class="juggernaut-target-core">HIT</span>
+        <span class="juggernaut-target-ring r1"></span><span class="juggernaut-target-ring r2"></span>
+      </button>
+      <div class="juggernaut-controls">
+        <button type="button" class="juggernaut-control" id="juggernaut-taunt-btn">TAUNT IT</button>
+        <button type="button" class="juggernaut-control" id="juggernaut-reset-btn">RESET</button>
+      </div>
+      <div class="juggernaut-log" id="juggernaut-log"><span>&gt; impact test awaiting input...</span></div>
+      <button type="button" class="juggernaut-exit" id="juggernaut-home">LEAVE THE TEST</button>
     </div>
   </div>
 </div>
@@ -6035,6 +6103,50 @@
   var notFoundHome=document.getElementById('not-found-home'); if(notFoundHome) notFoundHome.addEventListener('click',showHome);
   var egg1987Home=document.getElementById('egg1987-home'); if(egg1987Home) egg1987Home.addEventListener('click',showHome);
 
+  (function enhanceSecretPages_(){
+    function button(cls,id,text){ return '<button type="button" class="secret-action '+cls+'" id="'+id+'">'+text+'</button>'; }
+    var b=document.querySelector('#view-backrooms .backrooms-sheet');
+    if(b && !document.getElementById('backrooms-explore-btn')){
+      var controls=document.createElement('div'); controls.className='backrooms-room-controls'; controls.innerHTML=button('','backrooms-explore-btn','CHECK THE DOOR')+button('','backrooms-light-btn','FLICK THE LIGHTS'); b.appendChild(controls);
+      var st=document.createElement('div'); st.id='backrooms-room-status'; st.className='backrooms-room-status'; b.appendChild(st);
+      document.getElementById('backrooms-explore-btn').onclick=function(){st.textContent='The door is painted on. You should probably not have touched it.';};
+      document.getElementById('backrooms-light-btn').onclick=function(){st.textContent='The lights go out for exactly one second. When they return, the room feels slightly different.';};
+    }
+    var a=document.querySelector('#view-anomaly .anomaly-sheet');
+    if(a && !document.getElementById('anomaly-inspect-btn')){
+      var c=document.createElement('div'); c.className='anomaly-controls'; c.innerHTML=button('','anomaly-inspect-btn','INSPECT FOCUSED ENTRY'); a.appendChild(c);
+      var d=document.createElement('div'); d.id='anomaly-detail-pop'; d.className='anomaly-detail-pop'; d.textContent='Select a row above, then inspect it.'; a.appendChild(d);
+      document.getElementById('anomaly-inspect-btn').onclick=function(){var r=document.querySelector('#view-anomaly .anomaly-table tr.anomaly-focus'); d.textContent=r ? 'The entry resists further inspection. That is probably for the best.' : 'Nothing is selected. The anomaly seems pleased.';};
+    }
+    var h=document.querySelector('#view-hollowknight .hollow-sheet');
+    if(h && !document.getElementById('hollow-listen-btn')){
+      var c2=document.createElement('div'); c2.className='hollow-controls'; c2.innerHTML=button('','hollow-listen-btn','LISTEN'); h.appendChild(c2);
+      var m=document.createElement('div'); m.id='hollow-message'; m.className='hollow-message'; h.appendChild(m);
+      document.getElementById('hollow-listen-btn').onclick=function(){m.textContent='...something moved below you.';};
+    }
+    var stf=document.querySelector('#view-staffonly .staffonly-center');
+    if(stf && !document.getElementById('staffonly-knock-btn')){
+      var ac=document.createElement('div'); ac.className='staffonly-actions'; ac.innerHTML=button('','staffonly-knock-btn','KNOCK ANYWAY'); stf.appendChild(ac);
+      document.getElementById('staffonly-knock-btn').onclick=function(){var p=document.getElementById('staffonly-page'); if(p){p.classList.add('staffonly-fast');} var detail=document.getElementById('staffonly-detail'); if(detail)detail.innerHTML='<p>Someone on the other side knocked back.</p><p>There is still no staff system.</p>';};
+    }
+    var v=document.querySelector('#view-vault111 .vault111-doc');
+    if(v && !document.getElementById('vault111-open-btn')){
+      var vc=document.createElement('div'); vc.className='vault111-actions'; vc.innerHTML=button('','vault111-open-btn','READ THE MARGIN NOTES'); v.appendChild(vc);
+      var note=document.createElement('div'); note.id='vault111-margin-note'; note.className='vault111-choice'; note.textContent='Margin note: "Stop making final_FINAL_v2 files."'; v.appendChild(note);
+      document.getElementById('vault111-open-btn').onclick=function(){note.classList.toggle('show');};
+    }
+    var portal=document.querySelector('#view-portal .portal-body');
+    if(portal && !document.getElementById('portal-test-btn')){
+      var pc=document.createElement('div'); pc.className='portal-tests'; pc.innerHTML=button('','portal-test-btn','RUN A TEST'); portal.appendChild(pc);
+      var pr=document.createElement('div'); pr.id='portal-test-result'; pr.className='portal-test-result'; portal.appendChild(pr);
+      document.getElementById('portal-test-btn').onclick=function(){pr.textContent='Test result: still not a test. Somehow you passed.';};
+    }
+    var users=document.querySelector('#view-users .users-page');
+    if(users && !document.getElementById('users-refresh-btn')){
+      var u=document.createElement('button'); u.type='button'; u.id='users-refresh-btn'; u.className='secret-action'; u.textContent='REFRESH LOG'; u.style.marginTop='14px'; users.insertBefore(u, users.querySelector('.users-terminal-line')); u.onclick=function(){renderUsersTable_();};
+    }
+  })();
+
   (function wireSecretArtifactInteractions_(){
     document.querySelectorAll('#view-1987 .redacted').forEach(function(el){
       el.addEventListener('click',function(){ el.classList.toggle('revealed'); });
@@ -6148,13 +6260,30 @@
   (function wireJuggernautButton_() {
     var btn = document.getElementById('juggernaut-smash-btn');
     var page = document.getElementById('juggernaut-main');
+    var fill = document.getElementById('juggernaut-health-fill');
+    var healthText = document.getElementById('juggernaut-health-text');
+    var status = document.getElementById('juggernaut-status');
+    var copy = document.getElementById('juggernaut-copy');
+    var log = document.getElementById('juggernaut-log');
+    var taunt = document.getElementById('juggernaut-taunt-btn');
+    var reset = document.getElementById('juggernaut-reset-btn');
     if (!btn || !page) return;
-    btn.addEventListener('click', function () {
-      page.classList.add('smashing');
-      btn.textContent = "DIDN'T THINK SO";
-      btn.disabled = true;
-      setTimeout(function () { page.classList.remove('smashing'); }, 1400);
+    var hp = 100;
+    var hitCount = 0;
+    var taunts = ["That all you've got?", 'It heard you. It is unimpressed.', 'You are making progress. Probably.', 'The barrier has filed a complaint.'];
+    function setHp(v){ hp=Math.max(0,v); if(fill) fill.style.width=hp+'%'; if(healthText) healthText.textContent=hp+'%'; }
+    function resetFight(){ hp=100; hitCount=0; setHp(100); page.classList.remove('juggernaut-hit','juggernaut-broken'); if(status)status.textContent='READY'; if(copy)copy.textContent='There is one rule: keep hitting it until it gives up.'; if(log)log.innerHTML='<span>&gt; impact test reset.</span>'; btn.disabled=false; btn.classList.remove('spent'); }
+    btn.addEventListener('click', function(){
+      if(hp<=0)return;
+      hitCount++; hp-=20; setHp(hp);
+      page.classList.remove('juggernaut-hit'); void page.offsetWidth; page.classList.add('juggernaut-hit');
+      if(log){ var line=document.createElement('div'); line.textContent='> IMPACT '+String(hitCount).padStart(2,'0')+' // FORCE REGISTERED'; log.prepend(line); while(log.children.length>4)log.removeChild(log.lastChild); }
+      if(hp<=0){ page.classList.add('juggernaut-broken'); if(status)status.textContent='BARRIER BROKEN'; if(copy)copy.textContent='Okay. You win. Please stop punching the archive.'; btn.disabled=true; btn.classList.add('spent'); }
+      else if(status)status.textContent='IMPACT DETECTED';
     });
+    if(taunt)taunt.addEventListener('click',function(){ if(copy)copy.textContent=taunts[Math.floor(Math.random()*taunts.length)]; if(status)status.textContent='PROVOCATION'; });
+    if(reset)reset.addEventListener('click',resetFight);
+    resetFight();
   })();
   function renderHollowMotes_() {
     var wrap = document.getElementById('hollow-motes');
