@@ -269,7 +269,7 @@
 
   .archive-tags-section{ margin-top:32px; }
   .archive-tags-intro{ font-family:'VT323',monospace; font-size:18px; color:var(--muted); margin:-5px 0 12px; }
-  .archive-tags-tabs{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+  .archive-tags-tabs{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:9px; }
   .archive-tags-tab{ font-family:'VT323',monospace; font-size:16px; color:var(--muted); background:var(--panel); border:1px solid var(--border); padding:6px 11px; cursor:pointer; }
   .archive-tags-tab:hover{ color:var(--ink); border-color:var(--muted); }
   .archive-tags-tab.active{ color:var(--green); border-color:var(--green); }
@@ -281,6 +281,10 @@
   .archive-tag-title{ font-family:'VT323',monospace; font-size:20px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .archive-tag-artist{ font-family:'VT323',monospace; font-size:15px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
   .archive-tag-badge{ margin-top:5px; }
+  .archive-tag-kind{ font-family:'Press Start 2P',monospace; font-size:7px; color:var(--muted-dim); letter-spacing:.6px; margin-bottom:4px; }
+  .archive-tag-card.artist-entry{ cursor:pointer; }
+  .archive-tag-card.artist-entry .archive-tag-cover{ border-radius:0; }
+  .archive-tag-card.artist-entry .archive-tag-title{ color:var(--green); }
   @media(max-width:700px){ .archive-tags-grid{ grid-template-columns:1fr; } }
 
   .home-social-section{ margin-top:28px; }
@@ -1157,6 +1161,48 @@
   .portal-cake-wrap{ display:inline-block; padding:14px 18px; border:1px solid #c3ccd1; background:#f4f6f7; box-shadow:6px 6px 0 rgba(50,70,80,.12); }
   .portal-cake-label{ margin-bottom:2px; }
 
+  /* Secret routes: keep the main composition centered and intentional. */
+  body.secret-route #view-1987 > .classified-page,
+  body.secret-route #view-gameover > .gameover-page,
+  body.secret-route #view-backrooms > .backrooms-page,
+  body.secret-route #view-juggernaut > .juggernaut-page,
+  body.secret-route #view-hollowknight > .hollow-page,
+  body.secret-route #view-anomaly > .anomaly-page,
+  body.secret-route #view-staffonly > .staffonly-page,
+  body.secret-route #view-echo > .echo-page,
+  body.secret-route #view-users > .users-page,
+  body.secret-route #view-void > .void-page,
+  body.secret-route #view-vault111 > .vault111-page,
+  body.secret-route #view-portal > .portal-page{
+    width:100vw; max-width:none; margin:0;
+    align-items:center; justify-content:center; text-align:center;
+  }
+  body.secret-route #view-1987 .classified-sheet,
+  body.secret-route #view-backrooms .backrooms-sheet,
+  body.secret-route #view-anomaly .anomaly-sheet,
+  body.secret-route #view-staffonly .staffonly-center,
+  body.secret-route #view-juggernaut .juggernaut-slab,
+  body.secret-route #view-hollowknight .hollow-sheet,
+  body.secret-route #view-echo .echo-output{
+    margin-left:auto; margin-right:auto;
+  }
+  body.secret-route #view-hollowknight .hollow-sheet,
+  body.secret-route #view-echo .echo-output{ text-align:center; }
+  .credits-scroll{
+    width:min(720px,92vw); left:50%; margin-left:0;
+    padding-top:12vh;
+    animation:creditsScrollCentered 32s linear infinite;
+  }
+  @keyframes creditsScrollCentered{
+    from{ transform:translate(-50%,0); }
+    to{ transform:translate(-50%,-100%); }
+  }
+  .credits-page{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+  .portal-cake-wrap{ cursor:pointer; }
+  .portal-cake-shape{ display:none !important; }
+  .portal-cake{ font-size:56px; line-height:1; filter:none; transition:transform .35s ease,opacity .35s ease; }
+  .portal-cake.portal-cake-poof{ transform:scale(1.5) rotate(25deg); opacity:0; }
+
   @media(max-width:620px){
     .classified-sheet,.backrooms-sheet,.anomaly-sheet,.staffonly-center{ padding:24px 20px; }
     .hollow-page{ padding:12vh 8vw; }
@@ -1265,13 +1311,17 @@
 
   <section class="archive-tags-section" id="archive-tags-section">
     <div class="section-kicker">ARCHIVE STATUS</div>
-    <div class="archive-tags-intro">Songs the archive has marked as new, updated, synced, or otherwise noteworthy.</div>
+    <div class="archive-tags-intro">Songs that has been recently added, updated, or synced.</div>
+    <div class="archive-tags-tabs" id="archive-tags-type-tabs">
+      <button type="button" class="archive-tags-tab active" data-archive-kind="all">ALL</button>
+      <button type="button" class="archive-tags-tab" data-archive-kind="songs">SONGS</button>
+      <button type="button" class="archive-tags-tab" data-archive-kind="artists">ARTISTS</button>
+    </div>
     <div class="archive-tags-tabs" id="archive-tags-tabs">
-      <button type="button" class="archive-tags-tab active" data-tag-filter="all">ALL</button>
+      <button type="button" class="archive-tags-tab active" data-tag-filter="all">ALL STATUS</button>
       <button type="button" class="archive-tags-tab" data-tag-filter="new">NEW</button>
       <button type="button" class="archive-tags-tab" data-tag-filter="updated">UPDATED</button>
       <button type="button" class="archive-tags-tab" data-tag-filter="synced">SYNCED</button>
-      <button type="button" class="archive-tags-tab" data-tag-filter="other">OTHER</button>
     </div>
     <div id="archive-tags-content"><div class="loading">Loading archive status&hellip;</div></div>
   </section>
@@ -1638,8 +1688,8 @@
       <p class="portal-note">Note: this easter egg was not part of the test.</p>
     </div>
     <div class="portal-cake-wrap" id="portal-cake-wrap">
-      <div class="portal-cake" id="portal-cake"><span class="portal-cake-shape"></span></div>
-      <div class="portal-cake-label">(tap the cake)</div>
+      <div class="portal-cake" id="portal-cake" aria-label="portal symbol">🌀</div>
+      <div class="portal-cake-label">(tap the symbol)</div>
     </div>
   </div>
 </div>
@@ -2021,16 +2071,10 @@
       var current=getLocalImageChoice_(storageKey,base,list);
       img.src=optimizeArtUrl(current, img.classList.contains('detail-hero-img') ? 440 : 300);
       img.setAttribute('data-alt-wired','1');
-      img.style.cursor='pointer';
-      img.title='Tap to view all cover art (' + urls.length + ')';
-      img.addEventListener('click',function(ev){
-        ev.stopPropagation();
-        openCoverArtModal_(urls, current, function(chosen){
-          current=chosen;
-          saveLocalImageChoice_(storageKey,chosen);
-          img.src=optimizeArtUrl(chosen, img.classList.contains('detail-hero-img') ? 440 : 300);
-        });
-      });
+      img.style.cursor='default';
+      img.removeAttribute('title');
+      // Alternate artwork is display-only when clicking the image. The
+      // dedicated COVERS badge is the only control that opens the gallery.
     });
   }
   function wireCoverSwitcher_(root){
@@ -2045,32 +2089,38 @@
       var current=getLocalImageChoice_(storageKey,base,list);
       img.src=optimizeArtUrl(current,440);
       wrap.setAttribute('data-alt-wired','1');
-      img.style.cursor='pointer';
-      img.title='Tap to view all cover art (' + urls.length + ')';
-      img.addEventListener('click',function(ev){
-        ev.stopPropagation();
-        openCoverArtModal_(urls,current,function(chosen){
-          current=chosen;
-          saveLocalImageChoice_(storageKey,chosen);
-          img.src=optimizeArtUrl(chosen,440);
-        });
-      });
+      img.style.cursor='default';
+      img.removeAttribute('title');
+      // Do not bind a click handler here. The COVERS badge opens the gallery.
     });
   }
 
-  // Renders a small clickable "N COVERS" badge for use inside a card's
-  // existing badge/meta row. Clicking it forwards to the nearby cover
-  // image's own click handler (wired above) so there's only one modal
-  // implementation to maintain.
+  // The COVERS badge is the sole gallery control. Artwork itself is never
+  // clickable for changing the locally-selected image.
   function coversBadgeHtml_(alternateList){
     var list=parseImageList_(alternateList);
     if(!list.length)return '';
     return '<span class="badge covers" onclick="event.stopPropagation(); openCoverArtModalFromTrigger_(this);">' + (list.length+1) + ' COVERS</span>';
   }
   function openCoverArtModalFromTrigger_(el){
+    if(!el)return;
     var card = el.closest('.lyric-card, .track-card, .artist-card, .album-card, .im-card, .detail-hero, .cover-switcher');
     var img = card ? (card.querySelector('img[data-cover-image]') || card.querySelector('img[data-alt-images]')) : null;
-    if (img) img.click();
+    if(!img)return;
+    var list=[];
+    try { list=JSON.parse(decodeURIComponent(img.getAttribute('data-alt-images') || (card.getAttribute('data-alt-list') || ''))); } catch(e) { list=[]; }
+    if(!list.length && card.getAttribute('data-alt-list')) {
+      try { list=JSON.parse(decodeURIComponent(card.getAttribute('data-alt-list'))); } catch(e) {}
+    }
+    var base=img.getAttribute('data-alt-base') || img.getAttribute('src') || '';
+    var storageKey=img.getAttribute('data-image-key') || card.getAttribute('data-image-key') || '';
+    var urls=uniqueImageUrls_(base,list);
+    if(urls.length<2)return;
+    var current=getLocalImageChoice_(storageKey,base,list);
+    openCoverArtModal_(urls,current,function(chosen){
+      saveLocalImageChoice_(storageKey,chosen);
+      img.src=optimizeArtUrl(chosen, img.classList.contains('detail-hero-img') ? 440 : 300);
+    });
   }
 
   function openCoverArtModal_(urls, currentUrl, onSelect){
@@ -2241,33 +2291,55 @@
     return ' style="border-color:' + color + ';"';
   }
   var archiveTagsFilter_='all';
+  var archiveTagsKind_='all';
   var archiveTagsLoading_=false;
 
+  function archiveStatusType_(b){
+    var type=String(b && b.type || '').toLowerCase();
+    return ['new','updated','synced'].indexOf(type)!==-1 ? type : '';
+  }
+  function archiveSongMatchesBadge_(song,b){
+    if(normalizeArtistKey(song.title)!==normalizeArtistKey(b.title))return false;
+    if(!b.artist)return true;
+    var badgeArtist=normalizeArtistKey(b.artist);
+    var songArtist=normalizeArtistKey(song.artist);
+    if(badgeArtist===songArtist)return true;
+    return splitArtistNames(song.artist).some(function(n){return normalizeArtistKey(n)===badgeArtist;});
+  }
+  function archiveArtistForBadge_(b){
+    var target=normalizeArtistKey(b.title || b.artist);
+    return (allArtists||[]).filter(function(a){return normalizeArtistKey(a.artist)===target;})[0] || null;
+  }
   function renderArchiveTags_(){
     var container=document.getElementById('archive-tags-content');
     if(!container)return;
-    var songBadges=(archiveBadges||[]).filter(function(b){return String(b.pageType||'song').toLowerCase()==='song';});
-    if(!songBadges.length){
-      container.innerHTML='<div class="empty">No song status tags have been added yet.</div>';
+    var statusBadges=(archiveBadges||[]).filter(function(b){return !!archiveStatusType_(b);});
+    if(!statusBadges.length){
+      container.innerHTML='<div class="empty">No recent archive status tags have been added yet.</div>';
       return;
     }
-    var filtered=songBadges.filter(function(b){
-      var type=String(b.type||'').toLowerCase();
-      if(archiveTagsFilter_==='all')return true;
-      if(archiveTagsFilter_==='other')return ['new','updated','synced'].indexOf(type)===-1;
-      return type===archiveTagsFilter_;
+    var filtered=statusBadges.filter(function(b){
+      return archiveTagsFilter_==='all' || archiveStatusType_(b)===archiveTagsFilter_;
     });
-    var seen={}, entries=[];
+    var entries=[];
     filtered.forEach(function(b){
-      var key=normalizeArtistKey(b.title)+'|'+normalizeArtistKey(b.artist)+'|'+String(b.type||'').toLowerCase();
-      if(seen[key])return;
-      seen[key]=true;
-      var match=(allLyrics||[]).filter(function(s){
-        if(normalizeArtistKey(s.title)!==normalizeArtistKey(b.title))return false;
-        if(!b.artist)return true;
-        return splitArtistNames(s.artist).some(function(n){return normalizeArtistKey(n)===normalizeArtistKey(b.artist);});
-      })[0];
-      if(match)entries.push({badge:b,song:match});
+      var type=archiveStatusType_(b);
+      var pageType=String(b.pageType||'song').toLowerCase();
+      if(pageType==='artist'){
+        if(archiveTagsKind_==='songs')return;
+        var artist=archiveArtistForBadge_(b);
+        if(!artist)return;
+        entries.push({badge:b,artist:artist,kind:'artist'});
+        return;
+      }
+      if(pageType!=='song' || archiveTagsKind_==='artists')return;
+      var match=(allLyrics||[]).filter(function(s){return archiveSongMatchesBadge_(s,b);})[0];
+      if(match)entries.push({badge:b,song:match,kind:'song'});
+    });
+    var seen={};
+    entries=entries.filter(function(e){
+      var b=e.badge, key=e.kind+'|'+normalizeArtistKey(b.title)+'|'+normalizeArtistKey(b.artist)+'|'+archiveStatusType_(b);
+      if(seen[key])return false; seen[key]=true; return true;
     });
     if(!entries.length){
       container.innerHTML='<div class="empty">Nothing is tagged in this category yet.</div>';
@@ -2275,34 +2347,43 @@
     }
     var fallback=getFallbackImage();
     container.innerHTML='<div class="archive-tags-grid">'+entries.map(function(e){
-      var s=e.song,b=e.badge,type=String(b.type||'').toLowerCase();
-      var color=badgeAccentColor_(type);
-      var border=color?' style="border-color:'+color+';"':'';
-      var locked=s.isLocked?' locked':'';
-      var cover=s.cover?optimizeArtUrl(s.cover,160):fallback;
+      var b=e.badge,type=archiveStatusType_(b),color=badgeAccentColor_(type),border=color?' style="border-color:'+color+';"':'';
+      if(e.kind==='artist'){
+        var a=e.artist;
+        var base=a.pfp || a.pfpCached || fallback;
+        var altList=parseImageList_(a.alternatePfps);
+        var chosen=getLocalImageChoice_(imageStorageKey_('artist',normalizeArtistKey(a.artist)),base,altList);
+        var cover=chosen===base?artistImageUrl_(a,160):optimizeArtUrl(chosen,160);
+        return '<div class="archive-tag-card artist-entry"'+border+' data-archive-artist="'+escapeHtml(a.artist)+'">'+
+          '<img class="archive-tag-cover" src="'+escapeHtml(cover)+'" loading="lazy" decoding="async" onerror="this.src=\''+fallback+'\'">'+
+          '<div class="archive-tag-body"><div class="archive-tag-kind">ARTIST</div><div class="archive-tag-title">'+escapeHtml(a.artist)+'</div>'+
+          '<div class="archive-tag-badge">'+badgeHtmlFor_(a.artist,'','artist')+'</div></div></div>';
+      }
+      var s=e.song,locked=s.isLocked?' locked':'',cover=s.cover?optimizeArtUrl(s.cover,160):fallback;
       return '<div class="archive-tag-card'+locked+'"'+border+' data-archive-tag-id="'+escapeHtml(s.id)+'" data-archive-tag-locked="'+String(!!s.isLocked)+'">'+
         '<img class="archive-tag-cover" src="'+escapeHtml(cover)+'" loading="lazy" decoding="async" onerror="this.src=\''+fallback+'\'">'+
-        '<div class="archive-tag-body"><div class="archive-tag-title">'+escapeHtml(s.title)+'</div>'+
+        '<div class="archive-tag-body"><div class="archive-tag-kind">SONG</div><div class="archive-tag-title">'+escapeHtml(s.title)+'</div>'+
         '<div class="archive-tag-artist">by '+escapeHtml(s.artist||'Unknown artist')+'</div>'+
         '<div class="archive-tag-badge">'+badgeHtmlFor_(s.title,s.artist,'song')+'</div></div></div>';
     }).join('')+'</div>';
     container.querySelectorAll('[data-archive-tag-id]').forEach(function(card){
-      card.addEventListener('click',function(){
-        if(card.getAttribute('data-archive-tag-locked')==='true')return;
-        showLyricsDetail(card.getAttribute('data-archive-tag-id'));
-      });
+      card.addEventListener('click',function(){if(card.getAttribute('data-archive-tag-locked')!=='true')showLyricsDetail(card.getAttribute('data-archive-tag-id'));});
+    });
+    container.querySelectorAll('[data-archive-artist]').forEach(function(card){
+      card.addEventListener('click',function(){showArtistDetail(card.getAttribute('data-archive-artist'));});
     });
   }
 
   function ensureArchiveTagsData_(){
-    if(lyricsLoaded){renderArchiveTags_();return;}
+    if(lyricsLoaded && artistsLoaded){renderArchiveTags_();return;}
     if(archiveTagsLoading_)return;
     archiveTagsLoading_=true;
-    api('lyrics').then(function(list){
-      allLyrics=list||[];
-      lyricsLoaded=true;
-      archiveTagsLoading_=false;
-      renderArchiveTags_();
+    var lp=lyricsLoaded?Promise.resolve(allLyrics):api('lyrics');
+    var ap=artistsLoaded?Promise.resolve(allArtists):api('artists').catch(function(){return [];});
+    Promise.all([lp,ap]).then(function(r){
+      if(!lyricsLoaded){allLyrics=r[0]||[];lyricsLoaded=true;}
+      if(!artistsLoaded){allArtists=r[1]||[];artistsLoaded=true;}
+      archiveTagsLoading_=false; renderArchiveTags_();
     }).catch(function(){
       archiveTagsLoading_=false;
       var c=document.getElementById('archive-tags-content');
@@ -3114,6 +3195,14 @@
   window.addEventListener('popstate', routeFromHash);
   window.addEventListener('hashchange', routeFromHash);
 
+  document.querySelectorAll('#archive-tags-type-tabs .archive-tags-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      archiveTagsKind_=tab.getAttribute('data-archive-kind')||'all';
+      document.querySelectorAll('#archive-tags-type-tabs .archive-tags-tab').forEach(function(t){t.classList.remove('active');});
+      tab.classList.add('active');
+      renderArchiveTags_();
+    });
+  });
   document.querySelectorAll('#archive-tags-tabs .archive-tags-tab').forEach(function(tab){
     tab.addEventListener('click',function(){
       archiveTagsFilter_=tab.getAttribute('data-tag-filter')||'all';
