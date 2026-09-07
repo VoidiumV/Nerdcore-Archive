@@ -1160,17 +1160,49 @@
   .portal-cake{ font-size:56px; line-height:1; filter:none; transition:transform .35s ease,opacity .35s ease; }
   .portal-cake.portal-cake-poof{ transform:scale(1.5) rotate(25deg); opacity:0; }
 
-  /* Secret scenes: environmental interaction rather than button menus. */
-  .backrooms-page{ --room-brightness:1; filter:brightness(var(--room-brightness)); transition:filter .12s ease; animation:backroomsRoomFlicker 4.8s steps(1,end) infinite; }
-  .backrooms-page.dark{ animation:none; }
-  @keyframes backroomsRoomFlicker{ 0%,11%,13%,56%,58%,100%{ --room-brightness:1; } 12%,57%{ --room-brightness:.62; } }
-  .backrooms-page.dark{ --room-brightness:.34; }
-  .backrooms-ceiling-light{ position:absolute; z-index:2; top:7vh; left:50%; width:180px; height:34px; transform:translateX(-50%); cursor:pointer; }
-  .backrooms-ceiling-light::before{ content:''; position:absolute; left:12px; right:12px; top:0; height:5px; background:#4a4327; box-shadow:0 7px 0 #292514; }
-  .backrooms-ceiling-light span{ position:absolute; left:24px; right:24px; top:9px; height:20px; background:rgba(255,244,177,.82); box-shadow:0 0 28px 12px rgba(255,238,151,.28); clip-path:polygon(7% 0,93% 0,100% 100%,0 100%); animation:backroomsTubeFlicker 4.8s steps(1,end) infinite; }
-  .backrooms-page.dark .backrooms-ceiling-light span{ opacity:.05; box-shadow:none; }
-  .backrooms-ceiling-light::after{ content:'BUZZ'; position:absolute; top:34px; left:0; right:0; text-align:center; font:10px 'VT323',monospace; color:#6d6234; opacity:.45; }
-  @keyframes backroomsTubeFlicker{ 0%,11%,13%,56%,58%,100%{opacity:1;} 12%,57%{opacity:.18;} }
+  /* Backrooms lighting: a small recessed fixture with a soft, physical-looking
+     pool of light. The room itself dims through an overlay rather than filtering
+     the whole page, so the document remains crisp. */
+  .backrooms-page{ position:relative; }
+  .backrooms-page::before{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background:rgba(7,7,4,0);
+    transition:background .18s ease;
+    animation:backroomsRoomFlicker 5.2s steps(1,end) infinite;
+  }
+  .backrooms-page.dark::before{ background:rgba(7,7,4,.62); animation:none; }
+  @keyframes backroomsRoomFlicker{
+    0%,10%,12%,55%,57%,100%{ background:rgba(7,7,4,0); }
+    11%,56%{ background:rgba(7,7,4,.34); }
+  }
+  .backrooms-ceiling-light{
+    position:absolute; z-index:3; top:4.5vh; left:50%; width:210px; height:58px;
+    transform:translateX(-50%); cursor:pointer;
+  }
+  .backrooms-ceiling-light::before{
+    content:''; position:absolute; left:28px; right:28px; top:0; height:10px;
+    border-radius:2px 2px 5px 5px; background:#55503b;
+    box-shadow:0 2px 0 #29271e, inset 0 -2px 0 rgba(0,0,0,.25);
+  }
+  .backrooms-ceiling-light::after{
+    content:''; position:absolute; left:45px; right:45px; top:10px; height:18px;
+    background:linear-gradient(180deg,#fffbe1 0%,#ded9b8 72%,#aaa583 100%);
+    border-radius:1px 1px 5px 5px;
+    box-shadow:0 9px 20px rgba(255,243,171,.18),0 22px 38px rgba(255,238,160,.08);
+    transition:opacity .12s ease,box-shadow .12s ease;
+  }
+  .backrooms-ceiling-light span{
+    position:absolute; left:54px; right:54px; top:14px; height:10px;
+    border-radius:1px; background:#fffdf0;
+    box-shadow:0 0 14px rgba(255,244,186,.42);
+    animation:backroomsTubeFlicker 5.2s steps(1,end) infinite;
+  }
+  .backrooms-page.dark .backrooms-ceiling-light::after,
+  .backrooms-page.dark .backrooms-ceiling-light span{ opacity:.08; box-shadow:none; }
+  @keyframes backroomsTubeFlicker{
+    0%,10%,12%,55%,57%,100%{opacity:1;}
+    11%,56%{opacity:.22;}
+  }
   .backrooms-page.dark .backrooms-sheet{ box-shadow:10px 10px 0 rgba(0,0,0,.5); }
 
   .anomaly-jumpscare{ position:fixed; inset:0; z-index:10050; display:grid; place-items:center; background:#070707; opacity:0; visibility:hidden; pointer-events:none; }
@@ -2229,6 +2261,7 @@
       if (bType !== desired) continue;
       if (badgeKey_(b.title, b.artist) === key) return b;
       if (!b.artist && normalizeArtistKey(b.title) === normalizeArtistKey(title)) return b;
+      if (desired === 'song' && archiveSongMatchesBadge_({title:title,artist:artist}, b)) return b;
     }
     return null;
   }
@@ -2266,13 +2299,35 @@
     var type=String(b && b.type || '').toLowerCase();
     return ['new','updated','synced'].indexOf(type)!==-1 ? type : '';
   }
+  function archiveBadgeLooseKey_(value){
+    return String(value||'')
+      .toLowerCase()
+      .replace(/[“”‘’]/g,"'")
+      .replace(/&/g,' and ')
+      .replace(/[\u2010-\u2015]/g,'-')
+      .replace(/[^a-z0-9]+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
   function archiveSongMatchesBadge_(song,b){
-    if(normalizeArtistKey(song.title)!==normalizeArtistKey(b.title))return false;
+    var songTitle=archiveBadgeLooseKey_(song.title);
+    var badgeTitle=archiveBadgeLooseKey_(b.title);
+    if(songTitle!==badgeTitle){
+      /* Some sheet rows have the same title with cosmetic punctuation or
+         an equivalent parenthetical suffix. Only use the base-title fallback
+         when the badge is Synced, which is the status most commonly attached
+         to a synced source whose display title gained a parenthetical credit. */
+      var badgeType=archiveStatusType_(b);
+      if(badgeType!=='synced')return false;
+      var baseSong=songTitle.replace(/\s*\([^)]*\)\s*$/,'').trim();
+      var baseBadge=badgeTitle.replace(/\s*\([^)]*\)\s*$/,'').trim();
+      if(!baseSong || !baseBadge || baseSong!==baseBadge)return false;
+    }
     if(!b.artist)return true;
-    var badgeArtist=normalizeArtistKey(b.artist);
-    var songArtist=normalizeArtistKey(song.artist);
+    var badgeArtist=archiveBadgeLooseKey_(b.artist);
+    var songArtist=archiveBadgeLooseKey_(song.artist);
     if(badgeArtist===songArtist)return true;
-    return splitArtistNames(song.artist).some(function(n){return normalizeArtistKey(n)===badgeArtist;});
+    return splitArtistNames(song.artist).some(function(n){return archiveBadgeLooseKey_(n)===badgeArtist;});
   }
   function archiveArtistForBadge_(b){
     var target=normalizeArtistKey(b.title || b.artist);
