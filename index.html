@@ -66,6 +66,7 @@
     display:flex; align-items:center; justify-content:space-between;
     gap:14px; flex-wrap:wrap;
   }
+  body.secret-route .topbar{ display:none !important; }
   .brand{ display:flex; align-items:center; gap:10px; cursor:default; }
   .brand-title{ cursor:default; }
   .cover-switcher{ position:relative; flex-shrink:0; display:flex; flex-direction:column; }
@@ -265,6 +266,22 @@
   .home-tile p{ font-size:16px; color:var(--muted); margin:0; line-height:1.5; }
   @media(max-width:600px){ .home-grid{ grid-template-columns:1fr; } }
   .home-tile:last-child:nth-child(odd){ grid-column:1 / -1; }
+
+  .archive-tags-section{ margin-top:32px; }
+  .archive-tags-intro{ font-family:'VT323',monospace; font-size:18px; color:var(--muted); margin:-5px 0 12px; }
+  .archive-tags-tabs{ display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+  .archive-tags-tab{ font-family:'VT323',monospace; font-size:16px; color:var(--muted); background:var(--panel); border:1px solid var(--border); padding:6px 11px; cursor:pointer; }
+  .archive-tags-tab:hover{ color:var(--ink); border-color:var(--muted); }
+  .archive-tags-tab.active{ color:var(--green); border-color:var(--green); }
+  .archive-tags-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .archive-tag-card{ display:flex; gap:0; min-width:0; background:var(--panel); border:2px solid var(--border); cursor:pointer; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease; }
+  .archive-tag-card:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 rgba(0,0,0,.3); }
+  .archive-tag-cover{ width:78px; height:78px; object-fit:cover; flex:0 0 78px; background:#0a0d1c; }
+  .archive-tag-body{ min-width:0; padding:9px 11px; display:flex; flex-direction:column; justify-content:center; }
+  .archive-tag-title{ font-family:'VT323',monospace; font-size:20px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .archive-tag-artist{ font-family:'VT323',monospace; font-size:15px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+  .archive-tag-badge{ margin-top:5px; }
+  @media(max-width:700px){ .archive-tags-grid{ grid-template-columns:1fr; } }
 
   .home-social-section{ margin-top:28px; }
   .home-social-label{
@@ -524,8 +541,10 @@
   .artist-card img.image-ready{ opacity:1; }
   .artist-card .name{ font-family:'Press Start 2P', monospace; font-size:12px; color:var(--green); padding:12px 10px; text-align:center; line-height:1.6; word-break:break-word; overflow-wrap:anywhere; }
   .franchise-cat{ font-family:'VT323', monospace; font-size:13px; color:var(--amber); text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
-  .artist-card-badges{ min-height:0; display:flex; justify-content:center; gap:6px; flex-wrap:wrap; padding:0 10px 6px; }
-  .group-tag{ font-family:'VT323', monospace; font-size:13px; color:#5fc9ff; text-align:center; padding:0 10px 12px; letter-spacing:0.5px; }
+  .artist-card-badges{ min-height:0; display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:wrap; padding:0; }
+  .artist-card-subline{ display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; min-height:24px; padding:0 10px 8px; }
+  .group-tag{ font-family:'VT323', monospace; font-size:13px; color:#5fc9ff; text-align:center; padding:0; letter-spacing:0.5px; }
+  .artist-type-label{ font-family:'VT323',monospace; font-size:14px; color:#5fc9ff; border:1px solid #5fc9ff; padding:2px 8px; text-transform:uppercase; letter-spacing:.3px; }
   .group-members-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
   .group-member-chip{ font-family:'VT323', monospace; font-size:17px; color:var(--ink); background:var(--panel-2); border:2px solid var(--border); padding:6px 13px; cursor:pointer; letter-spacing:0.3px; }
   .group-member-chip:hover{ color:var(--green); border-color:var(--green); }
@@ -823,7 +842,6 @@
 
   .sync-btn.retry{margin-left:10px;}
 
-  /* ---------- EASTER EGG: #/gameover — full arcade cabinet screen ---------- */
   #view-gameover{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .gameover-page{ position:relative; width:100%; min-height:100vh; background:#000; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; box-sizing:border-box; }
   .gameover-bezel{ position:absolute; inset:0; pointer-events:none; border:18px solid #150000; box-shadow:inset 0 0 70px rgba(255,0,0,0.18); }
@@ -841,7 +859,6 @@
   .gameover-exit-link{ position:absolute; left:0; right:0; bottom:26px; z-index:2; text-align:center; }
   @media(max-width:600px){ .gameover-title{ font-size:32px; } .gameover-countdown{ font-size:44px; } }
 
-  /* ---------- EASTER EGG: #/backrooms — liminal, fluorescent-yellow ---------- */
   #view-backrooms{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .backrooms-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box;
     background: repeating-linear-gradient(90deg, #8a7a2a 0 2px, #7d6e22 2px 4px), linear-gradient(180deg, #cdb84a 0%, #a8933a 55%, #6e5f22 100%);
@@ -860,7 +877,6 @@
   .backrooms-exit{ display:inline-block; margin-top:18px; }
   .backrooms-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 3px); }
 
-  /* ---------- EASTER EGG: #/credits — full-screen movie reel ---------- */
   #view-credits{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .credits-page{ position:relative; width:100%; height:100vh; background:#000; overflow:hidden; }
   .credits-vignette{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.8) 100%); }
@@ -872,7 +888,6 @@
   .credits-exit{ position:absolute; left:0; right:0; bottom:20px; z-index:2; text-align:center; }
   @media(prefers-reduced-motion:reduce){ .credits-scroll{ animation:none; position:static; padding-top:20px; } }
 
-  /* ---------- EASTER EGG: #/juggernaut — comic-book halftone smash ---------- */
   #view-juggernaut{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .juggernaut-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box;
     background: radial-gradient(circle, #3a0000 1.5px, transparent 1.8px) 0 0/16px 16px, #1a0000;
@@ -886,7 +901,6 @@
   .juggernaut-btn:hover{ box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
   @media(prefers-reduced-motion:reduce){ .juggernaut-page.smashing .juggernaut-slab{ animation:none!important; } }
 
-  /* ---------- EASTER EGG: #/hollowknight — dark drifting cavern ---------- */
   #view-hollowknight{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .hollow-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box;
     background: radial-gradient(ellipse at 50% 28%, #131c1e 0%, #05070a 72%);
@@ -904,7 +918,6 @@
   .hollow-exit{ display:inline-block; margin-top:20px; }
   @media(prefers-reduced-motion:reduce){ .hollow-vessel{ animation:none!important; } .hollow-mote{ animation:none!important; opacity:.3!important; } }
 
-  /* ---------- EASTER EGG: #/anomaly — printed containment document (light paper, breaks from the dark theme on purpose) ---------- */
   #view-anomaly{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .anomaly-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box; background:#e7e3d6; display:flex; align-items:flex-start; justify-content:center; padding:60px 22px; overflow:hidden; }
   .anomaly-sheet{ position:relative; z-index:1; max-width:720px; width:100%; background:#f5f2e7; border:1px solid #9c9887; box-shadow:0 10px 30px rgba(0,0,0,0.28); padding:40px 42px; }
@@ -919,7 +932,6 @@
   .anomaly-exit .retry-link{ color:#2a2a2a; border-color:#8a8674; }
   .anomaly-exit .retry-link:hover{ color:#a8261e; border-color:#a8261e; }
 
-  /* ---------- EASTER EGG: long-press logo glitch ---------- */
   @keyframes bodyGlitchShift{
     0%,100%{ transform:translate(0,0); filter:none; }
     20%{ transform:translate(-3px,1px); filter:hue-rotate(18deg) saturate(1.4); }
@@ -936,7 +948,6 @@
   .brand-title{ user-select:none; }
   @media(prefers-reduced-motion:reduce){ body.site-glitching{ animation:none!important; } body.site-glitching::before{ display:none!important; } }
 
-  /* ---------- EASTER EGG: #/1987 — full-bleed redacted case file ---------- */
   #view-1987{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .classified-page{ position:relative; width:100%; min-height:100vh; box-sizing:border-box; background:#0a0a0a; display:flex; align-items:center; justify-content:center; padding:60px 22px; overflow:hidden; }
   .classified-watermark{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; overflow:hidden; }
@@ -961,7 +972,6 @@
   .notfound-body p{ margin:0 0 14px; }
   .notfound-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px); }
 
-  /* ---------- EASTER EGG: #/staffonly ---------- */
   #view-staffonly{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .staffonly-page{ position:relative; width:100%; height:100vh; background:#0a0000; overflow:hidden; display:flex; align-items:center; justify-content:center; transition:background .6s ease, filter .5s ease; }
   .staffonly-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(255,43,43,0.05) 0 1px, transparent 1px 3px); }
@@ -986,7 +996,6 @@
   .staffonly-page.staffonly-swiping{ filter:brightness(3) saturate(0); opacity:0; }
   @media(prefers-reduced-motion:reduce){ .staffonly-badge,.staffonly-siren,.staffonly-keycard{ animation:none!important; } }
 
-  /* ---------- EASTER EGG: #/echo ---------- */
   #view-echo{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .echo-page{ width:100%; height:100vh; background:#05050a; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:26px; text-align:center; transition:opacity .5s ease; }
   .echo-title{ font-family:'Press Start 2P',monospace; font-size:16px; color:#5fc9ff; letter-spacing:1px; margin-bottom:22px; }
@@ -999,7 +1008,6 @@
   .echo-page.echo-leaving{ opacity:0; }
   @media(prefers-reduced-motion:reduce){ .echo-line{ animation:none!important; opacity:1!important; } }
 
-  /* ---------- EASTER EGG: #/users ---------- */
   #view-users{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .users-page{ width:100%; min-height:100vh; background:#000; padding:26px; font-family:'JetBrains Mono',monospace; box-sizing:border-box; transition:opacity .5s ease; }
   .users-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:8px; }
@@ -1018,7 +1026,6 @@
   .users-terminal-hint{ margin-top:8px; color:#3a5c48; font-size:12px; letter-spacing:0.3px; }
   .users-page.users-leaving{ opacity:0; }
 
-  /* ---------- EASTER EGG: #/void ---------- */
   #view-void{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .void-page{ position:relative; width:100%; height:100vh; background:#000; overflow:hidden; }
   .void-hello{ position:absolute; top:37%; left:63%; font-family:'VT323',monospace; font-size:6px; color:#0a0a0a; cursor:pointer; user-select:none; transition:color .3s ease; }
@@ -1027,7 +1034,6 @@
   .void-found.show{ display:block; }
   .void-found .retry-link{ color:var(--green); font-size:18px; }
 
-  /* ---------- EASTER EGG: #/vault111 ---------- */
   #view-vault111{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .vault111-page{ width:100%; min-height:100vh; background:#001505; position:relative; overflow:hidden; font-family:'JetBrains Mono',monospace; color:#2ee66b; padding:30px 26px; box-sizing:border-box; transition:opacity .6s ease; }
   .vault111-scanlines{ position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(46,230,107,0.06) 0 1px, transparent 1px 3px); }
@@ -1044,7 +1050,6 @@
   .vault111-page.vault111-sealing .vault111-door{ transform:rotate(540deg) scale(0); }
   .vault111-page.vault111-sealing{ opacity:0; }
 
-  /* ---------- EASTER EGG: #/portal ---------- */
   #view-portal{ padding:0 !important; max-width:none !important; margin:0 !important; }
   .portal-page{ width:100%; min-height:100vh; background:#eef2f5; color:#33424a; font-family:'Space Mono',monospace; text-align:center; padding:50px 30px; box-sizing:border-box; transition:opacity .6s ease; }
   .portal-topline{ font-family:'Press Start 2P',monospace; font-size:10px; letter-spacing:2px; color:#5a8fa3; margin-bottom:18px; }
@@ -1060,6 +1065,103 @@
   .portal-cake-label{ font-family:'VT323',monospace; font-size:14px; color:#7d8f97; margin-top:6px; }
   .portal-cake.portal-cake-poof .portal-cake-shape{ transform:scale(1.6) rotate(20deg); filter:grayscale(1) blur(3px); opacity:0; }
   .portal-page.portal-leaving{ opacity:0; }
+
+
+  body.secret-route{ overflow-x:hidden; }
+  body.secret-route::after{ opacity:.22; animation:none; }
+  body.secret-route .page{ min-height:100vh; }
+  .classified-page{ background:#0d0e11; padding:48px 22px; }
+  .classified-watermark{ opacity:.35; }
+  .classified-watermark span{ font-size:120px; letter-spacing:7px; }
+  .classified-sheet{ max-width:760px; background:#121317; border:1px solid #33363d; border-left:5px solid #ff2b2b; box-shadow:12px 12px 0 rgba(0,0,0,.35); padding:30px 34px; }
+  .classified-stamp{ transform:none; border-width:2px; }
+  .classified-title{ font-size:17px; letter-spacing:.2px; }
+  .classified-body{ font-size:19px; line-height:1.75; }
+  .redacted{ cursor:pointer; padding:1px 5px; user-select:none; }
+  .redacted.revealed{ color:#ff8c8c; background:transparent; }
+  .classified-footer{ letter-spacing:.4px; }
+
+  .gameover-page{ background:#07080d; }
+  .gameover-bezel{ border:12px solid #11131a; box-shadow:inset 0 0 0 1px #2c3040; }
+  .gameover-scanlines{ opacity:.45; }
+  .gameover-inner{ max-width:620px; width:100%; border:1px solid #303442; background:#0c0e15; padding:34px 28px; box-shadow:8px 8px 0 rgba(0,0,0,.45); }
+  .gameover-title{ text-shadow:4px 4px 0 #32131a; animation:none; }
+  .gameover-countdown{ margin-bottom:24px; }
+  .gameover-btn{ min-width:120px; transition:transform .12s ease,background .12s ease; }
+  .gameover-btn:hover{ transform:translate(-2px,-2px); background:#11151c; }
+
+  .backrooms-page{ background:#b5a044; align-items:flex-start; padding-top:10vh; }
+  .backrooms-buzz{ background:repeating-linear-gradient(90deg,rgba(255,255,220,.06) 0 1px,transparent 1px 9px); animation:none; }
+  .backrooms-sheet{ max-width:720px; background:#19170f; border:1px solid #554f2d; border-top:6px solid #d3c269; box-shadow:10px 10px 0 rgba(0,0,0,.28); }
+  .backrooms-stamp{ transform:none; font-size:10px; }
+  .backrooms-title{ font-size:17px; animation:none; }
+  .backrooms-audio-fake{ border-color:#5a5434; }
+  .backrooms-audio-fake.playing{ border-color:#d3c269; }
+  .backrooms-audio-fake.playing button{ color:#d3c269; border-color:#d3c269; }
+
+  .credits-page{ background:#08090c; }
+  .credits-vignette{ background:linear-gradient(90deg,rgba(0,0,0,.45),transparent 18%,transparent 82%,rgba(0,0,0,.45)); }
+  .credits-scroll{ width:min(720px,92%); left:50%; transform:translateX(-50%); }
+  .credits-page.paused .credits-scroll{ animation-play-state:paused; }
+  .credits-exit{ bottom:18px; }
+  .credits-heading{ letter-spacing:1px; }
+
+  .juggernaut-page{ background:#18100f; }
+  .juggernaut-page::before{ content:''; position:absolute; inset:0; background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 5px); pointer-events:none; }
+  .juggernaut-slab{ max-width:700px; background:#0f0d0d; border:2px solid #ff2b2b; border-radius:2px; box-shadow:12px 12px 0 rgba(0,0,0,.4); transform:rotate(-.6deg); }
+  .juggernaut-title{ text-shadow:3px 3px 0 #3b0909; }
+  .juggernaut-quote{ font-size:29px; }
+
+  .hollow-page{ background:#070b0d; align-items:flex-end; justify-content:flex-start; text-align:left; padding:12vh 10vw; }
+  .hollow-sheet{ max-width:620px; border-left:1px solid #394a4e; padding-left:28px; }
+  .hollow-title{ font-size:16px; }
+  .hollow-body{ font-size:20px; }
+  .hollow-vessel{ text-align:left; }
+  .hollow-mote{ cursor:pointer; pointer-events:auto; }
+
+  .anomaly-page{ background:#d9d6cc; padding:8vh 22px; }
+  .anomaly-sheet{ max-width:780px; background:#f1eee4; border:1px solid #aaa594; border-top:5px solid #a8261e; box-shadow:9px 9px 0 rgba(0,0,0,.18); padding:34px 38px; }
+  .anomaly-title{ letter-spacing:.2px; }
+  .anomaly-table tr{ cursor:pointer; }
+  .anomaly-table tr.anomaly-focus td{ background:#e7e2d3; }
+  .anomaly-table tr.anomaly-focus td:first-child{ color:#7f1d18; }
+
+  .staffonly-page{ background:#090c0a; }
+  .staffonly-center{ max-width:620px; width:calc(100% - 32px); border:1px solid #26372b; background:#0b100d; padding:34px 28px; box-shadow:8px 8px 0 rgba(0,0,0,.35); }
+  .staffonly-siren{ opacity:.35; }
+  .staffonly-badge{ animation:none; }
+  .staffonly-keycard-wrap{ transition:transform .15s ease; }
+  .staffonly-keycard-wrap:hover{ transform:translateY(-3px); }
+
+  .echo-page{ background:#080b10; justify-content:flex-start; padding-top:16vh; }
+  .echo-title{ border-bottom:1px solid #233646; padding-bottom:12px; }
+  .echo-output{ width:min(560px,100%); border-left:1px solid #1e3546; padding-left:18px; align-items:flex-start; min-height:240px; }
+  .echo-line{ text-align:left; }
+
+  .users-page{ background:#070a08; padding:34px clamp(18px,5vw,56px); }
+  .users-header{ border-bottom:1px solid #1c3023; padding-bottom:10px; }
+  .users-table tr:hover td{ background:#0a170e; }
+  .users-terminal-line{ border-top:1px solid #1c3023; padding-top:16px; }
+
+  .void-page{ background:#020203; }
+  .void-hello{ font-size:7px; }
+  .void-found{ border:1px solid #203c2c; padding:22px 28px; background:#050906; box-shadow:8px 8px 0 rgba(0,0,0,.4); }
+
+  .vault111-page{ background:#061008; }
+  .vault111-doc{ max-width:760px; }
+  .vault111-door-wrap{ border-top:1px dashed #1a5c33; padding-top:18px; }
+  .vault111-door{ font-size:52px; }
+
+  .portal-page{ background:#e7ebee; padding-top:10vh; }
+  .portal-body{ max-width:620px; }
+  .portal-cake-wrap{ display:inline-block; padding:14px 18px; border:1px solid #c3ccd1; background:#f4f6f7; box-shadow:6px 6px 0 rgba(50,70,80,.12); }
+  .portal-cake-label{ margin-bottom:2px; }
+
+  @media(max-width:620px){
+    .classified-sheet,.backrooms-sheet,.anomaly-sheet,.staffonly-center{ padding:24px 20px; }
+    .hollow-page{ padding:12vh 8vw; }
+    .gameover-inner{ padding:28px 18px; }
+  }
 
   /* ---------- PRINT / EXPORT LYRICS SHEET ---------- */
   #print-lyrics-sheet{ display:none; }
@@ -1159,6 +1261,19 @@
   <section class="recently-viewed-section" id="recently-viewed-section" style="display:none;">
     <div class="section-kicker">RECENTLY VIEWED</div>
     <div class="recently-viewed-grid" id="recently-viewed-grid"></div>
+  </section>
+
+  <section class="archive-tags-section" id="archive-tags-section">
+    <div class="section-kicker">ARCHIVE STATUS</div>
+    <div class="archive-tags-intro">Songs the archive has marked as new, updated, synced, or otherwise noteworthy.</div>
+    <div class="archive-tags-tabs" id="archive-tags-tabs">
+      <button type="button" class="archive-tags-tab active" data-tag-filter="all">ALL</button>
+      <button type="button" class="archive-tags-tab" data-tag-filter="new">NEW</button>
+      <button type="button" class="archive-tags-tab" data-tag-filter="updated">UPDATED</button>
+      <button type="button" class="archive-tags-tab" data-tag-filter="synced">SYNCED</button>
+      <button type="button" class="archive-tags-tab" data-tag-filter="other">OTHER</button>
+    </div>
+    <div id="archive-tags-content"><div class="loading">Loading archive status&hellip;</div></div>
   </section>
 
 </div>
@@ -1313,8 +1428,6 @@
   <div data-disclaimer-page="about"></div>
   <div id="about-content"><div class="loading">Loading&hellip;</div></div>
 </div>
-
-<!-- ARCHIVE 404 EASTER EGG -->
 <div class="page" id="view-404" style="display:none">
   <div class="notfound-page">
     <div class="notfound-scanlines"></div>
@@ -1330,8 +1443,6 @@
   </div>
   <p style="margin-top:22px;"><span class="retry-link" id="not-found-home">Tap here to pretend this never happened.</span></p>
 </div>
-
-<!-- EASTER EGG: THE BITE OF '87 -->
 <div class="page" id="view-1987" style="display:none">
   <div class="classified-page">
     <div class="bite87-scanlines"></div>
@@ -1351,8 +1462,6 @@
     </div>
   </div>
 </div>
-
-<!-- EASTER EGG: GAME OVER -->
 <div class="page" id="view-gameover" style="display:none">
   <div class="gameover-page">
     <div class="gameover-scanlines"></div>
@@ -1373,8 +1482,6 @@
     <p class="gameover-exit-link"><span class="retry-link" id="gameover-home">Back to safety.</span></p>
   </div>
 </div>
-
-<!-- EASTER EGG: BACKROOMS -->
 <div class="page" id="view-backrooms" style="display:none">
   <div class="backrooms-page">
     <div class="backrooms-scanlines"></div>
@@ -1397,8 +1504,6 @@
     </div>
   </div>
 </div>
-
-<!-- EASTER EGG: CREDITS -->
 <div class="page" id="view-credits" style="display:none">
   <div class="credits-page">
     <div class="credits-vignette"></div>
@@ -1406,8 +1511,6 @@
     <p class="credits-exit"><span class="retry-link" id="credits-home">Skip credits.</span></p>
   </div>
 </div>
-
-<!-- EASTER EGG: JUGGERNAUT -->
 <div class="page" id="view-juggernaut" style="display:none">
   <div class="juggernaut-page" id="juggernaut-main">
     <div class="juggernaut-slab">
@@ -1418,8 +1521,6 @@
     </div>
   </div>
 </div>
-
-<!-- EASTER EGG: HOLLOW KNIGHT -->
 <div class="page" id="view-hollowknight" style="display:none">
   <div class="hollow-page">
     <div class="hollow-motes" id="hollow-motes"></div>
@@ -1435,8 +1536,6 @@
     </div>
   </div>
 </div>
-
-<!-- EASTER EGG: ANOMALY -->
 <div class="page" id="view-anomaly" style="display:none">
   <div class="anomaly-page">
     <div class="anomaly-sheet">
@@ -1455,8 +1554,6 @@
     </div>
   </div>
 </div>
-
-<!-- EASTER EGG: STAFF ONLY -->
 <div class="page" id="view-staffonly" style="display:none">
   <div class="staffonly-page" id="staffonly-page">
     <div class="staffonly-scanlines"></div>
@@ -1475,8 +1572,6 @@
     </div>
   </div>
 </div>
-
-<!-- EASTER EGG: ECHO -->
 <div class="page" id="view-echo" style="display:none">
   <div class="echo-page" id="echo-page">
     <div class="echo-title">SAY SOMETHING INTO THE CHAMBER.</div>
@@ -1485,8 +1580,6 @@
     <div class="echo-hint">(say <b>"stop"</b> to leave the echo chamber)</div>
   </div>
 </div>
-
-<!-- EASTER EGG: USERS -->
 <div class="page" id="view-users" style="display:none">
   <div class="users-page" id="users-page">
     <div class="users-header">
@@ -1503,16 +1596,12 @@
     <div class="users-terminal-hint">(type <b>logout</b> or <b>exit</b> and press Enter)</div>
   </div>
 </div>
-
-<!-- EASTER EGG: VOID -->
 <div class="page" id="view-void" style="display:none">
   <div class="void-page" id="void-page">
     <span class="void-hello" id="void-hello">hello</span>
     <div class="void-found" id="void-found">you found it.<br><span class="retry-link" id="void-home-inner">leave the void.</span></div>
   </div>
 </div>
-
-<!-- EASTER EGG: VAULT 111 -->
 <div class="page" id="view-vault111" style="display:none">
   <div class="vault111-page" id="vault111-page">
     <div class="vault111-scanlines"></div>
@@ -1538,8 +1627,6 @@
     </div>
   </div>
 </div>
-
-<!-- EASTER EGG: PORTAL -->
 <div class="page" id="view-portal" style="display:none">
   <div class="portal-page" id="portal-page">
     <div class="portal-topline">APERTURE SCIENCE &mdash; ENRICHMENT CENTER</div>
@@ -1630,7 +1717,7 @@
 <div class="modal-overlay" id="cover-art-overlay">
   <div class="modal-box">
     <h3>ALL COVER ART</h3>
-    <p>Tap a cover below to view it here &mdash; this only changes what you see, not the site's saved artwork.</p>
+    <p>Tap a cover below to make it the cover you see on this device. Your choice is saved locally and does not change the archive's artwork.</p>
     <div class="cover-art-grid" id="cover-art-grid"></div>
     <div class="modal-actions">
       <div class="modal-btn" id="cover-art-close">CLOSE</div>
@@ -1877,6 +1964,43 @@
     if(Array.isArray(value)) return value.map(function(x){return String(x).trim();}).filter(Boolean);
     return String(value||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
   }
+  function uniqueImageUrls_(base, list){
+    var out=[], seen={};
+    [base].concat(parseImageList_(list)).forEach(function(u){
+      u=String(u||'').trim();
+      if(!u || seen[u]) return;
+      seen[u]=true; out.push(u);
+    });
+    return out;
+  }
+  var LOCAL_IMAGE_CHOICES_KEY_='nerdcoreArchiveImageChoices_v2';
+  function readLocalImageChoices_(){
+    try {
+      var raw=localStorage.getItem(LOCAL_IMAGE_CHOICES_KEY_);
+      var obj=raw?JSON.parse(raw):{};
+      return obj && typeof obj==='object' ? obj : {};
+    } catch(e){ return {}; }
+  }
+  function getLocalImageChoice_(storageKey, base, list){
+    var urls=uniqueImageUrls_(base,list), map=readLocalImageChoices_(), chosen=map[storageKey];
+    if(chosen && urls.indexOf(chosen)!==-1) return chosen;
+    if(chosen && map[storageKey]) {
+      delete map[storageKey];
+      try{ localStorage.setItem(LOCAL_IMAGE_CHOICES_KEY_,JSON.stringify(map)); }catch(e){}
+    }
+    return urls[0] || base || '';
+  }
+  function saveLocalImageChoice_(storageKey, chosen){
+    if(!storageKey || !chosen) return;
+    try {
+      var map=readLocalImageChoices_();
+      map[storageKey]=String(chosen);
+      localStorage.setItem(LOCAL_IMAGE_CHOICES_KEY_,JSON.stringify(map));
+    } catch(e){}
+  }
+  function imageStorageKey_(kind, id){
+    return String(kind||'image')+':'+String(id||'');
+  }
   function encodeImageListAttr_(list){ return escapeHtml(encodeURIComponent(JSON.stringify(parseImageList_(list)))); }
   // Cover art with alternates is left completely unobstructed -- no badge
   // or border sits on top of it. Instead a "N COVERS" badge is rendered in
@@ -1888,14 +2012,24 @@
     if(!root)return;
     root.querySelectorAll('img[data-alt-images]').forEach(function(img){
       if(img.getAttribute('data-alt-wired')==='1')return;
-      var raw=img.getAttribute('data-alt-images'), list=[]; try{list=JSON.parse(decodeURIComponent(raw||''));}catch(e){return;} if(!list.length)return;
+      var list=[]; try{list=JSON.parse(decodeURIComponent(img.getAttribute('data-alt-images')||''));}catch(e){return;}
+      if(!list.length)return;
+      var base=img.getAttribute('data-alt-base') || img.getAttribute('src') || '';
+      var storageKey=img.getAttribute('data-image-key') || '';
+      var urls=uniqueImageUrls_(base,list);
+      if(urls.length<2)return;
+      var current=getLocalImageChoice_(storageKey,base,list);
+      img.src=optimizeArtUrl(current, img.classList.contains('detail-hero-img') ? 440 : 300);
       img.setAttribute('data-alt-wired','1');
       img.style.cursor='pointer';
-      img.title='Tap to view all cover art (' + (list.length+1) + ')';
+      img.title='Tap to view all cover art (' + urls.length + ')';
       img.addEventListener('click',function(ev){
         ev.stopPropagation();
-        var urls=[img.getAttribute('src')].concat(list).filter(Boolean);
-        openCoverArtModal_(urls, img.getAttribute('src'), function(chosen){ img.src=chosen; });
+        openCoverArtModal_(urls, current, function(chosen){
+          current=chosen;
+          saveLocalImageChoice_(storageKey,chosen);
+          img.src=optimizeArtUrl(chosen, img.classList.contains('detail-hero-img') ? 440 : 300);
+        });
       });
     });
   }
@@ -1905,13 +2039,21 @@
       if(wrap.getAttribute('data-alt-wired')==='1')return;
       var img=wrap.querySelector('img[data-cover-image]'); if(!img)return;
       var list=[]; try{list=JSON.parse(decodeURIComponent(wrap.getAttribute('data-alt-list')||''));}catch(e){return;}
-      var urls=[img.getAttribute('src')].concat(list).filter(Boolean); if(urls.length<2)return;
+      var base=wrap.getAttribute('data-alt-base') || img.getAttribute('src') || '';
+      var storageKey=wrap.getAttribute('data-image-key') || '';
+      var urls=uniqueImageUrls_(base,list); if(urls.length<2)return;
+      var current=getLocalImageChoice_(storageKey,base,list);
+      img.src=optimizeArtUrl(current,440);
       wrap.setAttribute('data-alt-wired','1');
       img.style.cursor='pointer';
       img.title='Tap to view all cover art (' + urls.length + ')';
       img.addEventListener('click',function(ev){
         ev.stopPropagation();
-        openCoverArtModal_(urls, img.getAttribute('src'), function(chosen){ img.src=chosen; });
+        openCoverArtModal_(urls,current,function(chosen){
+          current=chosen;
+          saveLocalImageChoice_(storageKey,chosen);
+          img.src=optimizeArtUrl(chosen,440);
+        });
       });
     });
   }
@@ -1936,6 +2078,7 @@
     var grid=document.getElementById('cover-art-grid');
     if(!overlay||!grid)return;
     var fallback=getFallbackImage();
+    urls=uniqueImageUrls_(urls[0]||'',urls.slice(1));
     grid.innerHTML=urls.map(function(u,i){
       var isSelected = u===currentUrl;
       return '<div class="cover-art-thumb' + (isSelected?' selected':'') + '" data-cover-idx="' + i + '"><img src="' + escapeHtml(optimizeArtUrl(u,220)) + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'"></div>';
@@ -2097,6 +2240,76 @@
     if (!color) return '';
     return ' style="border-color:' + color + ';"';
   }
+  var archiveTagsFilter_='all';
+  var archiveTagsLoading_=false;
+
+  function renderArchiveTags_(){
+    var container=document.getElementById('archive-tags-content');
+    if(!container)return;
+    var songBadges=(archiveBadges||[]).filter(function(b){return String(b.pageType||'song').toLowerCase()==='song';});
+    if(!songBadges.length){
+      container.innerHTML='<div class="empty">No song status tags have been added yet.</div>';
+      return;
+    }
+    var filtered=songBadges.filter(function(b){
+      var type=String(b.type||'').toLowerCase();
+      if(archiveTagsFilter_==='all')return true;
+      if(archiveTagsFilter_==='other')return ['new','updated','synced'].indexOf(type)===-1;
+      return type===archiveTagsFilter_;
+    });
+    var seen={}, entries=[];
+    filtered.forEach(function(b){
+      var key=normalizeArtistKey(b.title)+'|'+normalizeArtistKey(b.artist)+'|'+String(b.type||'').toLowerCase();
+      if(seen[key])return;
+      seen[key]=true;
+      var match=(allLyrics||[]).filter(function(s){
+        if(normalizeArtistKey(s.title)!==normalizeArtistKey(b.title))return false;
+        if(!b.artist)return true;
+        return splitArtistNames(s.artist).some(function(n){return normalizeArtistKey(n)===normalizeArtistKey(b.artist);});
+      })[0];
+      if(match)entries.push({badge:b,song:match});
+    });
+    if(!entries.length){
+      container.innerHTML='<div class="empty">Nothing is tagged in this category yet.</div>';
+      return;
+    }
+    var fallback=getFallbackImage();
+    container.innerHTML='<div class="archive-tags-grid">'+entries.map(function(e){
+      var s=e.song,b=e.badge,type=String(b.type||'').toLowerCase();
+      var color=badgeAccentColor_(type);
+      var border=color?' style="border-color:'+color+';"':'';
+      var locked=s.isLocked?' locked':'';
+      var cover=s.cover?optimizeArtUrl(s.cover,160):fallback;
+      return '<div class="archive-tag-card'+locked+'"'+border+' data-archive-tag-id="'+escapeHtml(s.id)+'" data-archive-tag-locked="'+String(!!s.isLocked)+'">'+
+        '<img class="archive-tag-cover" src="'+escapeHtml(cover)+'" loading="lazy" decoding="async" onerror="this.src=\''+fallback+'\'">'+
+        '<div class="archive-tag-body"><div class="archive-tag-title">'+escapeHtml(s.title)+'</div>'+
+        '<div class="archive-tag-artist">by '+escapeHtml(s.artist||'Unknown artist')+'</div>'+
+        '<div class="archive-tag-badge">'+badgeHtmlFor_(s.title,s.artist,'song')+'</div></div></div>';
+    }).join('')+'</div>';
+    container.querySelectorAll('[data-archive-tag-id]').forEach(function(card){
+      card.addEventListener('click',function(){
+        if(card.getAttribute('data-archive-tag-locked')==='true')return;
+        showLyricsDetail(card.getAttribute('data-archive-tag-id'));
+      });
+    });
+  }
+
+  function ensureArchiveTagsData_(){
+    if(lyricsLoaded){renderArchiveTags_();return;}
+    if(archiveTagsLoading_)return;
+    archiveTagsLoading_=true;
+    api('lyrics').then(function(list){
+      allLyrics=list||[];
+      lyricsLoaded=true;
+      archiveTagsLoading_=false;
+      renderArchiveTags_();
+    }).catch(function(){
+      archiveTagsLoading_=false;
+      var c=document.getElementById('archive-tags-content');
+      if(c)c.innerHTML='<div class="empty">Archive status is unavailable right now.</div>';
+    });
+  }
+
   function loadArchiveMeta_() {
     api('changelog').catch(function(){ return []; }).then(function (changes) {
       archiveChangelog=changes||[]; archiveLastUpdatedStr=archiveChangelog.length ? archiveChangelog[0].dateStr : '';
@@ -2106,6 +2319,7 @@
     api('badges').catch(function(){ return []; }).then(function (badges) {
       archiveBadges = badges || [];
       if (lyricsLoaded) refreshVisibleBadgeViews_();
+      if(document.getElementById('view-home').style.display!=='none') ensureArchiveTagsData_();
     });
   }
 
@@ -2524,7 +2738,17 @@
     }
   })();
 
+  var SECRET_ROUTE_NAMES_=['1987','gameover','backrooms','credits','juggernaut','hollowknight','anomaly','staffonly','echo','users','void','vault111','portal'];
+  function isSecretRoute_(path){
+    return SECRET_ROUTE_NAMES_.indexOf(String(path||''))!==-1;
+  }
+  function syncSecretChrome_(){
+    var path=window.location.hash.replace(/^#\/?/,'').replace(/\/+$/,'');
+    document.body.classList.toggle('secret-route',isSecretRoute_(path));
+  }
+
   function hideAllViews(isNavigatingToLyricDetail) {
+    syncSecretChrome_();
     clearInterval(gameoverTimer_);
     clearTimeout(staffonlyTimer_);
     clearTimeout(vault111Timer_);
@@ -2625,11 +2849,13 @@
 
   function showHome() {
     hideAllViews();
+    document.body.classList.remove('secret-route');
     document.getElementById('view-home').style.display = '';
     setActiveTab('home');
     setPath('');
     renderRecentlyViewed_();
     renderFavorites_();
+    ensureArchiveTagsData_();
   }
   function showLyricsList() {
     hideAllViews();
@@ -2888,6 +3114,15 @@
   window.addEventListener('popstate', routeFromHash);
   window.addEventListener('hashchange', routeFromHash);
 
+  document.querySelectorAll('#archive-tags-tabs .archive-tags-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      archiveTagsFilter_=tab.getAttribute('data-tag-filter')||'all';
+      document.querySelectorAll('#archive-tags-tabs .archive-tags-tab').forEach(function(t){t.classList.remove('active');});
+      tab.classList.add('active');
+      renderArchiveTags_();
+    });
+  });
+
   document.querySelectorAll('#view-top5 .subtab').forEach(function (tab) {
     tab.addEventListener('click', function () {
       var pane = tab.getAttribute('data-pane');
@@ -3122,10 +3357,23 @@
     return html;
   }
 
+  function artistAliasMatchesQuery_(rawArtistField, q){
+    if(isNA(rawArtistField) || !q) return false;
+    var raw=String(rawArtistField);
+    if(raw.toLowerCase().indexOf(q)!==-1) return true;
+    var names=splitArtistNames(raw);
+    return names.some(function(name){
+      var key=normalizeArtistKey(name);
+      return (allArtists||[]).some(function(a){
+        if(normalizeArtistKey(a.artist)!==key) return false;
+        return splitCsv_(a.aka||'').some(function(alias){
+          return alias.toLowerCase().indexOf(q)!==-1;
+        });
+      });
+    });
+  }
   function songArtistsMatchQuery_(item, q) {
-    if (!isNA(item.artist) && String(item.artist).toLowerCase().indexOf(q) !== -1) return true;
-    if (!isNA(item.featured) && String(item.featured).toLowerCase().indexOf(q) !== -1) return true;
-    return false;
+    return artistAliasMatchesQuery_(item.artist,q) || artistAliasMatchesQuery_(item.featured,q);
   }
 
   function loadLyrics() {
@@ -3165,6 +3413,7 @@
     var pfpMap = {};
     var hiddenMap = {};
     var groupMap = {};
+    var groupMemberCountMap = {};
     var friendMap = {};
     var akaMap = {};
     allArtists.forEach(function (a) {
@@ -3172,7 +3421,10 @@
       if (!key) return;
       pfpMap[key] = { pfp: a.pfp || '', pfpCached: a.pfpCached || '', alternatePfps: a.alternatePfps || [] };
       if (a.hidden) hiddenMap[key] = true;
-      if (!isNA(a.members)) groupMap[key] = true;
+      if (!isNA(a.members)) {
+        groupMap[key] = true;
+        groupMemberCountMap[key] = splitArtistNames(a.members).filter(function(x){ return !isNA(x); }).length;
+      }
       if (a.friend) friendMap[key] = true;
       if (!isNA(a.aka)) akaMap[key] = splitCsv_(a.aka);
     });
@@ -3223,6 +3475,7 @@
         pfpCached: imageMeta.pfpCached || '',
         alternatePfps: imageMeta.alternatePfps || [],
         isGroup: !!groupMap[normalizeArtistKey(n)],
+        groupMemberCount: groupMemberCountMap[normalizeArtistKey(n)] || 0,
         aka: akaMap[normalizeArtistKey(n)] || []
       };
     });
@@ -3238,20 +3491,23 @@
       return;
     }
     var fallback = getFallbackImage();
-    // NOTE: AKA is intentionally NOT shown on the list/grid card -- it only
-    // shows on the artist's own profile page (see renderArtistDetail).
-    // aka is still used above for search matching.
+    // AKA remains searchable but is intentionally never rendered on artist profiles/cards.
     container.innerHTML = '<div class="artist-grid">' + list.map(function (a, idx) {
-      var img = artistImageUrl_(a, 300);
-      var groupTagHtml = a.isGroup ? '<div class="group-tag">GROUP</div>' : '';
+      var altList=parseImageList_(a.alternatePfps);
+      var baseImage=a.pfp || fallback;
+      var chosenImage=getLocalImageChoice_(imageStorageKey_('artist',normalizeArtistKey(a.artist)),baseImage,altList);
+      var img = chosenImage===baseImage ? artistImageUrl_(a, 300) : optimizeArtUrl(chosenImage,300);
+      var memberCount = a.groupMemberCount || 0;
+      var groupTagHtml = a.isGroup ? '<span class="group-tag">' + (memberCount === 2 ? 'DUO' : 'GROUP') + '</span>' : '';
+      var badgeHtml = badgeHtmlFor_(a.artist, '', 'artist');
+      var badgeBorder = lyricCardBorderAttr_(a.artist, '', 'artist');
+      var subline = (groupTagHtml || badgeHtml) ? '<div class="artist-card-subline">' + groupTagHtml + '<div class="artist-card-badges">' + badgeHtml + '</div></div>' : '';
       var loadingMode = idx < 12 ? 'eager' : 'lazy';
-      var priority = idx < 8 ? ' high' : '';
       return (
-        '<div class="artist-card" data-artist="' + escapeHtml(a.artist) + '">' +
-          '<img data-artist-image="1" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
+        '<div class="artist-card"' + badgeBorder + ' data-artist="' + escapeHtml(a.artist) + '">' +
+          '<img data-artist-image="1" data-alt-images="' + encodeImageListAttr_(altList) + '" data-alt-base="' + escapeHtml(baseImage) + '" data-image-key="' + escapeHtml(imageStorageKey_('artist',normalizeArtistKey(a.artist))) + '" src="' + escapeHtml(img) + '" width="300" height="300" loading="' + loadingMode + '" fetchpriority="' + (idx < 8 ? 'high' : 'auto') + '" decoding="async" class="image-loading" alt="' + escapeHtml(a.artist) + '">' +
           '<div class="name">' + escapeHtml(a.artist) + '</div>' +
-          groupTagHtml +
-          '<div class="artist-card-badges">' + badgeHtmlFor_(a.artist, '', 'artist') + '</div>' +
+          subline +
         '</div>'
       );
     }).join('') + '</div>';
@@ -3953,7 +4209,13 @@
     recordRecentlyViewed_('album', album.title, 'album-' + encodeURIComponent(id), album.artist || '');
 
     var fallback = getFallbackImage();
-    var img = album.cover ? optimizeArtUrl(album.cover, 440) : fallback;
+    var albumAltList = parseImageList_(album.alternateCovers);
+    var albumBaseImage = album.cover || fallback;
+    var albumStorageKey = imageStorageKey_('album',normalizeArtistKey(album.id));
+    var albumChosenImage = getLocalImageChoice_(albumStorageKey,albumBaseImage,albumAltList);
+    var img = albumChosenImage===albumBaseImage
+      ? (album.cover ? optimizeArtUrl(album.cover,440) : fallback)
+      : optimizeArtUrl(albumChosenImage,440);
 
     var albumIdKey = normalizeArtistKey(album.id);
     var tracks = allLyrics.filter(function (item) {
@@ -3985,11 +4247,11 @@
     var header =
       '<div class="detail-hero">' +
         '<div class="hero-action-stack"><span class="hero-action-btn" id="album-favorite-btn"></span><span class="hero-action-btn links" id="album-share-btn">COPY SHARE LINK</span></div>' +
-        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(album.alternateCovers) + '" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
+        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(albumAltList) + '" data-alt-base="' + escapeHtml(albumBaseImage) + '" data-image-key="' + escapeHtml(albumStorageKey) + '" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(album.title) + '</h1>' +
           '<div class="detail-meta">' +
-            '<span>by <b>' + escapeHtml(album.artist) + '</b></span>' +
+            '<span>by <b class="album-artist-links">' + linkedArtistNamesHtml_(album.artist) + '</b></span>' +
             '<span class="' + badgeClass + '">' + escapeHtml(album.type) + '</span>' +
             (album.dateStr ? '<span>' + escapeHtml(album.dateStr) + '</span>' : '') +
             badgeHtmlFor_(album.title, album.artist, 'album') +
@@ -4025,7 +4287,7 @@
               '<img class="lyric-cover" src="' + tImg + '" loading="lazy" decoding="async" onerror="this.src=\'' + fallback + '\'">' +
               '<div class="lyric-body">' +
                 '<p class="lyric-title">' + escapeHtml(item.title) + '</p>' +
-                '<p class="lyric-artist">by ' + escapeHtml(item.artist) + '</p>' +
+                '<p class="lyric-artist">by ' + linkedArtistNamesHtml_(item.artist) + '</p>' +
                 (item.featured && !isNA(item.featured) ? '<p class="lyric-featured">feat. ' + escapeHtml(item.featured) + '</p>' : '') +
                 '<div class="lyric-meta-row">' + variantBadge + (item.isLocked ? '<span class="badge locked">Locked</span>' : '') + '</div>' +
               '</div>' +
@@ -4041,6 +4303,12 @@
       albumShareBtn.addEventListener('click', function () { copyShareLink_(shareUrlForAlbum_(album.id), albumShareBtn); });
     }
     wireAlbumFavoriteButton_(album);
+    container.querySelectorAll('[data-artist-link]').forEach(function(el){
+      el.addEventListener('click',function(e){
+        e.stopPropagation();
+        showArtistDetail(el.getAttribute('data-artist-link'));
+      });
+    });
 
     container.querySelectorAll('.track-card[data-id]').forEach(function (card) {
       card.addEventListener('click', function () {
@@ -4215,8 +4483,6 @@
       return normalizeArtistKey(a.artist) === normalizeArtistKey(name);
     })[0];
     var fallback = getFallbackImage();
-    var pfp = (pfpEntry && pfpEntry.pfp) ? pfpEntry.pfp : fallback;
-
     var groupMembers = (pfpEntry && !isNA(pfpEntry.members)) ? splitArtistNames(pfpEntry.members) : [];
     var matchNames = (groupMembers.length && artistDetailIncludeMembers) ? [name].concat(groupMembers) : [name];
     var matchKeys = matchNames.map(normalizeArtistKey);
@@ -4232,27 +4498,35 @@
       return artistDetailSortDir === 'asc' ? cmp : -cmp;
     });
 
-    var akaList = (pfpEntry && !isNA(pfpEntry.aka)) ? splitCsv_(pfpEntry.aka) : [];
     var rolesList = (pfpEntry && !isNA(pfpEntry.roles)) ? splitCsv_(pfpEntry.roles) : [];
     var birthdayStr = (pfpEntry && pfpEntry.birthday) ? String(pfpEntry.birthday).trim() : '';
     var fromStr = (pfpEntry && !isNA(pfpEntry.from)) ? String(pfpEntry.from).trim() : '';
+    var artistAltList = parseImageList_(pfpEntry && pfpEntry.alternatePfps);
+    var artistBaseImage = (pfpEntry && pfpEntry.pfp) ? pfpEntry.pfp : fallback;
+    var artistStorageKey = imageStorageKey_('artist',normalizeArtistKey(name));
+    var artistChosenImage = getLocalImageChoice_(artistStorageKey,artistBaseImage,artistAltList);
+    var artistHeroImage = artistChosenImage===artistBaseImage
+      ? ((pfpEntry && pfpEntry.pfp) ? artistImageUrl_(pfpEntry,440) : fallback)
+      : optimizeArtUrl(artistChosenImage,440);
+    var groupLabel = groupMembers.length === 2 ? 'DUO' : (groupMembers.length ? 'GROUP' : '');
+    var artistBadge = badgeHtmlFor_(name,'','artist');
+    var artistBadgeBorder = lyricCardBorderAttr_(name,'','artist');
     // Only show a "LINKS & RATES" action if this artist actually has at
     // least one social link or one rate entry (see #2).
     var showLinksBtn = artistHasLinksOrRates_(pfpEntry);
 
     var header =
-      '<div class="detail-hero">' +
+      '<div class="detail-hero"' + artistBadgeBorder + '>' +
         '<div class="hero-action-stack">' +
           '<span class="hero-action-btn" id="artist-favorite-btn"></span>' +
           '<span class="hero-action-btn" id="artist-report-missing-btn">&#9873; REQUEST MISSING SONG</span>' +
           (showLinksBtn ? '<span class="hero-action-btn links" id="artist-links-btn">&#128279; LINKS &amp; RATES</span>' : '') +
           '<span class="hero-action-btn links" id="artist-share-btn">COPY SHARE LINK</span>' +
         '</div>' +
-        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(pfpEntry && pfpEntry.alternatePfps) + '" src="' + escapeHtml(optimizeArtUrl(pfp, 440)) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
+        '<img class="detail-hero-img" data-alt-images="' + encodeImageListAttr_(artistAltList) + '" data-alt-base="' + escapeHtml(artistBaseImage) + '" data-image-key="' + escapeHtml(artistStorageKey) + '" src="' + escapeHtml(artistHeroImage) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'">' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(name) + '</h1>' +
-          (akaList.length ? '<div class="artist-aka">AKA ' + escapeHtml(akaList.join(', ')) + '</div>' : '') +
-          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (birthdayStr ? '<span><b>' + (groupMembers.length ? 'Formed' : 'Born') + ':</b> ' + escapeHtml(birthdayStr) + '</span>' : '') + (fromStr ? '<span><b>From:</b> ' + escapeHtml(fromStr) + '</span>' : '') + coversBadgeHtml_(pfpEntry && pfpEntry.alternatePfps) + '</div>' +
+          '<div class="detail-meta"><span>' + allSongs.length + (allSongs.length === 1 ? ' song' : ' songs') + '</span>' + (groupLabel ? '<span class="artist-type-label">' + groupLabel + '</span>' : '') + artistBadge + (birthdayStr ? '<span><b>' + (groupMembers.length ? 'Formed' : 'Born') + ':</b> ' + escapeHtml(birthdayStr) + '</span>' : '') + (fromStr ? '<span><b>From:</b> ' + escapeHtml(fromStr) + '</span>' : '') + coversBadgeHtml_(artistAltList) + '</div>' +
           (rolesList.length ? '<div class="artist-roles-row">' + rolesList.map(function (r) { return '<span class="role-badge">' + escapeHtml(r) + '</span>'; }).join('') + '</div>' : '') +
         '</div>' +
       '</div>';
@@ -4536,7 +4810,11 @@
     }
     var src = activeVariant || post;
 
-    var img = src.cover ? optimizeArtUrl(src.cover, 440) : (post.cover ? optimizeArtUrl(post.cover, 440) : fallback);
+    var songAltList=parseImageList_(src.alternateCovers || post.alternateCovers);
+    var songBaseImage=src.cover || post.cover || fallback;
+    var songStorageKey=imageStorageKey_('song',String(post.id)+':'+String(activeVariant ? activeVariant.label : 'main'));
+    var songChosenImage=getLocalImageChoice_(songStorageKey,songBaseImage,songAltList);
+    var img=optimizeArtUrl(songChosenImage,440);
 
     var streamBtns = '';
     if (src.spotify) {
@@ -4627,7 +4905,7 @@
           '<span class="hero-action-btn" id="lyric-report-btn">&#9873; REPORT ISSUE</span>' +
           '<span class="hero-action-btn links" id="lyric-share-btn">COPY SHARE LINK</span>' +
         '</div>' +
-        (function(){ var altList=parseImageList_(src.alternateCovers || post.alternateCovers); return '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(altList) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'"></div>'; })() +
+        '<div class="cover-switcher" data-alt-list="' + encodeImageListAttr_(songAltList) + '" data-alt-base="' + escapeHtml(songBaseImage) + '" data-image-key="' + escapeHtml(songStorageKey) + '"><img class="detail-hero-img" data-cover-image="1" src="' + escapeHtml(img) + '" loading="eager" decoding="async" fetchpriority="high" onerror="this.src=\'' + fallback + '\'"></div>' +
         '<div class="detail-hero-text">' +
           '<h1 class="detail-title">' + escapeHtml(displayTitle) + '</h1>' +
           '<div class="detail-meta"><span style="color:var(--ink);">by <b>' + linkedArtistNamesHtml_(post.artist) + '</b></span><span>' + escapeHtml(src.dateStr || post.dateStr) + '</span>' + badgeHtmlFor_(post.title, post.artist, 'song') + coversBadgeHtml_(src.alternateCovers || post.alternateCovers) + '</div>' +
@@ -5635,7 +5913,7 @@
       var name=String(x.artist||x.name||x.title||'');
       var akaList=splitCsv_(x.aka||'');
       var hay=(name+' '+akaList.join(' ')).toLowerCase();
-      if(name && hay.indexOf(q)!==-1) add({route:'artist-'+encodeURIComponent(name),title:name,type:'artist',subtitle:akaList.length?('AKA '+akaList.join(', ')):''});
+      if(name && hay.indexOf(q)!==-1) add({route:'artist-'+encodeURIComponent(name),title:name,type:'artist',subtitle:''});
     });
     return out.slice(0,12);
   }
@@ -5668,8 +5946,37 @@
   var notFoundHome=document.getElementById('not-found-home'); if(notFoundHome) notFoundHome.addEventListener('click',showHome);
   var egg1987Home=document.getElementById('egg1987-home'); if(egg1987Home) egg1987Home.addEventListener('click',showHome);
 
+  (function wireSecretArtifactInteractions_(){
+    document.querySelectorAll('#view-1987 .redacted').forEach(function(el){
+      el.addEventListener('click',function(){ el.classList.toggle('revealed'); });
+    });
+    document.querySelectorAll('#view-anomaly .anomaly-table tr').forEach(function(row){
+      row.addEventListener('click',function(){
+        document.querySelectorAll('#view-anomaly .anomaly-table tr').forEach(function(r){r.classList.remove('anomaly-focus');});
+        row.classList.add('anomaly-focus');
+      });
+    });
+    var credits=document.querySelector('.credits-page');
+    if(credits){
+      credits.addEventListener('click',function(ev){
+        if(ev.target.closest && ev.target.closest('.credits-exit'))return;
+        credits.classList.toggle('paused');
+      });
+    }
+    var motes=document.getElementById('hollow-motes');
+    if(motes){
+      motes.addEventListener('click',function(ev){
+        var mote=ev.target.closest && ev.target.closest('.hollow-mote');
+        if(!mote)return;
+        mote.style.animation='none';
+        mote.style.opacity='1';
+        mote.style.transform='scale(3)';
+        setTimeout(function(){ mote.remove(); },220);
+      });
+    }
+  })();
+
   // ----------------------------------------------------------------------
-  // EASTER EGG: #/gameover
   // ----------------------------------------------------------------------
   var gameoverTimer_ = null;
   function startGameoverCountdown_() {
@@ -5700,17 +6007,21 @@
   })();
 
   // ----------------------------------------------------------------------
-  // EASTER EGG: #/backrooms
   // ----------------------------------------------------------------------
   (function wireBackroomsPlay_() {
     var btn = document.getElementById('backrooms-play-btn');
     var err = document.getElementById('backrooms-error');
     if (!btn) return;
-    btn.addEventListener('click', function () { if (err) err.classList.add('show'); });
+    btn.addEventListener('click', function () {
+      var player=btn.closest('.backrooms-audio-fake');
+      if(player)player.classList.add('playing');
+      btn.textContent='PLAYING...';
+      if(err)err.classList.add('show');
+      setTimeout(function(){btn.textContent='PLAY AGAIN';},900);
+    });
   })();
 
   // ----------------------------------------------------------------------
-  // EASTER EGG: #/credits
   // ----------------------------------------------------------------------
   var CREDITS_ROLES_ = [
     { role: 'Archivist In Chief', name: 'BritishJuggernaut' },
@@ -5744,7 +6055,6 @@
   }
 
   // ----------------------------------------------------------------------
-  // EASTER EGG: #/juggernaut
   // ----------------------------------------------------------------------
   (function wireJuggernautButton_() {
     var btn = document.getElementById('juggernaut-smash-btn');
@@ -5757,8 +6067,6 @@
       setTimeout(function () { page.classList.remove('smashing'); }, 1400);
     });
   })();
-
-  // ---- #/hollowknight ---- (drifting motes in the dark)
   function renderHollowMotes_() {
     var wrap = document.getElementById('hollow-motes');
     if (!wrap) return;
@@ -5772,8 +6080,6 @@
     }
     wrap.innerHTML = html;
   }
-
-  // ---- #/staffonly ---- (exit: tap the floating keycard to "swipe out")
   var staffonlyTimer_ = null;
   function startStaffOnlySequence_(){
     clearTimeout(staffonlyTimer_);
@@ -5804,8 +6110,6 @@
       setTimeout(showHome, 480);
     });
   })();
-
-  // ---- #/echo ---- (exit: type "stop" into the chamber)
   var ECHO_EXIT_WORDS_ = ['stop','quiet','shh','shhh'];
   function renderEchoLines_(value){
     var wrap=document.getElementById('echo-output'); if(!wrap)return;
@@ -5840,8 +6144,6 @@
       renderEchoLines_(input.value);
     });
   })();
-
-  // ---- #/users ---- (exit: type "logout" or "exit" into the terminal prompt)
   var USERS_FAKE_LOG_ = [
     {name:'j.martinez88', ip:'73.162.44.201', status:'Reading lyrics'},
     {name:'kayla_w', ip:'24.15.98.6', status:'Browsing artist page'},
@@ -5887,8 +6189,6 @@
       }
     });
   })();
-
-  // ---- #/void ----
   function resetVoidPage_(){
     var hello=document.getElementById('void-hello'), found=document.getElementById('void-found');
     if(hello) hello.style.display='';
@@ -5903,8 +6203,6 @@
     });
   })();
   var voidHomeInner=document.getElementById('void-home-inner'); if(voidHomeInner) voidHomeInner.addEventListener('click', showHome);
-
-  // ---- #/vault111 ---- (exit: tap the vault door to re-seal it)
   var vault111Timer_ = null;
   var vault111CounterInterval_ = null;
   function startVault111Sequence_(){
@@ -5931,8 +6229,6 @@
       setTimeout(showHome, 650);
     });
   })();
-
-  // ---- #/portal ---- (exit: tap the cake, watch it vanish, auto-exit the chamber)
   (function wirePortalCake_(){
     var cakeWrap=document.getElementById('portal-cake-wrap');
     var cake=document.getElementById('portal-cake');
@@ -5955,7 +6251,6 @@
   var anomalyHome = document.getElementById('anomaly-home'); if (anomalyHome) anomalyHome.addEventListener('click', showHome);
 
   // ----------------------------------------------------------------------
-  // EASTER EGG: long-press (or click-and-hold) the logo to glitch the site
   // ----------------------------------------------------------------------
   (function wireLogoGlitchEasterEgg_() {
     var logo = document.getElementById('brand-home');
